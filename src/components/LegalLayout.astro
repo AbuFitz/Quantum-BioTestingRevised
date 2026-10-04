@@ -1,14 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHead from './PageHead.astro';
+import Intro from './Intro.astro';
+import CloseEnquiry from './CloseEnquiry.astro';
 import { SITE } from '../data/site';
 interface Props { title: string; description: string; heading: string; sections: { id: string; title: string }[] }
 const { title, description, heading, sections } = Astro.props;
 ---
 <Base title={title} description={description}>
-  <PageHead title={heading} lead={`Last updated: ${SITE.updated}`} crumbs={[{ href: '/', label: 'Home' }, { label: heading }]} />
+  <Intro title={heading} lead={`Last updated: ${SITE.updated}`} crumbs={[{ href: '/', label: 'Home' }, { label: heading }]} />
   <section class="section">
-    <div class="container legal">
+    <div class="wrap legal">
       <nav class="toc" aria-label="On this page">
         <ol>{sections.map((s, i) => <li><a href={`#${s.id}`}>{i + 1}. {s.title}</a></li>)}</ol>
       </nav>

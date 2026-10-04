@@ -1,9 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
-import PageHead from '../../components/PageHead.astro';
-import Icon from '../../components/Icon.astro';
+import Intro from '../../components/Intro.astro';
 import MarkerGroups from '../../components/MarkerGroups.astro';
-import CtaBand from '../../components/CtaBand.astro';
+import CloseEnquiry from '../../components/CloseEnquiry.astro';
+import Icon from '../../components/Icon.astro';
+import man from '../../assets/photos/man.jpg';
+import woman from '../../assets/photos/woman.jpg';
 import { TESTS, MENS_GROUPS, WOMENS_AREAS, MENU_NOTE, type TestProduct } from '../../data/tests';
 import { PRICE, RRP, SITE } from '../../data/site';
 
@@ -13,6 +15,9 @@ export function getStaticPaths() {
 const { test } = Astro.props as { test: TestProduct };
 const other = TESTS.find((t) => t.key !== test.key)!;
 const isMens = test.key === 'mens';
+const tone = isMens ? 'sky' : 'blush';
+const photo = isMens ? man : woman;
+const photoAlt = isMens ? 'A smiling man holding a coffee' : 'A woman holding a bunch of flowers';
 
 const ld = {
   '@context': 'https://schema.org',
@@ -29,54 +34,47 @@ const ld = {
   description={`${test.name}: ${test.biomarkers.toLowerCase()}, ${PRICE} (RRP ${RRP}). See everything the test covers and send an appointment enquiry.`}
   jsonLd={ld}
 >
-  <PageHead
-    title={test.name}
-    lead={test.summary}
-    crumbs={[{ href: '/', label: 'Home' }, { href: '/tests/', label: 'Tests' }, { label: test.name }]}
-  />
+  <Intro title={test.name} lead={test.summary} tone={tone} photo={photo} photoAlt={photoAlt} crumbs={[{ href: '/', label: 'Home' }, { href: '/tests/', label: 'Tests' }, { label: test.name }]} />
 
-  <section class="section" aria-labelledby="summary-title">
-    <div class="container split">
+  <section class="section" aria-labelledby="included-title">
+    <div class="wrap facts-split">
       <div>
-        <h2 id="summary-title">What is included</h2>
-        <ul class="ticks" style="margin-top:1rem">
+        <h2 class="display" id="included-title" style="margin-bottom:1.25rem">What is included</h2>
+        <ul class="ticks">
           {test.inclusions.map((i) => <li><Icon name={i.icon} /><span>{i.text}</span></li>)}
           <li><Icon name="clock" /><span>Results in {test.results}</span></li>
         </ul>
       </div>
-      <aside class="panel" aria-label="Price and enquiry">
-        <p class="price"><span class="price__now">{PRICE}</span><span class="price__rrp">RRP <s>{RRP}</s></span></p>
-        <p class="muted">An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
+      <aside class:list={['panel panel--stick', { 'panel--blush': !isMens }]} aria-label="Price and enquiry">
+        <p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p>
+        <p>An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
         <p><a class="btn" href={`/contact/?test=${test.key}`}>Enquire about this test <Icon name="arrow-right" /></a></p>
-        <p class="muted">Looking for the other test? <a href={`/tests/${other.slug}/`}>{other.name}</a></p>
+        <p>Looking for the other test? <a href={`/tests/${other.slug}/`}>{other.name}</a></p>
       </aside>
     </div>
   </section>
 
-  <section class="section section--tint" aria-labelledby="markers-title">
-    <div class="container">
+  <section class="section section--tight" aria-labelledby="markers-title">
+    <div class="wrap">
       <div class="section__head">
-        <h2 id="markers-title">{isMens ? 'Biomarkers by group' : 'Health areas covered'}</h2>
+        <h2 class="display" id="markers-title">{isMens ? 'Biomarkers by group' : 'Health areas covered'}</h2>
         <p class="muted">
           {isMens
             ? 'Open a group to see the markers in it.'
             : `The Women’s Health Check covers ${WOMENS_AREAS.length} health areas, with up to 350 biomarkers in total.`}
         </p>
       </div>
-      {isMens ? <MarkerGroups groups={MENS_GROUPS} /> : (
-        <ul class="area-list">{WOMENS_AREAS.map((a) => <li>{a}</li>)}</ul>
-      )}
-      <p class="muted" style="margin-top:1.25rem;max-width:var(--measure)">{MENU_NOTE}</p>
+      {isMens ? <MarkerGroups groups={MENS_GROUPS} /> : <ul class="area-list">{WOMENS_AREAS.map((a) => <li>{a}</li>)}</ul>}
+      <p class="muted" style="margin-top:1.25rem;max-width:40rem">{MENU_NOTE}</p>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="before-title">
-    <div class="container">
-      <div class="prose">
-      <h2 id="before-title">Before your appointment</h2>
+  <section class="section section--tight" aria-labelledby="before-title">
+    <div class="wrap"><div class="prose">
+      <h2 class="display" id="before-title">Before your appointment</h2>
       <p>Fast for 8–12 hours beforehand (water is fine) and avoid strenuous exercise for 24 hours. <a href="/how-it-works/#preparation">Read the full preparation guidance</a>.</p>
-      </div>
+    </div>
     </div>
   </section>
-  <CtaBand />
+  <CloseEnquiry />
 </Base>

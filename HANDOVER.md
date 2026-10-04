@@ -29,7 +29,7 @@ Repositories: **NEW** (this one, implementation) · **OLD** `AbuFitz/Quantum-Bio
 UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "145+ countries", "7-day availability"; "most comprehensive in the UK"; NHS comparison table (15–20 markers, 1–3 weeks); "was £2,000 / save £1,005" (superseded by the supplied RRP); "cancel up to 48 hours before" (conflicts with the Terms tiers); express-results as a headline claim; Men's APOE/autoimmune notes that refer to a physician consultation men are not stated to receive; card-payment and VAT-exemption statements in Terms.
 
 **Inferred (reversible decisions)**
-Astro static site + one Vercel function; Public Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
+Astro static site + one Vercel function; Bricolage Grotesque + DM Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
@@ -74,21 +74,35 @@ Source retained untouched at `brand/source/quantum-logo-source.png` (2000×2000 
 
 ## Typography
 
-Public Sans (variable, SIL OFL), Latin subset, one preloaded WOFF2, metric-matched fallback. Chosen after rendering real headline, price, paragraph, nav and button specimens of Figtree, Public Sans, Hanken Grotesk, Albert Sans and Onest: Public Sans had the clearest numerals (`£995`, `HbA1c`) and the calmest institutional proportions. H1 maximum 40px, body 17px.
+Bricolage Grotesque (headlines, prices, offer names, menu) and DM Sans (text and controls), both SIL OFL, axis-limited and subset to Latin by `scripts/subset-fonts.py` (about 82 KB for both), preloaded, with metric-matched fallbacks. Chosen after rendering the real headline, prices and mobile menu in six display faces and three text faces; see `docs/design-research.md`. Newsreader and Figtree (an earlier pass) and Public Sans (the first pass) are no longer used.
 
+**Accepted risk:** the Greek letter ε in "APOE ε2/ε3/ε4" (men's marker list) is in neither typeface and falls back to the system sans-serif. It is a single glyph on one page.
 
----
+# Delivered design: "a good local" (all pages)
 
-# Design pass 3: identity v3, "a good local" (homepage only, awaiting approval)
+A welcoming, people-first identity: warm cream paper, the logo's blue for headlines, buttons and one full colour chapter, pale blue and blush tints (from the logo's blue and red) for the two tests, the Q's red as the accent and the closing chapter, arches and circles drawn from the Q, and warm graded photography. It replaced earlier proposals (first-pass clinical theme, "clear sample", and a "menu-style" recomposition that was reverted at the client's request; all recoverable from git).
 
-Supersedes the pass-2 "clear sample" direction (recoverable from git: commit `7d608e5`). Only `/` uses the new theme (`src/layouts/BaseV3.astro`, `src/styles/v3.css`, `src/components/v3/`); every other page still uses the pass-1 system until the direction is approved. Business, evidence and integration dependencies above are unchanged. Research and reasoning: `docs/design-research.md`.
+**Structure.** One stylesheet (`src/styles/site.css`), one layout (`src/layouts/Base.astro`), shared components in `src/components/` (Header, Footer, Intro, OfferPanels, VisitChapter, Tips, FaqSection, CloseEnquiry, MarkerGroups, LegalLayout, EnquiryForm). Content lives in `src/data/`. Every page is built from the same components, so the offers, the visit steps, the FAQ and the closing enquiry are identical wherever they appear. The homepage keeps a compact hero with a full-width test choice straight after it.
 
-**Thesis.** Quantum should feel like a good independent neighbourhood business: somewhere you would be comfortable walking into, with taste, and obvious about what to do next. Warmth comes from people-first photography, plain language and composition; the logo's blue anchors it (headlines, buttons, one full colour chapter), with tints of the logo's own two inks as the supporting palette: pale blue (`#dce6f6`) and blush (`#f8ddd6`) for the two test panels, and the logo red (`#b02018`) as the closing chapter and the small accents. The blue/blush pairing is a colour choice, not a message; both panels carry identical content and can be unified if preferred. Photographs are graded (`scripts/make-photo-assets.mjs`) so greens and teals sit inside the blue/red palette.
+**Photography.** Hero: the client's clinician-and-patient photograph. People photography for the two tests, the visit chapter and the closing section: CC0 StockSnap images, graded into the palette (`scripts/make-photo-assets.mjs`; greens and teals pulled toward the logo blue and red). How it works: the client's "clinician explaining results" photograph. Sources, licences and the gaps are in `brand/photo-sources/PROVENANCE.md`. The two client photographs have no licence record; the StockSnap files are 960 px, the largest obtainable without an account. All are captioned or described as illustrative.
 
-**Typography.** Bricolage Grotesque (headlines, prices, menu) and DM Sans (text, controls), SIL OFL, pinned and subset by `scripts/subset-fonts.py` (80 KB total). Hero up to 90 px, h2 up to 58 px.
+## Release evidence (production build)
 
-**Photography.** Hero: the client's own clinician-and-patient photograph (restored, arch crop, warm grade). Everyday life: CC0 StockSnap images for the two tests, the visit chapter, the breather and the preparation section. See `brand/photo-sources/PROVENANCE.md`. The client's photograph has no licence record in the old repository; the StockSnap files are 960 px, the largest obtainable without an account. All are described as illustrative.
+| Area | Evidence | Status |
+|---|---|---|
+| Build, types, unit tests | `astro build`, `astro check` (0 errors, 0 warnings), 9 enquiry-function tests | pass |
+| Layout | all 8 pages plus 404 at 320, 360, 390, 768 and 1440 px: no horizontal overflow, one h1, no skipped heading level, images load with alt text, controls at least 44 px | pass |
+| Accessibility | axe (WCAG 2.0/2.1/2.2 A and AA plus best-practice) on all 8 pages at 390 and 1440 px: no violations after a duplicate region name on `/tests/` was fixed; skip link first on every page; visible focus; mobile menu opens, closes on Escape and returns focus | pass (fixed one) |
+| Reflow and zoom | every page at a 720×450 viewport (a 200% zoom of 1440×900): no horizontal scroll | pass |
+| Contrast | every text and background pairing of the palette checked against WCAG AA (`verify-home.mjs`) | pass |
+| Performance (Lighthouse, mobile profile) | all pages 99–100 for performance, accessibility, best practices and SEO; CLS 0; TBT 0 ms; LCP 1.7–2.2 s (limit 2.5 s). Stylesheet inlined to remove a render-blocking request | pass |
+| Links | every internal link and anchor resolves (no empty or `#` links); the only external link is the ICO | pass |
+| Metadata | unique titles and descriptions, absolute canonicals, sitemap lists all 8 pages, robots, favicon set, Apple touch icon, social image all load; structured data is Organization (home) and Service with the agreed price (test pages) only | pass |
+| Legacy routes | `vercel.json` 301s `/testing.html`, `/privacy.html`, `/terms.html`, `/index.html`, `/book.html` to existing pages (config checked; redirects run on Vercel, not in the local preview) | pass (config), untested on Vercel |
+| Enquiry journeys | every Enquire button (home, tests, product pages, closing section) preselects the right test; product pages show only their own details; validation, loading, failure, duplicate-submit guard and success wording; no date of birth in the form or payload | pass |
+| Privacy | no cookies, no storage, no third-party requests; works without JavaScript | pass |
+| Fonts | glyph coverage of both subsets checked against every character on the site; `©` was missing and is fixed; ε is accepted (above) | pass (fixed one), one accepted risk |
+| Real enquiry delivery | needs `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM`; no email has been sent from this build | **blocked** (client input) |
+| Content truth | provisional facts listed in the ledger above (marker counts and lists, turnaround, GP consultation and repeat test, clinic addresses, photo rights) | **blocked** (client confirmation) |
 
-**Homepage flow (mobile first).** A deliberately compact hero (about 450 px on a phone, 400 px on desktop: headline, one sentence, one button, three short facts and a short photograph), then both tests as equal colour-coded choices (price and enquiry on each, markers behind "See what is tested"), the visit explained in four steps, a short preparation section (full guide on How it works), five FAQs, and a closing enquiry for either test.
-
-**Verification:** `npm run verify:home` (92 checks, including hero height limits: WCAG contrast of every text/background pairing, five widths, tap targets, one-row header, equal test columns, product preselection from both choice buttons and the closing buttons, keyboard and focus, mobile menu with Escape, reduced motion, no-JS, assets, layout shift). `npm run verify` covers the other pages.
+Run them with `npm run verify` (all pages, about 6 minutes because of the axe scans), `npm run verify:home` (homepage detail, 92 checks) and `npm test`. Lighthouse was run separately against `scripts/preview-server.mjs`.

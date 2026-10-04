@@ -4,7 +4,7 @@ from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 from fontTools import subset
 import os
-TEXT = ''.join(chr(c) for c in range(0x20, 0x7f)) + '£€–—’‘“”…·×°+−éèêëáàâäíìîïóòôöúùûüçñÉÁÓ•→↓'
+TEXT = ''.join(chr(c) for c in range(0x20, 0x7f)) + '£€–—’‘“”…·×°+−©±éèêëáàâäíìîïóòôöúùûüçñÉÁÓ•→↓'
 B = 'node_modules/@fontsource-variable/'
 def prep(src, dst, limits):
     f = instancer.instantiateVariableFont(TTFont(src), limits)

@@ -1,0 +1,23 @@
+---
+// Closing enquiry route. Either test pre-selects the form.
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import man from '../assets/photos/man.jpg';
+import woman from '../assets/photos/woman.jpg';
+import { TESTS } from '../data/tests';
+---
+<section class="close" aria-labelledby="close-title">
+  <div class="wrap close__grid">
+    <div class="close__copy">
+      <h2 class="display" id="close-title" data-reveal>Tell us which check you would like</h2>
+      <div class="close__actions" data-reveal style="--d:.1s">
+        {TESTS.map((t) => <a class="btn" href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
+      </div>
+      <p class="close__note" data-reveal style="--d:.18s">An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
+    </div>
+    <div class="close__arches" aria-hidden="true">
+      <div class="arch"><Image src={man} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
+      <div class="arch"><Image src={woman} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
+    </div>
+  </div>
+</section>

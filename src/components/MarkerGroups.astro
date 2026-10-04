@@ -8,7 +8,7 @@ const { groups } = Astro.props;
   <nav aria-label="Marker groups" class="jump">
     {groups.map((g) => <a href={`#${g.id}`} data-jump>{g.name}</a>)}
   </nav>
-  <button class="btn btn--secondary btn--sm" type="button" data-expand hidden>Expand all groups</button>
+  <button class="btn btn--ghost btn--sm" type="button" data-expand hidden>Expand all groups</button>
 </div>
 <div class="group-list">
   {groups.map((g) => (

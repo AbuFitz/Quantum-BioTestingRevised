@@ -1,28 +1,26 @@
 ---
 import { Image } from 'astro:assets';
-import BaseV3 from '../layouts/BaseV3.astro';
+import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import OfferPanels from '../components/OfferPanels.astro';
+import VisitChapter from '../components/VisitChapter.astro';
+import Tips from '../components/Tips.astro';
+import FaqSection from '../components/FaqSection.astro';
+import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
 import orange from '../assets/photos/orange.jpg';
-import man from '../assets/photos/man.jpg';
-import woman from '../assets/photos/woman.jpg';
-import everyday from '../assets/photos/everyday.jpg';
 import walk from '../assets/photos/walk.jpg';
-import { SITE, PRICE, RRP } from '../data/site';
-import { TESTS, STEPS, FAQS } from '../data/tests';
+import { SITE, PRICE } from '../data/site';
+import { FAQS } from '../data/tests';
 
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, legalName: SITE.legalName, url: Astro.site!.href, logo: new URL('/icon-512.png', Astro.site).href };
-const pick = {
-  mens: { photo: man, alt: 'A smiling man holding a coffee', cls: 'pick--men', desc: 'Heart and cholesterol, blood count, metabolism, liver and kidney, thyroid, hormones, inflammation, vitamins and minerals, cancer screening markers and more, in 11 groups.' },
-  womens: { photo: woman, alt: 'A woman holding a bunch of flowers', cls: 'pick--women', desc: 'Hormone balance, heart health, stress, nutrition, tumour markers and more across 27 health areas, with a private GP consultation and a repeat test included.' },
-};
 const tips = [
   { icon: 'utensils-crossed', title: 'Fast for 8–12 hours', text: 'Water is permitted and encouraged. A morning appointment is simplest for most people.' },
   { icon: 'pill', title: 'Keep taking your medication', text: 'Take prescribed medication as normal unless your doctor has advised otherwise.' },
   { icon: 'dumbbell', title: 'Skip hard exercise', text: 'Avoid intense exercise for 24 hours beforehand, as it can affect some results.' },
 ];
 ---
-<BaseV3
+<Base
   title="Private Blood Tests for Men and Women | Quantum BioTesting"
   description={`Men’s and Women’s Health Checks at ${PRICE} each. Choose a test, send an enquiry and the team confirms your clinic and appointment time by email.`}
   jsonLd={orgLd}
@@ -57,51 +55,11 @@ const tips = [
         <h2 class="display" id="choose-title" data-reveal>Choose your health check</h2>
         <p class="muted" data-reveal style="--d:.08s">Both tests are {PRICE}. Open a test to see everything it covers.</p>
       </div>
-      <div class="picks">
-        {TESTS.map((t, i) => {
-          const p = pick[t.key];
-          return (
-            <article class={`pick ${p.cls}`} aria-labelledby={`t-${t.key}`} data-reveal style={`--d:${0.05 + i * 0.12}s`}>
-              <div class="pick__img"><Image src={p.photo} alt={p.alt} widths={[480, 720, 960]} sizes="(min-width: 48em) 38rem, 92vw" loading="lazy" /></div>
-              <div class="pick__body">
-                <h3 class="display" id={`t-${t.key}`}>{t.name}</h3>
-                <p class="pick__count">{t.biomarkers} · results in {t.results}</p>
-                <p class="pick__desc">{p.desc}</p>
-                <ul class="rows">
-                  {t.inclusions.slice(1).map((inc) => <li><Icon name={inc.icon} /><span>{inc.text}</span></li>)}
-                </ul>
-                <p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p>
-                <div class="pick__actions">
-                  <a class="btn" href={`/contact/?test=${t.key}`}>Enquire<span class="vh"> about the {t.name}</span> <Icon name="arrow-right" /></a>
-                  <a class="link" href={`/tests/${t.slug}/`}>See what is tested<span class="vh"> in the {t.name}</span> <Icon name="arrow-right" /></a>
-                </div>
-              </div>
-            </article>
-          );
-        })}
-      </div>
+      <OfferPanels />
     </div>
   </section>
 
-  <section class="visit on-blue" aria-labelledby="visit-title">
-    <div class="wrap visit__grid">
-      <div class="visit__img" data-reveal>
-        <div class="arch"><Image src={everyday} alt="A woman and child walking past a bright blue wall" widths={[400, 640, 900]} sizes="(min-width: 62em) 24rem, 80vw" loading="lazy" /></div>
-      </div>
-      <div class="visit__head">
-        <h2 class="display" id="visit-title" data-reveal>A quick visit, then back to your day</h2>
-        <p class="lead" data-reveal style="--d:.08s">The appointment takes about 15 minutes. Your sample goes to the laboratory, a clinical specialist reviews the results, and your report arrives by email.</p>
-      </div>
-      <div class="visit__steps">
-        <ol class="steps">
-          {STEPS.map((s, i) => (
-            <li class="step" data-reveal style={`--d:${i * 0.07}s`}><h3>{s.title}</h3><p>{s.text}</p></li>
-          ))}
-        </ol>
-        <p class="visit__more"><a class="link" href="/how-it-works/">Everything about the visit and your results <Icon name="arrow-right" /></a></p>
-      </div>
-    </div>
-  </section>
+  <VisitChapter heading="A quick visit, then back to your day" lead="The appointment takes about 15 minutes. Your sample goes to the laboratory, a clinical specialist reviews the results, and your report arrives by email." />
 
   <figure class="band" data-reveal>
     <div class="band__img"><Image src={walk} alt="Three people walking along a misty beach" widths={[640, 960, 1280]} sizes="(min-width: 78em) 78rem, 92vw" loading="lazy" /></div>
@@ -115,14 +73,7 @@ const tips = [
         <h2 class="display" id="before-title" data-reveal>Before you come in</h2>
         <p class="muted" data-reveal style="--d:.08s">Three small things that help your results be as accurate as possible.</p>
       </div>
-      <ul class="tips">
-        {tips.map((t, i) => (
-          <li class="tip" data-reveal style={`--d:${i * 0.08}s`}>
-            <span class="tip__ic" aria-hidden="true"><Icon name={t.icon} /></span>
-            <div><h3>{t.title}</h3><p>{t.text}</p></div>
-          </li>
-        ))}
-      </ul>
+      <Tips items={tips} />
       <div class="before__foot">
         <a class="btn btn--ghost" href="/how-it-works/#preparation">Full preparation guide <Icon name="arrow-right" /></a>
         <p class="muted">If you have a health condition or are unsure, contact the team before your appointment.</p>
@@ -133,32 +84,7 @@ const tips = [
     </div>
   </section>
 
-  <section class="faq" aria-labelledby="faq-title">
-    <div class="wrap faq__grid">
-      <div class="faq__head">
-        <h2 class="display" id="faq-title">Questions people ask</h2>
-      </div>
-      <div class="faq__list">
-        {FAQS.slice(0, 5).map((f) => (
-          <details><summary><span>{f.q}</span><span class="pm" aria-hidden="true"></span></summary><div><p>{f.a}</p></div></details>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FaqSection items={FAQS.slice(0, 5)} />
 
-  <section class="close" aria-labelledby="close-title">
-    <div class="wrap close__grid">
-      <div class="close__copy">
-      <h2 class="display" id="close-title" data-reveal>Tell us which check you would like</h2>
-      <div class="close__actions" data-reveal style="--d:.1s">
-        {TESTS.map((t) => <a class="btn" href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
-      </div>
-      <p class="close__note" data-reveal style="--d:.18s">An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
-      </div>
-      <div class="close__arches" aria-hidden="true">
-        <div class="arch"><Image src={man} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
-        <div class="arch"><Image src={woman} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
-      </div>
-    </div>
-  </section>
-</BaseV3>
+  <CloseEnquiry />
+</Base>

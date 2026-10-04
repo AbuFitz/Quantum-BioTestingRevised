@@ -1,0 +1,14 @@
+---
+interface Props { id?: string; heading?: string; items: { q: string; a: string }[] }
+const { id = 'faq-title', heading = 'Questions people ask', items } = Astro.props;
+---
+<section class="faq" aria-labelledby={id}>
+  <div class="wrap faq__grid">
+    <div class="faq__head"><h2 class="display" id={id}>{heading}</h2></div>
+    <div class="faq__list">
+      {items.map((f) => (
+        <details><summary><span>{f.q}</span><span class="pm" aria-hidden="true"></span></summary><div><p>{f.a}</p></div></details>
+      ))}
+    </div>
+  </div>
+</section>

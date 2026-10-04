@@ -34,4 +34,5 @@ await palette('stocksnap-8I4ATM3V9B-woman-with-flowers.jpg', 'woman.jpg', { gree
 await palette('stocksnap-EHXDKPHZ0C-mother-and-child.jpg', 'everyday.jpg', { warm: [1, 1, 1], sat: 1.0 });
 await palette('stocksnap-GU5GXVZDIY-beach-walk.jpg', 'walk.jpg', { sat: 1.05 });
 await palette('stocksnap-ULIKLNPKK0-cutting-orange.jpg', 'orange.jpg', { green: 0.4 });
+await palette('client-clinician-explaining-results.webp', 'results.jpg', { warm: [1.03, 1.0, 0.95], sat: 1.04 });
 console.log('photos graded');

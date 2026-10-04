@@ -2,6 +2,7 @@
 
 | File | Subject | Source and licence |
 |---|---|---|
+| `client-clinician-explaining-results.webp` (900×600) | Clinician explaining results to a colleague at a computer (used on How it works) | **Supplied by the client** (old repository `report-review.webp`); no licence record, provisional like the hero photograph. |
 | `client-clinician-and-patient.webp` (1200×801) | Clinician applying a plaster to a patient's arm after a sample | **Supplied by the client** (carried over from the old Quantum-BioTesting repository as `sample-collection.webp`). No source or licence record exists in that repository. Treat as provisional: confirm the rights, or replace with commissioned photography. |
 | `stocksnap-7BQNRHB6EX-smiling-man.jpg` (960×640) | Smiling man holding a coffee | StockSnap, CC0. https://stocksnap.io/photo/business-man-7BQNRHB6EX |
 | `stocksnap-8I4ATM3V9B-woman-with-flowers.jpg` (960×640) | Woman holding a bunch of flowers | StockSnap, CC0. https://stocksnap.io/photo/flower-white-8I4ATM3V9B |

@@ -1,21 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHead from '../components/PageHead.astro';
+import Intro from '../components/Intro.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 ---
 <Base
   title="Appointment Enquiry | Quantum BioTesting"
   description="Send an appointment enquiry for the Men’s or Women’s Health Check. An enquiry is a request: the team replies by email to confirm the clinic and time."
 >
-  <PageHead
-    title="Appointment enquiry"
-    lead="Tell us which test you want and when suits you. This is a request, not a confirmed booking."
-    crumbs={[{ href: '/', label: 'Home' }, { label: 'Contact' }]}
-  />
+  <Intro title="Appointment enquiry" lead="Tell us which test you want and when suits you. This is a request, not a confirmed booking." crumbs={[{ href: '/', label: 'Home' }, { label: 'Contact' }]} />
   <section class="section">
-    <div class="container split split--form">
+    <div class="wrap enquiry">
       <div><EnquiryForm /></div>
-      <aside class="panel" aria-labelledby="next-title">
+      <aside class="panel panel--sand" aria-labelledby="next-title">
         <h2 id="next-title">What happens next</h2>
         <ol>
           <li>The team reads your enquiry.</li>

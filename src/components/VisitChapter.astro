@@ -1,0 +1,30 @@
+---
+// The one full colour chapter: the visit in four steps.
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import everyday from '../assets/photos/everyday.jpg';
+import { STEPS } from '../data/tests';
+interface Props { id?: string; heading: string; lead: string; more?: boolean; photo?: boolean }
+const { id = 'visit-title', heading, lead, more = true, photo = true } = Astro.props;
+---
+<section class="visit on-blue" aria-labelledby={id}>
+  <div class:list={['wrap visit__grid', { 'visit__grid--plain': !photo }]}>
+    {photo && (
+      <div class="visit__img" data-reveal>
+        <div class="arch"><Image src={everyday} alt="A woman and child walking past a bright blue wall" widths={[400, 640, 900]} sizes="(min-width: 62em) 24rem, 80vw" loading="lazy" /></div>
+      </div>
+    )}
+    <div class="visit__head">
+      <h2 class="display" id={id} data-reveal>{heading}</h2>
+      <p class="lead" data-reveal style="--d:.08s">{lead}</p>
+    </div>
+    <div class="visit__steps">
+      <ol class="steps">
+        {STEPS.map((s, i) => (
+          <li class="step" data-reveal style={`--d:${i * 0.07}s`}><h3>{s.title}</h3><p>{s.text}</p></li>
+        ))}
+      </ol>
+      {more && <p class="visit__more"><a class="link" href="/how-it-works/">Everything about the visit and your results <Icon name="arrow-right" /></a></p>}
+    </div>
+  </div>
+</section>

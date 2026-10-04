@@ -1,8 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import PageHead from '../components/PageHead.astro';
+import Intro from '../components/Intro.astro';
 ---
-<Base title="Page not found | Quantum BioTesting" description="This page could not be found." noindex>
-  <PageHead title="Page not found" lead="The page you asked for does not exist or has moved." />
-  <section class="section"><div class="container"><p class="prose"><a href="/">Go to the home page</a>, see the <a href="/tests/">tests</a> or <a href="/contact/">make an enquiry</a>.</p></div></section>
+<Base title="Page not found | Quantum BioTesting" description="This page could not be found.">
+  <Intro title="Page not found" lead="The page you asked for does not exist or has moved." />
+  <section class="section"><div class="wrap"><div class="prose">
+    <p><a href="/">Go to the home page</a>, see the <a href="/tests/">tests</a> or <a href="/contact/">make an enquiry</a>.</p>
+  </div></div></section>
 </Base>
