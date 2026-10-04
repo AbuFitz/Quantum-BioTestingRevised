@@ -14,8 +14,15 @@ const check = (n, ok, d = '') => { results.push(ok); if (!ok) fail.push(`${n} ${
 // WCAG contrast
 const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
-for (const [name, fg, bg, min] of [['ink on cream', '#14233f', '#fcf6ec', 7], ['muted on cream', '#4c5870', '#fcf6ec', 4.5], ['blue on cream', '#013275', '#fcf6ec', 7], ['coral-d on cream (small text)', '#b93d26', '#fcf6ec', 4.5], ['ink on sage', '#14233f', '#d2e3ce', 7], ['muted-ish ink on sage (count line)', '#14233f', '#d2e3ce', 4.5], ['blue on sage', '#013275', '#d2e3ce', 4.5], ['ink on apricot', '#14233f', '#f9d4b2', 7], ['blue on apricot', '#013275', '#f9d4b2', 4.5], ['ink-2 on apricot (RRP label)', '#4c5870', '#f9d4b2', 4.5], ['ink-2 on sage', '#4c5870', '#d2e3ce', 4.5], ['ink-2 on sand', '#4c5870', '#f3e6cf', 4.5], ['blue on butter', '#013275', '#f8e4a6', 7], ['count/note ink on sage', '#2b3a56', '#d2e3ce', 7], ['count/note ink on apricot', '#2b3a56', '#f9d4b2', 7], ['note ink on butter', '#2b3a56', '#f8e4a6', 7], ['ink on butter', '#14233f', '#f8e4a6', 7], ['white on blue', '#ffffff', '#013275', 7], ['pale text on blue', '#dbe6f7', '#013275', 4.5], ['blue on coral-l (step number)', '#013275', '#ffa48e', 4.5], ['white on blue button', '#ffffff', '#013275', 7]])
-  check(`contrast ${name}`, ratio(fg, bg) >= min, ratio(fg, bg).toFixed(2));
+for (const [name, fg, bg, min] of [
+  ['ink on cream', '#14233f', '#fcf7ef', 7], ['muted on cream', '#4c5870', '#fcf7ef', 4.5], ['blue on cream', '#013275', '#fcf7ef', 7], ['red on cream (small text, icons)', '#b02018', '#fcf7ef', 4.5],
+  ['ink on sky', '#14233f', '#dce6f6', 7], ['blue on sky', '#013275', '#dce6f6', 7], ['count ink on sky', '#2b3a56', '#dce6f6', 7], ['muted on sky (RRP)', '#4c5870', '#dce6f6', 4.5], ['red on sky (icons)', '#b02018', '#dce6f6', 4.5],
+  ['ink on blush', '#14233f', '#f8ddd6', 7], ['blue on blush', '#013275', '#f8ddd6', 7], ['count ink on blush', '#2b3a56', '#f8ddd6', 7], ['muted on blush (RRP)', '#4c5870', '#f8ddd6', 4.5], ['red on blush (icons)', '#b02018', '#f8ddd6', 4.5],
+  ['muted on sand (faq answers)', '#4c5870', '#f3e9dc', 4.5], ['ink on sand', '#14233f', '#f3e9dc', 7], ['red on sand (footer labels)', '#b02018', '#fcf7ef', 4.5],
+  ['white on blue', '#ffffff', '#013275', 7], ['pale on blue', '#dbe6f7', '#013275', 4.5], ['blue on cream (step numbers)', '#013275', '#fcf7ef', 7],
+  ['white on red (closing chapter)', '#ffffff', '#b02018', 4.5], ['rose on red (closing note)', '#fbe4df', '#b02018', 4.5], ['blue on white (button on red)', '#013275', '#ffffff', 7],
+  ['white on blue button', '#ffffff', '#013275', 7],
+]) check(`contrast ${name}`, ratio(fg, bg) >= min, ratio(fg, bg).toFixed(2));
 
 const browser = await chromium.launch({ executablePath: EXE });
 try {
@@ -38,6 +45,7 @@ try {
       cardTops: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().top)),
       cardW: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().width)),
       cardH: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().height)),
+      heroH: document.querySelector('.hero').getBoundingClientRect().height,
       hdrOneRow: document.querySelector('.hdr').getBoundingClientRect().height < 90,
     }));
     check(`@${w} no horizontal overflow`, m.overflow <= 0, String(m.overflow));
@@ -45,6 +53,7 @@ try {
     check(`@${w} tap targets >=44px`, !m.small.length, m.small.join());
     check(`@${w} logo readable (>=140px)`, m.logoW >= 140, String(m.logoW));
     check(`@${w} header on one row`, m.hdrOneRow);
+    check(`@${w} hero is compact (<= 520px desktop, <= 560px phone)`, m.heroH <= (w >= 768 ? 520 : 560), String(Math.round(m.heroH)));
     check(`@${w} no console errors / failed requests`, !errs.length && !bad.length, [...errs, ...bad].join(' | '));
     if (w >= 768) check(`@${w} test choice starts within about one viewport`, m.testsTop < h + 120, String(m.testsTop));
     if (w >= 768) check(`@${w} two tests sit side by side at equal width`, Math.abs(m.cardW[0] - m.cardW[1]) <= 2, JSON.stringify(m.cardW));
