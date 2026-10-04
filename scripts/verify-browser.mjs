@@ -31,7 +31,7 @@ try {
       check(`${route} @${w} status`, is404 ? resp.status() === 404 : resp.status() === 200, String(resp.status()));
       const m = await page.evaluate(() => {
         const vw = innerWidth;
-        const wide = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && r.right > vw + 1 && !e.closest('.table-wrap'); }).map((e) => e.tagName + '.' + e.className).slice(0, 3);
+        const wide = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && r.right > vw + 1 && !e.closest('.table-wrap') && !e.closest('.close__rings'); }).map((e) => e.tagName + '.' + e.className).slice(0, 3);
         const small = [...document.querySelectorAll('a.btn, button, input:not([type=hidden]):not([type=radio]):not([type=checkbox]), select, textarea')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.height < 43.5) && !e.closest('.hp'); }).map((e) => e.tagName + ':' + (e.textContent || e.name).trim().slice(0, 20));
         return {
           overflow: document.documentElement.scrollWidth - vw, wide, small,
@@ -68,6 +68,7 @@ try {
     for (const p of ['/robots.txt', '/sitemap.xml']) { const r = await ctx.request.get(BASE + p); check(p, r.ok(), `${r.status()}`); }
     const sm = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
     check('sitemap lists 8 pages', (sm.match(/<loc>/g) || []).length === 8);
+    await page.goto(BASE + '/tests/');
     const logo = await page.evaluate(() => { const i = document.querySelector('.brand img'); return [i.getBoundingClientRect().width, i.getBoundingClientRect().height, i.naturalWidth]; });
     check('header logo readable (>=150px wide, loaded)', logo[0] >= 150 && logo[2] > 0, logo.join('x'));
     await ctx.close();
@@ -76,18 +77,13 @@ try {
   // 3. Navigation and product journeys (desktop)
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
-    await page.goto(BASE + '/');
-    for (const [label, path] of [['Tests', '/tests/'], ['How it works', '/how-it-works/'], ['Contact', '/contact/'], ['Home', '/']]) {
+    await page.goto(BASE + '/tests/');
+    for (const [label, path] of [['How it works', '/how-it-works/'], ['Contact', '/contact/'], ['Tests', '/tests/']]) {
       await page.locator('.site-nav').getByRole('link', { name: label, exact: true }).click(); await page.waitForURL('**' + path);
       check(`nav → ${label}`, await page.locator(`.site-nav [aria-current=page]`).innerText() === label);
     }
     for (const [key, slug] of [['mens', 'mens-health-check'], ['womens', 'womens-health-check']]) {
-      await page.goto(BASE + '/');
-      await page.locator(`#offer-${key}`).locator('xpath=ancestor::article').getByRole('link', { name: /^Enquire/ }).click();
-      await page.waitForURL(`**/contact/?test=${key}`);
-      check(`home ${key} enquire preselects product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
-      await page.goto(BASE + `/tests/${slug}/`);
-      await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForURL(`**/contact/?test=${key}`);
+      await page.goto(BASE + `/tests/${slug}/`);      await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForURL(`**/contact/?test=${key}`);
       check(`${slug} enquire preselects product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
     }
     // product pages separate: men's list not on women's page and vice versa
@@ -103,7 +99,7 @@ try {
     await page.getByRole('button', { name: 'Expand all groups' }).click();
     check('expand all', (await page.locator('details.group[open]').count()) === 11);
     // FAQ
-    await page.goto(BASE + '/'); const f = page.locator('.faq details').first(); await f.locator('summary').click();
+    await page.goto(BASE + '/how-it-works/'); const f = page.locator('.faq details').first(); await f.locator('summary').click();
     check('FAQ opens', await f.evaluate((e) => e.open));
     // prices consistent
     for (const r of ['/', '/tests/', '/tests/mens-health-check/', '/tests/womens-health-check/', '/terms/']) {
@@ -116,13 +112,13 @@ try {
   // 4. Mobile menu keyboard behaviour
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } }); const page = await ctx.newPage();
-    await page.goto(BASE + '/');
+    await page.goto(BASE + '/tests/');
     const btn = page.getByRole('button', { name: 'Menu' });
-    check('mobile nav closed initially', !(await page.locator('#site-nav').isVisible()));
-    await btn.click(); check('menu opens', await page.locator('#site-nav').isVisible() && (await btn.getAttribute('aria-expanded')) === 'true');
+    check('legacy mobile nav closed initially', !(await page.locator('#site-nav').isVisible()));
+    await btn.click(); check('legacy menu opens', await page.locator('#site-nav').isVisible() && (await btn.getAttribute('aria-expanded')) === 'true');
     await page.keyboard.press('Escape');
-    check('Escape closes menu and returns focus', !(await page.locator('#site-nav').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
-    await btn.click(); await page.locator('#site-nav').getByRole('link', { name: 'Tests' }).click(); await page.waitForURL('**/tests/');
+    check('legacy Escape closes menu and returns focus', !(await page.locator('#site-nav').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
+    await btn.click(); await page.locator('#site-nav').getByRole('link', { name: 'How it works' }).click(); await page.waitForURL('**/how-it-works/');
     check('mobile menu link navigates', true);
     await ctx.close();
   }
@@ -170,7 +166,7 @@ try {
   // 6. Reduced motion and no storage / cookies
   {
     const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
-    await page.goto(BASE + '/'); await page.locator('.faq summary').first().click();
+    await page.goto(BASE + '/how-it-works/'); await page.locator('.faq summary').first().click();
     const dur = await page.locator('.faq summary .icon').first().evaluate((e) => getComputedStyle(e).transitionDuration);
     check('reduced motion: transitions neutralised', parseFloat(dur) < 0.001, dur);
     check('no cookies set', (await ctx.cookies()).length === 0);

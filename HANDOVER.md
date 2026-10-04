@@ -75,3 +75,20 @@ Source retained untouched at `brand/source/quantum-logo-source.png` (2000×2000 
 ## Typography
 
 Public Sans (variable, SIL OFL), Latin subset, one preloaded WOFF2, metric-matched fallback. Chosen after rendering real headline, price, paragraph, nav and button specimens of Figtree, Public Sans, Hanken Grotesk, Albert Sans and Onest: Public Sans had the clearest numerals (`£995`, `HbA1c`) and the calmest institutional proportions. H1 maximum 40px, body 17px.
+
+
+---
+
+# Design pass 2: identity v2 (homepage only, awaiting approval)
+
+Scope: only `/` uses the new identity (`src/layouts/BaseV2.astro`, `src/styles/v2.css`, `src/components/v2/`). All other pages still use the pass-1 system until the direction is approved. Business, evidence and integration dependencies above are unchanged.
+
+**Creative thesis: "the clear sample."** Blood testing turns a small, opaque sample into something legible. The page is composed like a laboratory report in a good journal: paper, ink, hairline rules and numerals, with one dark chapter where the choice is made. The logo's Q (blue outer ring, red inner ring, slanted tail) is treated as a lens: the hero photograph sits inside it. The same rings return as the step markers and as an outline Q in the closing section. That is the single graphic detail.
+
+**System.** Display: Newsreader (optical-size serif, SIL OFL; subset in `newsreader-subset.woff2`, regenerate with `scripts/subset-newsreader.py`). Text and UI: Figtree (geometric, echoes the logotype). Hero up to 100px, h2 up to 64px, serif numerals and prices; body 17px. Colour roles from the logo: paper `#fbfaf7`, ink `#0d1a33`, blue `#013275` (sampled), deep `#01204f` (dark chapter), red `#b02018` (rarely: the active-nav rule, preparation numbers, struck RRP, the inner ring). Geometry: circles and 1px rules; no bordered cards. Buttons are pills. Motion: rings draw and the lens opens once on load (about 1.6 s); chapters fade up once as they enter; links and buttons nudge their arrows. All of it is disabled under `prefers-reduced-motion` and absent without JS.
+
+**Photography.** The injection-style image is gone. The hero and process photographs are CC0 / public-domain images found through Openverse (see `brand/photo-sources/PROVENANCE.md`), colour-graded to the identity (`scripts/make-photo-assets.mjs`). Only 1024 px versions were available, so the hero lens is sharp at its displayed size but should be replaced with commissioned photography at higher resolution when available. The second image's source attribution (a US government release via Rawpixel) should be re-confirmed. Both are captioned "Illustrative photograph" and imply no Quantum staff or patients.
+
+**Copy** is the existing approved/provisional copy; the hero line is descriptive, and the closing line asks which test is wanted. Biomarker headline figures (300+, up to 350) are still the provisional client-published numbers listed in the ledger.
+
+**Verification:** `npm run verify:home` (68 checks: contrast ratios, five widths, tap targets, header on one row, equal test columns, product preselection from hero, test columns and closing buttons, keyboard and focus, mobile menu with Escape, reduced motion, no-JS, assets, layout shift). `npm run verify` still covers the other pages.
