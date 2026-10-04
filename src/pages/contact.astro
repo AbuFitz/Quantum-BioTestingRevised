@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+---
+<Base
+  title="Appointment Enquiry | Quantum BioTesting"
+  description="Send an appointment enquiry for the Men’s or Women’s Health Check. An enquiry is a request: the team replies by email to confirm the clinic and time."
+>
+  <PageHead
+    title="Appointment enquiry"
+    lead="Tell us which test you want and when suits you. This is a request, not a confirmed booking."
+    crumbs={[{ href: '/', label: 'Home' }, { label: 'Contact' }]}
+  />
+  <section class="section">
+    <div class="container split split--form">
+      <div><EnquiryForm /></div>
+      <aside class="panel" aria-labelledby="next-title">
+        <h2 id="next-title">What happens next</h2>
+        <ol>
+          <li>The team reads your enquiry.</li>
+          <li>They email you to confirm the clinic, date and time, or to suggest an alternative.</li>
+          <li>Payment and cancellation details are given when your appointment is confirmed. See the <a href="/terms/">Terms &amp; Conditions</a>.</li>
+        </ol>
+        <p class="muted">Before you enquire: <a href="/how-it-works/#preparation">how to prepare for your test</a>. For the tests themselves, see <a href="/tests/">Tests</a>.</p>
+      </aside>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHead from '../components/PageHead.astro';
+import Icon from '../components/Icon.astro';
+import Steps from '../components/Steps.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import report from '../assets/photos/report-review.webp';
+import { STEPS, PREPARATION, CLINICS, FAQS } from '../data/tests';
+---
+<Base
+  title="How It Works: Appointment, Preparation and Results | Quantum BioTesting"
+  description="How an enquiry becomes an appointment, how to prepare for your blood test, what happens at the clinic and when results arrive."
+>
+  <PageHead
+    title="How it works"
+    lead="From enquiry to report, with what to do before your appointment."
+    crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]}
+  />
+
+  <section class="section" aria-labelledby="process-title">
+    <div class="container">
+      <div class="section__head"><h2 id="process-title">The process</h2></div>
+      <Steps steps={STEPS} row level="h3" />
+      <p class="muted" style="margin-top:1.5rem;max-width:var(--measure)">Sending the enquiry form does not confirm a booking. Your appointment is confirmed when the team emails you the clinic and time. Payment and cancellation details are in the <a href="/terms/">Terms &amp; Conditions</a>.</p>
+    </div>
+  </section>
+
+  <section class="section section--tint" id="preparation" aria-labelledby="prep-title">
+    <div class="container">
+      <div class="section__head">
+        <h2 id="prep-title">Preparing for your test</h2>
+        <p class="muted">Following these guidelines helps your results be as accurate as possible.</p>
+      </div>
+      <ul class="facts">
+        {PREPARATION.map((p) => (
+          <li class="fact"><Icon name={p.icon} class="icon--lg" /><h3>{p.title}</h3><p>{p.text}</p></li>
+        ))}
+      </ul>
+      <p class="note" style="margin-top:1.5rem">If you take regular medication, have a health condition or are unsure about preparation, please contact the team before your appointment.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="clinic-title">
+    <div class="container split">
+      <div>
+        <div class="section__head">
+          <h2 id="clinic-title">At the clinic</h2>
+          <p class="muted">The appointment takes about 15 minutes. A trained phlebotomist takes your blood sample. Wear a short-sleeved or loose-fitting top.</p>
+        </div>
+        <h3 style="margin-bottom:0.75rem">Clinic locations</h3>
+        <ul class="clinics">
+          {CLINICS.map((c) => (
+            <li class="clinic"><Icon name="map-pin" /><div><strong>{c.name}</strong><span>{c.address}</span></div></li>
+          ))}
+        </ul>
+        <p class="muted" style="margin-top:0.9rem;max-width:var(--measure)">Tell us your preferred clinic or area when you enquire. The team confirms the location with you by email.</p>
+      </div>
+      <figure class="photo">
+        <Image src={report} alt="A clinician explaining test results to a colleague at a computer" widths={[480, 720, 960]} sizes="(min-width: 52em) 34rem, 100vw" loading="lazy" />
+        <figcaption class="caption">Illustrative photograph.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--tint" aria-labelledby="results-title">
+    <div class="container">
+      <div class="section__head"><h2 id="results-title">Your results</h2></div>
+      <div class="prose">
+        <p>Your sample is analysed in the laboratory and every result is reviewed by a clinical specialist. The digital report arrives by email with plain-English commentary on your results.</p>
+        <p>Standard results take 2–5 working days from sample receipt at the laboratory, and 4 working days for the Women’s Health Check. An express service may return results in as little as 2 hours; ask the team about availability when you enquire.</p>
+        <p>Your report can be shared with your GP or any other healthcare provider.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="section__head"><h2 id="faq-title">Questions</h2></div>
+      <Faq items={FAQS} />
+    </div>
+  </section>
+  <CtaBand />
+</Base>

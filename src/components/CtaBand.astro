@@ -1,0 +1,11 @@
+---
+import Icon from './Icon.astro';
+interface Props { title?: string; text?: string }
+const { title = 'Ready to enquire?', text = 'Choose a test and send your preferred clinic and date. The team replies by email to confirm the appointment.' } = Astro.props;
+---
+<section class="cta-band" aria-labelledby="cta-title">
+  <div class="container">
+    <div><h2 id="cta-title">{title}</h2><p>{text}</p></div>
+    <a class="btn" href="/contact/">Make an enquiry <Icon name="arrow-right" /></a>
+  </div>
+</section>

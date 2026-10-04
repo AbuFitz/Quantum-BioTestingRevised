@@ -1,0 +1,28 @@
+---
+import Icon from './Icon.astro';
+import { TESTS } from '../data/tests';
+import { PRICE, RRP } from '../data/site';
+interface Props { headingLevel?: 'h2' | 'h3' }
+const { headingLevel: H = 'h3' } = Astro.props;
+---
+<div class="offers">
+  {TESTS.map((t) => (
+    <article class="offer" aria-labelledby={`offer-${t.key}`}>
+      <div class="offer__head">
+        <H id={`offer-${t.key}`}>{t.name}</H>
+        <p class="offer__markers">{t.biomarkers}</p>
+      </div>
+      <p class="price">
+        <span class="price__now">{PRICE}</span>
+        <span class="price__rrp">RRP <s>{RRP}</s></span>
+      </p>
+      <ul class="ticks">
+        {t.inclusions.map((i) => <li><Icon name={i.icon} /><span>{i.text}</span></li>)}
+      </ul>
+      <div class="offer__foot">
+        <a class="btn btn--secondary" href={`/tests/${t.slug}/`}>View details<span class="visually-hidden"> for the {t.name}</span></a>
+        <a class="btn" href={`/contact/?test=${t.key}`}>Enquire<span class="visually-hidden"> about the {t.name}</span></a>
+      </div>
+    </article>
+  ))}
+</div>

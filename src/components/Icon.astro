@@ -1,0 +1,10 @@
+---
+// Lucide icons, inlined at build time. One stroke weight is set in global.css (.icon).
+const icons = import.meta.glob('/node_modules/lucide-static/icons/*.svg', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+interface Props { name: string; class?: string; label?: string }
+const { name, class: cls = '', label } = Astro.props;
+const raw = icons[`/node_modules/lucide-static/icons/${name}.svg`];
+if (!raw) throw new Error(`Unknown Lucide icon: ${name}`);
+const inner = raw.replace(/<!--[\s\S]*?-->/, '').replace(/<svg[^>]*>/, '').replace('</svg>', '').trim();
+---
+<svg class={`icon ${cls}`.trim()} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden={label ? undefined : 'true'} role={label ? 'img' : undefined} aria-label={label} focusable="false" set:html={inner} />

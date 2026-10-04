@@ -1,0 +1,26 @@
+{
+  "name": "quantum-biotesting-web",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "node scripts/preview-server.mjs",
+    "assets": "node scripts/make-brand-assets.mjs",
+    "check": "astro check",
+    "test": "node --test tests/enquiry.test.mjs",
+    "verify": "node scripts/verify-browser.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/public-sans": "^5.3.0",
+    "astro": "^7.3.5",
+    "lucide-static": "^1.52.0",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "playwright": "^1.63.0",
+    "typescript": "^6.0.3"
+  }
+}

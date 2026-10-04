@@ -1,0 +1,110 @@
+---
+import LegalLayout from '../components/LegalLayout.astro';
+import { PRICE } from '../data/site';
+const S = [
+  { id: 'definitions', title: 'Definitions' },
+  { id: 'eligibility', title: 'Eligibility' },
+  { id: 'nature', title: 'Nature of the service' },
+  { id: 'booking', title: 'Enquiries, booking and contract' },
+  { id: 'payment', title: 'Payment' },
+  { id: 'cancellation', title: 'Cancellation and refunds' },
+  { id: 'preparation', title: 'Preparation' },
+  { id: 'results', title: 'Results and limitations' },
+  { id: 'consultation', title: 'Physician consultation' },
+  { id: 'liability', title: 'Limitation of liability' },
+  { id: 'ip', title: 'Intellectual property' },
+  { id: 'complaints', title: 'Complaints' },
+  { id: 'law', title: 'Governing law' },
+  { id: 'changes', title: 'Changes to these terms' },
+];
+---
+<LegalLayout title="Terms & Conditions | Quantum BioTesting" description="Terms and conditions for Quantum BioTesting health checks: eligibility, enquiries and booking, payment, cancellation, results and liability." heading="Terms & Conditions" sections={S}>
+  <section id="definitions">
+    <h2>1. Definitions</h2>
+    <ul>
+      <li>“Company” means Quantum BioTesting Ltd, registered in England and Wales.</li>
+      <li>“Service” means the Quantum health check tests, comprising phlebotomy, laboratory analysis and a written results report.</li>
+      <li>“Client” means the person purchasing or receiving the Service.</li>
+      <li>“Results” means the laboratory report and clinically reviewed results document provided to the Client.</li>
+      <li>“Physician” means the GMC-registered doctor assigned to review and discuss results with the Client where a consultation is included.</li>
+    </ul>
+  </section>
+  <section id="eligibility">
+    <h2>2. Eligibility</h2>
+    <p>The Service is available only to people who:</p>
+    <ul>
+      <li>are aged 18 or over;</li>
+      <li>currently live in the United Kingdom; and</li>
+      <li>are not currently an inpatient in a hospital, hospice or residential care facility.</li>
+    </ul>
+    <p>By purchasing the Service, the Client confirms they meet these criteria. The Company may decline or cancel a booking where eligibility cannot be confirmed.</p>
+  </section>
+  <section id="nature">
+    <h2>3. Nature of the service</h2>
+    <p>Quantum BioTesting health checks are private health information services. They are not a substitute for NHS services and are not:</p>
+    <ul>
+      <li>a diagnosis of any medical condition;</li>
+      <li>a recommendation to change prescribed medication or treatment; or</li>
+      <li>an emergency or urgent care service.</li>
+    </ul>
+    <p>Any consultation included in the Service is for reviewing and explaining test results only. It does not create an ongoing patient–doctor relationship. In a medical emergency, call 999 or go to your nearest Accident &amp; Emergency department.</p>
+  </section>
+  <section id="booking">
+    <h2>4. Enquiries, booking and contract</h2>
+    <p>Sending the website enquiry form, or enquiring by telephone, is a request. It is not a confirmed booking, and a preferred date is a request only. A contract between the Client and the Company is formed when the Company sends written confirmation of the appointment by email. The Company may decline any booking.</p>
+  </section>
+  <section id="payment">
+    <h2>5. Payment</h2>
+    <p>The price of each health check is {PRICE}, which covers the elements of the Service described on this website. Payment must be made in full before the appointment. Payment details are given in the confirmation email.</p>
+  </section>
+  <section id="cancellation">
+    <h2>6. Cancellation and refunds</h2>
+    <p>The Client may cancel an appointment on these terms:</p>
+    <ul>
+      <li>More than 7 calendar days before the appointment: full refund minus a £50 administrative fee.</li>
+      <li>3–7 calendar days before the appointment: 50% refund of the amount paid.</li>
+      <li>Less than 48 hours before the appointment: no refund, unless the cancellation is due to a documented medical emergency.</li>
+      <li>No-show: no refund.</li>
+    </ul>
+    <p>Cancellations must be made in writing through the website <a href="/contact/">enquiry form</a>, quoting your name and appointment date. The time the Company receives notice decides which tier applies.</p>
+    <p>The Company may cancel or reschedule an appointment in exceptional circumstances, such as clinic closure or physician unavailability. It will then offer a full refund or an alternative appointment at the Client’s choice.</p>
+  </section>
+  <section id="preparation">
+    <h2>7. Preparation</h2>
+    <p>Accurate results depend on following the preparation guidance (see <a href="/how-it-works/#preparation">How it works</a>). If the Client does not, the Company may proceed and note the deviation in the report, or reschedule the appointment. A rescheduling fee of £75 may apply where the failure is the Client’s.</p>
+  </section>
+  <section id="results">
+    <h2>8. Results and limitations</h2>
+    <p>The Client acknowledges that:</p>
+    <ul>
+      <li>no diagnostic test is 100% accurate, and results reflect a single point in time;</li>
+      <li>reference ranges are based on population statistics and may not apply to every individual;</li>
+      <li>a result within a normal range does not guarantee the absence of a medical condition; and</li>
+      <li>abnormal results should be discussed with the Client’s own GP or treating physician before any clinical decision is made.</li>
+    </ul>
+  </section>
+  <section id="consultation">
+    <h2>9. Physician consultation</h2>
+    <p>Where a consultation is included (the Women’s Health Check), it is limited to explaining and putting test results in context. The physician may explain the significance of individual results and recommend sharing specific findings with the Client’s GP. The physician may not prescribe medication, issue NHS referrals or give formal diagnoses.</p>
+  </section>
+  <section id="liability">
+    <h2>10. Limitation of liability</h2>
+    <p>To the maximum extent permitted by English law, the Company’s total liability is limited to the amount the Client paid for the Service, and the Company is not liable for indirect, consequential or special losses. Nothing in these terms limits liability for death or personal injury caused by the Company’s negligence.</p>
+  </section>
+  <section id="ip">
+    <h2>11. Intellectual property</h2>
+    <p>The content of this website belongs to Quantum BioTesting Ltd. The Client’s results report is for their personal use and may not be published or distributed commercially without written consent.</p>
+  </section>
+  <section id="complaints">
+    <h2>12. Complaints</h2>
+    <p>To make a complaint, write to us through the website <a href="/contact/">enquiry form</a>. We aim to acknowledge complaints within 3 business days and give a full response within 20 business days.</p>
+  </section>
+  <section id="law">
+    <h2>13. Governing law</h2>
+    <p>These terms and any dispute arising from them are governed by the laws of England and Wales, and the courts of England and Wales have exclusive jurisdiction.</p>
+  </section>
+  <section id="changes">
+    <h2>14. Changes to these terms</h2>
+    <p>We may revise these terms. Updated terms apply to new bookings from the date of publication. The version in force when your booking is confirmed governs your contract with us.</p>
+  </section>
+</LegalLayout>

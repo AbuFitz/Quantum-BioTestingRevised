@@ -1,0 +1,79 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Offers from '../components/Offers.astro';
+import Steps from '../components/Steps.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import hero from '../assets/photos/sample-collection.webp';
+import { SITE, PRICE } from '../data/site';
+import { STEPS, FAQS } from '../data/tests';
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: Astro.site!.href,
+  logo: new URL('/icon-512.png', Astro.site).href,
+};
+---
+<Base
+  title="Private Blood Tests for Men and Women | Quantum BioTesting"
+  description={`Men’s and Women’s Health Checks at ${PRICE} each. Compare the tests, then send an appointment enquiry. Results are reviewed by a clinical specialist.`}
+  jsonLd={orgLd}
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <h1 id="hero-title">Private blood tests for men and women</h1>
+        <p class="lead">Two health checks, each {PRICE}. Choose a test, send an enquiry and the team will confirm your clinic and appointment time by email. No GP referral is needed.</p>
+        <div class="hero__actions">
+          <a class="btn" href="#tests">Compare the tests <Icon name="arrow-right" /></a>
+          <a class="btn btn--secondary" href="/contact/">Make an enquiry</a>
+        </div>
+      </div>
+      <figure class="hero__figure">
+        <Image src={hero} alt="A clinician applying a plaster to a patient’s arm after a blood sample" widths={[480, 720, 960]} sizes="(min-width: 52em) 36rem, 100vw" loading="eager" fetchpriority="high" />
+        <figcaption class="caption">Illustrative photograph.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--tint section--first" id="tests" aria-labelledby="tests-title">
+    <div class="container">
+      <div class="section__head" style="margin-bottom:1.1rem">
+        <h2 id="tests-title">Choose your health check</h2>
+      </div>
+      <Offers />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="service-title">
+    <div class="container">
+      <div class="split">
+        <div class="prose">
+          <h2 id="service-title">What the service is</h2>
+          <p>Quantum BioTesting offers private blood tests for people who want a broader look at their health than a routine check. Your sample is analysed in a laboratory, reviewed by a clinical specialist, and returned as a digital report with plain-English commentary.</p>
+          <p>The tests are private health information services. They are not a substitute for NHS care and are not a diagnosis. Share your report with your own GP if anything concerns you.</p>
+          <p><a href="/how-it-works/">Read how it works, including preparation</a></p>
+        </div>
+        <div>
+          <h2 class="visually-hidden">The process</h2>
+          <Steps steps={STEPS} level="h3" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tint" aria-labelledby="faq-title">
+    <div class="container">
+      <div class="section__head"><h2 id="faq-title">Common questions</h2></div>
+      <Faq items={FAQS.slice(0, 5)} />
+      <p style="margin-top:1rem"><a href="/how-it-works/">More on preparation, the clinic visit and results</a></p>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>

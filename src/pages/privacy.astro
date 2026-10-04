@@ -1,0 +1,98 @@
+---
+import LegalLayout from '../components/LegalLayout.astro';
+const S = [
+  { id: 'who', title: 'Who we are' },
+  { id: 'data', title: 'Data we collect' },
+  { id: 'use', title: 'How we use your data' },
+  { id: 'sharing', title: 'Sharing your data' },
+  { id: 'retention', title: 'How long we keep it' },
+  { id: 'rights', title: 'Your rights' },
+  { id: 'security', title: 'Security' },
+  { id: 'cookies', title: 'Cookies and tracking' },
+  { id: 'transfers', title: 'International transfers' },
+  { id: 'children', title: 'Children' },
+  { id: 'changes', title: 'Changes to this policy' },
+  { id: 'complaints', title: 'Complaints' },
+];
+---
+<LegalLayout title="Privacy Policy | Quantum BioTesting" description="How Quantum BioTesting collects and uses personal data, including appointment enquiries and test information, and your rights under UK GDPR." heading="Privacy Policy" sections={S}>
+  <section id="who">
+    <h2>1. Who we are</h2>
+    <p>Quantum BioTesting Ltd (“we”, “us”, “our”) is a private health diagnostics company registered in England and Wales. We are the data controller for the personal data you give us.</p>
+    <p>To contact us about your data, use the <a href="/contact/">enquiry form</a> and say that your message concerns privacy.</p>
+  </section>
+  <section id="data">
+    <h2>2. Data we collect</h2>
+    <p><strong>Through the website enquiry form:</strong></p>
+    <ul>
+      <li>your full name, email address and phone number;</li>
+      <li>the test you are asking about;</li>
+      <li>optionally, a preferred clinic or area, a preferred date and any notes you choose to write.</li>
+    </ul>
+    <p>The form does not ask for your date of birth or any health information. Please do not put health details in the notes box.</p>
+    <p><strong>When we arrange and deliver your appointment:</strong> our team and clinic partners may need further identity and contact details, appointment details, and health information such as biological sex, current medications and medical history. Test results are health data, which is special category data under UK GDPR and receives a higher level of protection.</p>
+    <p><strong>Technical data:</strong> our hosting provider keeps standard server logs (for example IP address, browser type and the pages requested) to run and secure the website.</p>
+  </section>
+  <section id="use">
+    <h2>3. How we use your data</h2>
+    <table>
+      <thead><tr><th scope="col">Purpose</th><th scope="col">Legal basis (UK GDPR)</th></tr></thead>
+      <tbody>
+        <tr><td>Replying to your enquiry and arranging your appointment</td><td>Article 6(1)(b), steps at your request before a contract</td></tr>
+        <tr><td>Providing the test, your results report and any included consultation</td><td>Article 6(1)(b), contract; Article 9(2)(h), provision of health care</td></tr>
+        <tr><td>Keeping clinical records as required</td><td>Article 6(1)(c), legal obligation; Article 9(2)(h)</td></tr>
+        <tr><td>Security and fraud prevention, including spam filtering on the enquiry form</td><td>Article 6(1)(f), legitimate interests</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section id="sharing">
+    <h2>4. Sharing your data</h2>
+    <p>We never sell your personal data. We share it only with:</p>
+    <ul>
+      <li><strong>Laboratories</strong> that analyse your sample, solely to carry out your tests.</li>
+      <li><strong>GMC-registered physicians</strong> who review your results or conduct an included consultation.</li>
+      <li><strong>Clinic partners</strong> where your appointment takes place, limited to the details needed for your visit.</li>
+      <li><strong>Service providers</strong> that host this website and deliver enquiry emails to our team, under agreements that stop them using your data for other purposes.</li>
+      <li><strong>Regulators and public bodies</strong> where we are legally required to disclose data.</li>
+    </ul>
+  </section>
+  <section id="retention">
+    <h2>5. How long we keep it</h2>
+    <ul>
+      <li>Clinical health records (test results, physician notes): 8 years from your test date.</li>
+      <li>Booking and financial records: 7 years.</li>
+      <li>Enquiries that do not lead to an appointment: only as long as needed to respond to you.</li>
+    </ul>
+    <p>After the retention period, data is securely deleted or anonymised.</p>
+  </section>
+  <section id="rights">
+    <h2>6. Your rights</h2>
+    <p>Under UK GDPR you have the right to access your data, to have it corrected, to ask for it to be erased (subject to legal duties to keep clinical records), to restrict or object to processing, to receive it in a portable format, and to withdraw consent where we rely on it.</p>
+    <p>To use any of these rights, send us a message through the <a href="/contact/">enquiry form</a>. We will respond within 30 days.</p>
+  </section>
+  <section id="security">
+    <h2>7. Security</h2>
+    <p>Data you send through this website is encrypted in transit using HTTPS. The enquiry form sends your details to our team by email, and we ask that you keep health information out of it.</p>
+  </section>
+  <section id="cookies">
+    <h2>8. Cookies and tracking</h2>
+    <p>This website does not set cookies, does not use analytics or advertising trackers, and does not store anything in your browser. Fonts and images are served from the website itself. For that reason there is no cookie banner.</p>
+    <p>If we add analytics or any other tracking in future, we will update this policy and ask for your consent first where the law requires it.</p>
+  </section>
+  <section id="transfers">
+    <h2>9. International transfers</h2>
+    <p>We aim to process and store your personal data in the United Kingdom. Where a service provider processes data elsewhere, we require adequate protection for it.</p>
+  </section>
+  <section id="children">
+    <h2>10. Children</h2>
+    <p>Our services are available only to people aged 18 and over. We do not knowingly collect personal data from anyone under 18. If you believe we have, please tell us through the <a href="/contact/">enquiry form</a>.</p>
+  </section>
+  <section id="changes">
+    <h2>11. Changes to this policy</h2>
+    <p>We may update this policy. The date at the top of this page shows when it last changed.</p>
+  </section>
+  <section id="complaints">
+    <h2>12. Complaints</h2>
+    <p>If you are unhappy with how we have handled your personal data, tell us through the <a href="/contact/">enquiry form</a> first. You also have the right to complain to the Information Commissioner’s Office (ICO) at <a href="https://ico.org.uk">ico.org.uk</a>, helpline 0303 123 1113.</p>
+  </section>
+</LegalLayout>

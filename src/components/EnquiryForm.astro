@@ -1,0 +1,207 @@
+---
+import Icon from './Icon.astro';
+import { TESTS } from '../data/tests';
+import { PRICE } from '../data/site';
+---
+<form class="form" id="enquiry-form" novalidate method="post" action="/api/enquiry" aria-describedby="form-note">
+  <div id="form-error" class="alert alert--error" role="alert" tabindex="-1" hidden>
+    <Icon name="circle-alert" class="icon--lg" />
+    <div><h2>Your enquiry has not been sent</h2><p data-error-text></p></div>
+  </div>
+
+  <fieldset class="field" data-field="test">
+    <legend>Which test are you asking about?</legend>
+    <div class="choices" role="radiogroup">
+      {TESTS.map((t) => (
+        <label class="choice">
+          <input type="radio" name="test" value={t.key} required aria-describedby="err-test" />
+          <span><strong>{t.name}</strong><small>{t.biomarkers} · {PRICE}</small></span>
+        </label>
+      ))}
+    </div>
+    <p class="field__error" id="err-test" hidden></p>
+  </fieldset>
+
+  <div class="form-row form-row--2">
+    <div class="field" data-field="name">
+      <label class="field__label" for="f-name">Full name</label>
+      <input class="input" id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="err-name" />
+      <p class="field__error" id="err-name" hidden></p>
+    </div>
+    <div class="field" data-field="phone">
+      <label class="field__label" for="f-phone">Phone number</label>
+      <input class="input" id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="30" aria-describedby="err-phone" />
+      <p class="field__error" id="err-phone" hidden></p>
+    </div>
+  </div>
+
+  <div class="field" data-field="email">
+    <label class="field__label" for="f-email">Email address</label>
+    <input class="input" id="f-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="hint-email err-email" />
+    <p class="field__hint" id="hint-email">The team replies to this address to confirm your appointment.</p>
+    <p class="field__error" id="err-email" hidden></p>
+  </div>
+
+  <div class="form-row form-row--2">
+    <div class="field" data-field="clinic">
+      <label class="field__label" for="f-clinic">Clinic or area <span class="field__opt">(optional)</span></label>
+      <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" aria-describedby="err-clinic" />
+      <p class="field__error" id="err-clinic" hidden></p>
+    </div>
+    <div class="field" data-field="date">
+      <label class="field__label" for="f-date">Preferred date <span class="field__opt">(optional)</span></label>
+      <input class="input" id="f-date" name="date" type="date" aria-describedby="hint-date err-date" />
+      <p class="field__hint" id="hint-date">A request only. Availability is confirmed by the team.</p>
+      <p class="field__error" id="err-date" hidden></p>
+    </div>
+  </div>
+
+  <div class="field" data-field="notes">
+    <label class="field__label" for="f-notes">Notes <span class="field__opt">(optional)</span></label>
+    <textarea class="input" id="f-notes" name="notes" rows="4" maxlength="1000" aria-describedby="hint-notes err-notes"></textarea>
+    <p class="field__hint" id="hint-notes">For example, preferred times. Please do not include health details here.</p>
+    <p class="field__error" id="err-notes" hidden></p>
+  </div>
+
+  <div class="hp" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+  <div class="field" data-field="consent">
+    <label class="consent">
+      <input type="checkbox" name="consent" required aria-describedby="err-consent" />
+      <span>I have read the <a href="/privacy/">Privacy Policy</a> and agree to be contacted about this enquiry.</span>
+    </label>
+    <p class="field__error" id="err-consent" hidden></p>
+  </div>
+
+  <div>
+    <button class="btn" type="submit" data-submit><Icon name="loader-circle" class="spin" /><span data-label>Send enquiry</span></button>
+    <p class="field__hint" id="form-note" style="margin-top:0.6rem">Sending this form is an enquiry. It does not confirm a booking.</p>
+  </div>
+  <noscript><p class="alert alert--error">This form needs JavaScript to send. Please enable it and reload the page.</p></noscript>
+</form>
+
+<div id="form-success" class="alert alert--ok" role="status" tabindex="-1" hidden>
+  <Icon name="circle-check" class="icon--lg" />
+  <div>
+    <h2>Enquiry sent</h2>
+    <p>Thank you. The team will reply to <strong data-sent-email></strong> to confirm the clinic and appointment time.</p>
+    <p>This is a request, not a confirmed booking. Your appointment is confirmed only when you receive that email.</p>
+    <p><a href="/">Back to home</a></p>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('enquiry-form') as HTMLFormElement;
+  const success = document.getElementById('form-success')!;
+  const errBox = document.getElementById('form-error')!;
+  const errText = errBox.querySelector('[data-error-text]')!;
+  const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+  const label = submit.querySelector('[data-label]')!;
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const TEST_NAMES: Record<string, string> = { mens: 'Men’s Health Check', womens: 'Women’s Health Check' };
+
+  // Preselect the product from ?test=mens|womens
+  const wanted = new URLSearchParams(location.search).get('test');
+  if (wanted && TEST_NAMES[wanted]) {
+    const r = form.querySelector<HTMLInputElement>(`input[name="test"][value="${wanted}"]`);
+    if (r) r.checked = true;
+  }
+  // Preferred date: from tomorrow, within a year
+  const date = form.elements.namedItem('date') as HTMLInputElement;
+  const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const min = new Date(); min.setDate(min.getDate() + 1);
+  const max = new Date(); max.setFullYear(max.getFullYear() + 1);
+  date.min = iso(min); date.max = iso(max);
+
+  const val = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value.trim();
+  const rules: Record<string, () => string> = {
+    test: () => (form.querySelector('input[name="test"]:checked') ? '' : 'Choose the test you are asking about.'),
+    name: () => (val('name') ? '' : 'Enter your full name.'),
+    phone: () => (val('phone').replace(/\D/g, '').length >= 7 ? '' : 'Enter a phone number we can reach you on.'),
+    email: () => (EMAIL.test(val('email')) ? '' : 'Enter a valid email address, such as name@example.com.'),
+    date: () => {
+      const v = val('date');
+      if (!v) return '';
+      if (v < date.min) return 'Choose a date from tomorrow onwards.';
+      if (v > date.max) return 'Choose a date within the next year.';
+      return '';
+    },
+    consent: () => ((form.elements.namedItem('consent') as HTMLInputElement).checked ? '' : 'Confirm you have read the Privacy Policy and agree to be contacted.'),
+  };
+  const setError = (field: string, msg: string) => {
+    const wrap = form.querySelector(`[data-field="${field}"]`)!;
+    const p = wrap.querySelector<HTMLElement>('.field__error')!;
+    wrap.classList.toggle('field--error', !!msg);
+    p.hidden = !msg;
+    p.textContent = msg;
+    wrap.querySelectorAll<HTMLElement>('input:not([type=radio]), textarea').forEach((el) => (msg ? el.setAttribute('aria-invalid', 'true') : el.removeAttribute('aria-invalid')));
+  };
+  const validate = () => {
+    let first: HTMLElement | null = null;
+    for (const [field, rule] of Object.entries(rules)) {
+      const msg = rule();
+      setError(field, msg);
+      if (msg && !first) first = form.querySelector<HTMLElement>(`[data-field="${field}"] input, [data-field="${field}"] textarea`);
+    }
+    first?.focus();
+    return !first;
+  };
+  form.addEventListener('input', (e) => {
+    const f = (e.target as HTMLElement).closest<HTMLElement>('[data-field]');
+    if (f && rules[f.dataset.field!] && f.classList.contains('field--error')) setError(f.dataset.field!, rules[f.dataset.field!]());
+  });
+  form.addEventListener('change', (e) => {
+    const f = (e.target as HTMLElement).closest<HTMLElement>('[data-field]');
+    if (f && rules[f.dataset.field!] && f.classList.contains('field--error')) setError(f.dataset.field!, rules[f.dataset.field!]());
+  });
+
+  let submissionId = crypto.randomUUID();
+  let sending = false;
+  const fail = (msg: string) => {
+    errText.textContent = msg;
+    errBox.hidden = false;
+    errBox.focus();
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (sending) return; // duplicate-submit guard
+    errBox.hidden = true;
+    if (!validate()) return;
+    sending = true;
+    submit.setAttribute('aria-busy', 'true');
+    submit.disabled = true;
+    label.textContent = 'Sending…';
+    const test = (form.querySelector('input[name="test"]:checked') as HTMLInputElement).value;
+    const payload = {
+      submissionId, test, name: val('name'), email: val('email'), phone: val('phone'),
+      clinic: val('clinic'), date: val('date'), notes: val('notes'), consent: true, website: val('website'),
+    };
+    try {
+      const res = await fetch('/api/enquiry', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) {
+        form.hidden = true;
+        success.querySelector('[data-sent-email]')!.textContent = payload.email;
+        success.hidden = false;
+        success.focus();
+        return;
+      }
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 422 && body.fields) {
+        for (const [f, m] of Object.entries(body.fields)) if (rules[f] || f in rules) setError(f, String(m));
+        fail('Please correct the highlighted fields and try again.');
+      } else if (res.status === 503) {
+        fail('The enquiry service is not available at the moment. Please try again later.');
+      } else {
+        fail('Something went wrong sending your enquiry. Please check your details and try again.');
+      }
+    } catch {
+      fail('We could not reach the server. Please check your connection and try again.');
+    } finally {
+      sending = false;
+      submit.removeAttribute('aria-busy');
+      submit.disabled = false;
+      label.textContent = 'Send enquiry';
+    }
+  });
+</script>

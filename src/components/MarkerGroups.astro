@@ -1,0 +1,46 @@
+---
+import Icon from './Icon.astro';
+import type { MarkerGroup } from '../data/tests';
+interface Props { groups: MarkerGroup[] }
+const { groups } = Astro.props;
+---
+<div class="toolbar">
+  <nav aria-label="Marker groups" class="jump">
+    {groups.map((g) => <a href={`#${g.id}`} data-jump>{g.name}</a>)}
+  </nav>
+  <button class="btn btn--secondary btn--sm" type="button" data-expand hidden>Expand all groups</button>
+</div>
+<div class="group-list">
+  {groups.map((g) => (
+    <details class="group" id={g.id}>
+      <summary><span>{g.name}</span><Icon name="chevron-down" /></summary>
+      <div class="group__body">
+        <ul class="group__items">{g.items.map((m) => <li>{m}</li>)}</ul>
+        {g.note && <p class="note">{g.note}</p>}
+      </div>
+    </details>
+  ))}
+</div>
+<script>
+  const groups = Array.from(document.querySelectorAll<HTMLDetailsElement>('.group'));
+  const btn = document.querySelector<HTMLButtonElement>('[data-expand]');
+  const openFromHash = () => {
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el instanceof HTMLDetailsElement && el.classList.contains('group')) { el.open = true; el.scrollIntoView(); }
+  };
+  document.querySelectorAll<HTMLAnchorElement>('[data-jump]').forEach((a) => a.addEventListener('click', () => {
+    const el = document.getElementById(a.hash.slice(1));
+    if (el instanceof HTMLDetailsElement) el.open = true;
+  }));
+  window.addEventListener('hashchange', openFromHash);
+  openFromHash();
+  if (btn) {
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      const expand = btn.dataset.state !== 'open';
+      groups.forEach((g) => (g.open = expand));
+      btn.dataset.state = expand ? 'open' : 'closed';
+      btn.textContent = expand ? 'Collapse all groups' : 'Expand all groups';
+    });
+  }
+</script>

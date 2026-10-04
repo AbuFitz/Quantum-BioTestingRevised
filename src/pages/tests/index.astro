@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHead from '../../components/PageHead.astro';
+import Offers from '../../components/Offers.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { TESTS, MENU_NOTE } from '../../data/tests';
+import { PRICE, RRP } from '../../data/site';
+const [men, women] = TESTS;
+---
+<Base
+  title="Men’s and Women’s Health Checks | Quantum BioTesting"
+  description={`Compare the Men’s Health Check (300+ biomarkers) and Women’s Health Check (up to 350 biomarkers). ${PRICE} each, RRP ${RRP}.`}
+>
+  <PageHead
+    title="Our tests"
+    lead={`Two health checks, each ${PRICE}. Open a test for the full list of what it covers.`}
+    crumbs={[{ href: '/', label: 'Home' }, { label: 'Tests' }]}
+  />
+  <section class="section" aria-labelledby="choose">
+    <div class="container">
+      <h2 id="choose" class="visually-hidden">The two tests</h2>
+      <Offers />
+    </div>
+  </section>
+
+  <section class="section section--tint" aria-labelledby="compare-title">
+    <div class="container">
+      <div class="section__head"><h2 id="compare-title">Side-by-side comparison</h2></div>
+      <div class="table-wrap" role="region" aria-labelledby="compare-title" tabindex="0">
+        <table class="compare">
+          <thead>
+            <tr><th scope="col"><span class="visually-hidden">Feature</span></th><th scope="col">{men.name}</th><th scope="col">{women.name}</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Price</th><td><span class="price__now">{PRICE}</span> <span class="price__rrp">RRP <s>{RRP}</s></span></td><td><span class="price__now">{PRICE}</span> <span class="price__rrp">RRP <s>{RRP}</s></span></td></tr>
+            <tr><th scope="row">Biomarkers</th><td>300+ in 11 groups</td><td>Up to 350 in 27 health areas</td></tr>
+            <tr><th scope="row">Clinical specialist review</th><td>Included</td><td>Included</td></tr>
+            <tr><th scope="row">Extras</th><td>Optional follow-up telephone consultation; ask the team</td><td>Private remote GP consultation and a 6-month repeat test included</td></tr>
+            <tr><th scope="row">Results</th><td>{men.results}</td><td>{women.results}</td></tr>
+            <tr><th scope="row">Appointment</th><td>About 15 minutes</td><td>About 15 minutes</td></tr>
+            <tr><th scope="row"><span class="visually-hidden">Details</span></th>
+              <td><a href={`/tests/${men.slug}/`}>Men’s test details <Icon name="arrow-right" /></a></td>
+              <td><a href={`/tests/${women.slug}/`}>Women’s test details <Icon name="arrow-right" /></a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:1rem;max-width:var(--measure)">{MENU_NOTE}</p>
+    </div>
+  </section>
+  <CtaBand />
+</Base>
