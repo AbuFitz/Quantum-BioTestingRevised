@@ -14,7 +14,7 @@ const check = (n, ok, d = '') => { results.push(ok); if (!ok) fail.push(`${n} ${
 // WCAG contrast
 const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
-for (const [name, fg, bg, min] of [['ink on paper', '#0d1a33', '#fbfaf7', 7], ['muted on paper', '#4a5671', '#fbfaf7', 4.5], ['blue on paper', '#013275', '#fbfaf7', 7], ['red on paper (small)', '#b02018', '#fbfaf7', 4.5], ['white on deep', '#ffffff', '#01204f', 7], ['sky on deep', '#b9c9e6', '#01204f', 4.5], ['red-lit on deep', '#ff8f86', '#01204f', 4.5], ['white on blue button', '#ffffff', '#013275', 7], ['deep on paper button', '#01204f', '#fbfaf7', 7]])
+for (const [name, fg, bg, min] of [['ink on cream', '#14233f', '#fcf6ec', 7], ['muted on cream', '#4c5870', '#fcf6ec', 4.5], ['blue on cream', '#013275', '#fcf6ec', 7], ['coral-d on cream (small text)', '#b93d26', '#fcf6ec', 4.5], ['ink on sage', '#14233f', '#d2e3ce', 7], ['muted-ish ink on sage (count line)', '#14233f', '#d2e3ce', 4.5], ['blue on sage', '#013275', '#d2e3ce', 4.5], ['ink on apricot', '#14233f', '#f9d4b2', 7], ['blue on apricot', '#013275', '#f9d4b2', 4.5], ['ink-2 on apricot (RRP label)', '#4c5870', '#f9d4b2', 4.5], ['ink-2 on sage', '#4c5870', '#d2e3ce', 4.5], ['ink-2 on sand', '#4c5870', '#f3e6cf', 4.5], ['blue on butter', '#013275', '#f8e4a6', 7], ['count/note ink on sage', '#2b3a56', '#d2e3ce', 7], ['count/note ink on apricot', '#2b3a56', '#f9d4b2', 7], ['note ink on butter', '#2b3a56', '#f8e4a6', 7], ['ink on butter', '#14233f', '#f8e4a6', 7], ['white on blue', '#ffffff', '#013275', 7], ['pale text on blue', '#dbe6f7', '#013275', 4.5], ['blue on coral-l (step number)', '#013275', '#ffa48e', 4.5], ['white on blue button', '#ffffff', '#013275', 7]])
   check(`contrast ${name}`, ratio(fg, bg) >= min, ratio(fg, bg).toFixed(2));
 
 const browser = await chromium.launch({ executablePath: EXE });
@@ -28,16 +28,16 @@ try {
     const m = await page.evaluate(() => ({
       overflow: document.documentElement.scrollWidth - innerWidth,
       h1: document.querySelectorAll('h1').length,
-      fonts: ['Newsreader', 'Figtree'].map((f) => document.fonts.check(`16px "${f}"`)),
+      fonts: ['Bricolage', 'DM Sans'].map((f) => document.fonts.check(`16px "${f}"`)),
       brokenImg: [...document.images].filter((i) => i.complete && i.naturalWidth === 0).length,
       small: [...document.querySelectorAll('a.btn, button')].filter((e) => e.getBoundingClientRect().width && e.getBoundingClientRect().height < 43.5).map((e) => e.textContent.trim()),
       h1Size: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
       logoW: document.querySelector('.hdr__brand img').getBoundingClientRect().width,
       headerBottom: document.querySelector('.hdr').getBoundingClientRect().bottom,
-      testsTop: document.querySelector('#tests').getBoundingClientRect().top,
-      cardTops: [...document.querySelectorAll('.test')].map((e) => Math.round(e.getBoundingClientRect().top)),
-      cardW: [...document.querySelectorAll('.test')].map((e) => Math.round(e.getBoundingClientRect().width)),
-      cardH: [...document.querySelectorAll('.test')].map((e) => Math.round(e.getBoundingClientRect().height)),
+      testsTop: document.querySelector('#choose').getBoundingClientRect().top,
+      cardTops: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().top)),
+      cardW: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().width)),
+      cardH: [...document.querySelectorAll('.pick')].map((e) => Math.round(e.getBoundingClientRect().height)),
       hdrOneRow: document.querySelector('.hdr').getBoundingClientRect().height < 90,
     }));
     check(`@${w} no horizontal overflow`, m.overflow <= 0, String(m.overflow));
@@ -46,12 +46,13 @@ try {
     check(`@${w} logo readable (>=140px)`, m.logoW >= 140, String(m.logoW));
     check(`@${w} header on one row`, m.hdrOneRow);
     check(`@${w} no console errors / failed requests`, !errs.length && !bad.length, [...errs, ...bad].join(' | '));
-    if (w >= 768) check(`@${w} tests chapter starts in or just below first viewport`, m.testsTop < h + 40, String(m.testsTop));
-    if (w >= 992) check(`@${w} two tests equal width and height`, Math.abs(m.cardW[0] - m.cardW[1]) <= 2 && Math.abs(m.cardH[0] - m.cardH[1]) <= 2 && m.cardTops[0] === m.cardTops[1], JSON.stringify(m));
-    await page.screenshot({ path: `verification/v2-home-${w}-fold.png` });
+    if (w >= 768) check(`@${w} test choice starts within about one viewport`, m.testsTop < h + 120, String(m.testsTop));
+    if (w >= 768) check(`@${w} two tests sit side by side at equal width`, Math.abs(m.cardW[0] - m.cardW[1]) <= 2, JSON.stringify(m.cardW));
+    if (w < 768) check(`@${w} two tests stack at full width`, m.cardW[0] === m.cardW[1] && m.cardTops[1] > m.cardTops[0], JSON.stringify(m));
+    await page.screenshot({ path: `verification/v3-home-${w}-fold.png` });
     await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 400) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 90)); } scrollTo(0, 0); });
     await page.waitForTimeout(900);
-    if (w !== 360) await page.screenshot({ path: `verification/v2-home-${w}.png`, fullPage: true });
+    if (w !== 360) await page.screenshot({ path: `verification/v3-home-${w}.png`, fullPage: true });
     await ctx.close();
   }
 
@@ -59,14 +60,16 @@ try {
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
     await page.goto(BASE + '/', { waitUntil: 'networkidle' });
-    check('hero quick links jump to each test', await (async () => { await page.locator('.hero__quick a').nth(1).click(); await page.waitForTimeout(300); return page.url().endsWith('#t-womens'); })());
+    await page.locator('.hero__actions .btn').click(); await page.waitForTimeout(400);
+    check('hero button jumps to the test choice', page.url().endsWith('#choose') && (await page.locator('#choose').boundingBox()).y < 200, page.url());
     for (const key of ['mens', 'womens']) {
       await page.goto(BASE + '/'); await page.locator(`#t-${key}`).locator('xpath=ancestor::article').getByRole('link', { name: /^Enquire/ }).click();
       await page.waitForURL(`**/contact/?test=${key}`); check(`${key} enquire carries product to the form`, await page.locator(`input[name=test][value=${key}]`).isChecked());
       await page.goto(BASE + '/'); await page.locator('.close__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForURL(`**/contact/?test=${key}`);
       check(`${key} closing enquiry carries product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
     }
-    await page.goto(BASE + '/'); await page.locator('.test a.link').first().click(); await page.waitForURL('**/tests/mens-health-check/'); check('see-what-is-tested link opens the men’s page', true);
+    await page.goto(BASE + '/'); await page.locator('.pick a.link').first().click(); await page.waitForURL('**/tests/mens-health-check/'); check('see-what-is-tested link opens the men’s page', true);
+    await page.goto(BASE + '/'); await page.getByRole('link', { name: 'Full preparation guide' }).click(); await page.waitForURL('**/how-it-works/#preparation'); check('preparation guide link works', true);
     await page.goto(BASE + '/'); const d = page.locator('.faq details').first(); await d.locator('summary').click(); check('FAQ opens', await d.evaluate((e) => e.open));
     await page.keyboard.press('Tab');
     const prices = [...new Set((await page.locator('main').innerText()).match(/£\d[\d,]*/g))]; check('only agreed prices on the page', prices.every((p) => ['£995', '£2,112'].includes(p)), prices.join(' '));
@@ -84,7 +87,7 @@ try {
     const btn = page.getByRole('button', { name: 'Menu' });
     check('mobile nav closed', !(await page.locator('#nav').isVisible()));
     await btn.click(); check('menu opens', (await btn.getAttribute('aria-expanded')) === 'true' && await page.locator('#nav').isVisible());
-    await page.screenshot({ path: 'verification/v2-home-390-menu.png' });
+    await page.screenshot({ path: 'verification/v3-home-390-menu.png' });
     await page.keyboard.press('Escape'); check('Escape closes and returns focus', !(await page.locator('#nav').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
     await btn.click(); await page.locator('#nav').getByRole('link', { name: 'Tests' }).click(); await page.waitForURL('**/tests/'); check('menu link navigates', true);
     await ctx.close();
@@ -93,8 +96,8 @@ try {
   {
     const ctx = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
     await page.goto(BASE + '/', { waitUntil: 'networkidle' });
-    const st = await page.evaluate(() => ({ photo: getComputedStyle(document.querySelector('.q__photo')).animationName, rev: [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).opacity === '1'), ring: getComputedStyle(document.querySelector('.q__ring')).strokeDasharray }));
-    check('reduced motion: no ring/lens animation, all content visible', st.photo === 'none' && st.rev, JSON.stringify(st));
+    const st = await page.evaluate(() => ({ photo: getComputedStyle(document.querySelector('.hero__arch img')).animationName, rev: [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).opacity === '1') }));
+    check('reduced motion: no hero animation, all content visible', st.photo === 'none' && st.rev, JSON.stringify(st));
     check('no cookies or storage', (await ctx.cookies()).length === 0 && (await page.evaluate(() => localStorage.length)) === 0);
     const cls = await page.evaluate(() => new Promise((res) => { let v = 0; new PerformanceObserver((l) => l.getEntries().forEach((e) => !e.hadRecentInput && (v += e.value))).observe({ type: 'layout-shift', buffered: true }); setTimeout(() => res(v), 600); })); check('layout shift < 0.05', cls < 0.05, String(cls));
     await ctx.close();

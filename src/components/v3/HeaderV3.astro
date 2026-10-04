@@ -9,12 +9,12 @@ const current = (h: string) => (h === '/' ? path === '/' : path.startsWith(h));
 <header class="hdr" data-hdr>
   <div class="wrap hdr__bar">
     <a class="hdr__brand" href="/" aria-label={`${SITE.name} home`}>
-      <Image src={wordmark} alt={SITE.name} widths={[200, 400]} sizes="(min-width: 48em) 13rem, 11rem" loading="eager" fetchpriority="high" />
+      <Image src={wordmark} alt={SITE.name} widths={[200, 400]} sizes="(min-width: 48em) 13rem, 9.5rem" loading="eager" fetchpriority="high" />
     </a>
     <div class="hdr__actions">
       <a class="btn btn--sm" href="/contact/">Enquire</a>
       <button class="hdr__toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu" data-toggle>
-        <Icon name="menu" class="m" /><Icon name="x" class="x" /><span class="hdr__tlabel">Menu</span>
+        <Icon name="menu" class="m" /><Icon name="x" class="x" />
       </button>
     </div>
     <nav class="hdr__nav" id="nav" aria-label="Main" data-nav>

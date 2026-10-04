@@ -1,9 +1,9 @@
 ---
-import '../styles/v2.css';
-import HeaderV2 from '../components/v2/HeaderV2.astro';
-import FooterV2 from '../components/v2/FooterV2.astro';
-import newsreader from '../assets/fonts/newsreader-latin-opsz-normal.woff2?url';
-import figtree from '../assets/fonts/figtree-latin-wght-normal.woff2?url';
+import '../styles/v3.css';
+import HeaderV3 from '../components/v3/HeaderV3.astro';
+import FooterV3 from '../components/v3/FooterV3.astro';
+import bricolage from '../assets/fonts/bricolage-subset.woff2?url';
+import dmsans from '../assets/fonts/dmsans-subset.woff2?url';
 import { SITE } from '../data/site';
 
 interface Props { title: string; description: string; jsonLd?: object | object[] }
@@ -20,14 +20,14 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#fbfaf7" />
+    <meta name="theme-color" content="#fcf6ec" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preload" href={newsreader} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={figtree} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={bricolage} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={dmsans} as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content="en_GB" />
@@ -44,9 +44,9 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <HeaderV2 />
+    <HeaderV3 />
     <main id="main" tabindex="-1"><slot /></main>
-    <FooterV2 />
+    <FooterV3 />
     <script>
       // Navigation disclosure on small screens; Escape closes and returns focus.
       const toggle = document.querySelector<HTMLButtonElement>('[data-toggle]');
