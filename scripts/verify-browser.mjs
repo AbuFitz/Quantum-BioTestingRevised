@@ -31,7 +31,7 @@ try {
       check(`${route} @${w} status`, is404 ? resp.status() === 404 : resp.status() === 200, String(resp.status()));
       const m = await page.evaluate(() => {
         const vw = innerWidth;
-        const wide = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && r.right > vw + 1 && !e.closest('.table-wrap') && !e.closest('.close__rings'); }).map((e) => e.tagName + '.' + e.className).slice(0, 3);
+        const wide = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && r.right > vw + 1 && !e.closest('.table-wrap') && !e.closest('.close__rings') && !e.closest('.hero__photo'); }).map((e) => e.tagName + '.' + e.className).slice(0, 3);
         const small = [...document.querySelectorAll('a.btn, button, input:not([type=hidden]):not([type=radio]):not([type=checkbox]), select, textarea')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && (r.height < 43.5) && !e.closest('.hp'); }).map((e) => e.tagName + ':' + (e.textContent || e.name).trim().slice(0, 20));
         return {
           overflow: document.documentElement.scrollWidth - vw, wide, small,

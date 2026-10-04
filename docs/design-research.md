@@ -21,3 +21,9 @@ Cream `#fcf6ec` canvas · sand `#f3e6cf` surface · **blue `#013275` (logo): hea
 
 ## Shapes
 Arches and circles (the Q's roundness, and the familiar shape of a window or doorway), soft 28px panels, pill buttons. No hairline-and-grid "report" look.
+
+
+## Pass 4 additions (recomposition)
+- **Image family.** An image set must share subject, light and grade. The only clinic photographs available are the client's three, all real clinicians with real people in soft interior light, so the page uses two and grades them identically. Unrelated lifestyle campaigns were removed.
+- **Offers as a menu.** Hospitality menus and good price lists set the name and price on one line and align the details beneath, which makes two items comparable without boxes. Each entry uses the same four rows in the same order.
+- **Colour.** One colour chapter is more confident than several; red is a small accent so it reads as the Q's inner ring rather than a section colour.
