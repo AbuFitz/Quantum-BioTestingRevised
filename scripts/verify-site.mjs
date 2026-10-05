@@ -177,8 +177,8 @@ try {
     check('visible focus ring (>= 2px)', await page.evaluate(() => { const s = getComputedStyle(document.activeElement); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2; }));
     await page.close(); const m = await ctx.newPage(); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
     const btn = m.getByRole('button', { name: /menu/i }); check('mobile nav closed initially', !(await m.locator('#menu').isVisible()));
-    await btn.click(); check('menu opens', (await btn.getAttribute('aria-expanded')) === 'true' && await m.locator('#menu').isVisible());
-    await m.keyboard.press('Escape'); check('Escape closes the menu and returns focus', !(await m.locator('#menu').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
+    await btn.click(); await m.waitForTimeout(450); check('menu opens', (await btn.getAttribute('aria-expanded')) === 'true' && await m.locator('#menu').isVisible());
+    await m.keyboard.press('Escape'); await m.waitForTimeout(450); check('Escape closes the menu and returns focus', !(await m.locator('#menu').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
     await btn.click(); await m.locator('#menu').getByRole('link', { name: 'How it works' }).click(); await m.waitForURL('**/how-it-works/'); check('menu link navigates', true);
     await ctx.close();
   }

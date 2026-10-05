@@ -6,7 +6,7 @@ import { NAV, SITE, PRICE } from '../data/site';
 const path = Astro.url.pathname;
 const current = (h: string) => (h === '/' ? path === '/' : path.startsWith(h));
 ---
-<div class="announce">
+<div class="announce" role="region" aria-label="Announcement">
   <div class="announce__in">
     <span class="announce__spacer" aria-hidden="true"></span>
     <p>Men’s and Women’s Health Checks · {PRICE} each<span class="announce__more"> · No GP referral needed</span></p>
