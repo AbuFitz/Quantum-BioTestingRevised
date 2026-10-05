@@ -2,7 +2,7 @@
 // The deep colour chapter: the visit in four steps, with an optional photograph.
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import report from '../assets/photos/report.jpg';
+import sample from '../assets/photos/sample.jpg';
 import { STEPS } from '../data/tests';
 interface Props { id?: string; heading: string; lead: string; more?: boolean; photo?: boolean }
 const { id = 'journey-title', heading, lead, more = true, photo = true } = Astro.props;
@@ -21,7 +21,7 @@ const { id = 'journey-title', heading, lead, more = true, photo = true } = Astro
     </div>
     {photo && (
       <figure class="journey__photo" data-reveal>
-        <Image src={report} alt="A smiling woman standing by a window holding a tablet" widths={[480, 720, 900]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+        <Image src={sample} alt="A gloved hand holding a blood collection tube" widths={[480, 720, 900]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
       </figure>
     )}
   </div>

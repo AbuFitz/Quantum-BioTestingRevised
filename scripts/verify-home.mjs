@@ -43,7 +43,7 @@ try {
     const [mb, wb] = [await men.boundingBox(), await wom.boundingBox()];
     check(`hero buttons have equal size ${tag}`, Math.abs(mb.height - wb.height) < 1 && Math.abs(mb.width - wb.width) < 40, `${mb.width}x${mb.height} vs ${wb.width}x${wb.height}`);
     // Product cards are equal
-    const cards = await page.locator('.card').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
+    const cards = await page.locator('.pack').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
     check(`two product cards ${tag}`, cards.length === 2);
     if (w >= 768) check(`product cards equal size ${tag}`, Math.abs(cards[0][0] - cards[1][0]) < 1 && Math.abs(cards[0][1] - cards[1][1]) < 2, JSON.stringify(cards));
     const text = await page.locator('main').innerText();

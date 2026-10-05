@@ -98,3 +98,17 @@ export const FAQS = [
   { q: 'Can I share my results with my GP?', a: 'Of course. Your digital report can be shared with your GP or any other healthcare provider.' },
   { q: 'What does the £995 include?', a: 'The blood draw, laboratory analysis, a clinical specialist’s review and your digital report. The Women’s Health Check also includes a private GP consultation and a 6-month repeat test.' },
 ];
+
+// What every check includes (shared by the homepage and the tests page)
+export const INCLUDED = [
+  { icon: 'droplets', title: 'A trained phlebotomist', text: 'Your sample is taken by a trained phlebotomist in an appointment of about 15 minutes.' },
+  { icon: 'microscope', title: 'Laboratory analysis', text: 'Your sample is analysed in the laboratory on automated platforms.' },
+  { icon: 'clipboard-check', title: 'Clinical specialist review', text: 'A clinical specialist reviews every result before your report reaches you.' },
+  { icon: 'file-text', title: 'A report in plain English', text: 'Your digital report arrives by email, with commentary that’s easy to follow.' },
+  { icon: 'share-2', title: 'Easy to share with your GP', text: 'Take your report to your GP or any other healthcare provider if you’d like to.' },
+  { icon: 'map-pin', title: 'Clinics to choose from', text: 'Four in London and one in Birmingham. Tell us which suits you best.' },
+];
+
+// The areas shown as chips on each product card
+export const MENS_CHIPS = ['Heart & cholesterol', 'Hormones', 'Thyroid', 'Liver & kidney', 'Vitamins & minerals', 'Inflammation'];
+export const WOMENS_CHIPS = ['Female hormones', 'Heart health', 'Thyroid', 'Stress', 'Nutrition', 'Tumour markers'];

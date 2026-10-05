@@ -89,7 +89,7 @@ try {
     }
     check(`all ${hrefs.size} internal links and anchors resolve, none empty`, dead.length === 0, dead.slice(0, 6).join(' | '));
     const ext = [...hrefs].map((e) => e.split('|')[1]).filter((h) => /^https?:/.test(h));
-    check('external links are limited to the ICO', ext.every((h) => /ico\.org\.uk/.test(h)), ext.join(','));
+    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
     await ctx.close();
   }
 
@@ -103,7 +103,7 @@ try {
     check('legacy routes redirect to existing pages', vj.redirects.every((x) => x.permanent && ROUTES.includes(x.destination)), JSON.stringify(vj.redirects.map((x) => x.source)));
     const ldOf = async (r) => { await page.goto(BASE + r); return page.locator('script[type="application/ld+json"]').allInnerTexts(); };
     const home = await ldOf('/'); check('home structured data is Organization and FAQPage only', home.length === 2 && /"Organization"/.test(home[0]) && /"FAQPage"/.test(home[1]) && !/review|rating|telephone|address/i.test(home.join('')));
-    for (const r of ['/tests/mens-health-check/', '/tests/womens-health-check/']) { const l = await ldOf(r); check(`${r} structured data is a Service with the agreed price`, l.length === 1 && /"Service"/.test(l[0]) && /"price":"995"/.test(l[0]) && /GBP/.test(l[0])); }
+    for (const r of ['/tests/mens-health-check/', '/tests/womens-health-check/']) { const l = await ldOf(r); check(`${r} structured data is a Service with the agreed price`, l.length === 2 && l.some((t) => /"Service"/.test(t) && /"price":"995"/.test(t) && /GBP/.test(t)) && l.some((t) => /BreadcrumbList/.test(t))); }
     for (const r of ROUTES) { const t = await (await ctx.request.get(BASE + r)).text(); const prices = [...new Set(t.replace(/<script[\s\S]*?<\/script>/g, '').match(/£\d(?:[\d,]*\d)?/g) || [])].filter((p) => !['£50', '£75'].includes(p)); check(`prices consistent ${r}`, prices.every((p) => ['£995', '£2,112', '£1,117'].includes(p)), prices.join(' ')); }
     await ctx.close();
   }
@@ -149,9 +149,9 @@ try {
     await page.locator('input[name=test][value=mens]').check(); await page.getByLabel('Full name').fill('Test Person'); await page.getByLabel('Phone number').fill('07700 900123');
     await page.getByLabel('Email address').fill('bad'); await page.getByRole('button', { name: 'Send enquiry' }).click();
     check('invalid email message', (await page.locator('#err-email').innerText()).includes('valid email'));
-    await page.getByLabel('Email address').fill('test@example.com'); await page.getByLabel(/I have read the/).check(); await page.getByLabel('Clinic or area').fill('Fulham');
+    await page.getByLabel('Email address').fill('test@example.com'); await page.getByLabel(/read the Privacy Policy/).check(); await page.getByLabel('Clinic or area').fill('Fulham');
     await page.getByRole('button', { name: 'Send enquiry' }).click(); await page.locator('#form-error:not([hidden])').waitFor();
-    check('unconfigured delivery shows failure, never success', (await page.locator('#form-error').innerText()).includes('not been sent') && await page.locator('#form-success').isHidden());
+    check('unconfigured delivery shows failure, never success', (await page.locator('#form-error').innerText()).includes('couldn’t send') && await page.locator('#form-success').isHidden());
     check('button usable again after failure', await page.getByRole('button', { name: 'Send enquiry' }).isEnabled());
     await page.route('**/api/enquiry', (r) => r.abort()); await page.getByRole('button', { name: 'Send enquiry' }).click();
     await page.waitForFunction(() => document.querySelector('[data-error-text]').textContent.includes('reach the server')); check('network failure state', true); await page.unroute('**/api/enquiry');
@@ -161,7 +161,7 @@ try {
     check('loading state disables the button', await page.locator('[data-submit]').isDisabled());
     await page.locator('#form-success:not([hidden])').waitFor();
     check('duplicate submission prevented (one request)', calls === 1, String(calls));
-    check('success wording says request, not booking', /not a confirmed booking/.test(await page.locator('#form-success').innerText()));
+    check('success wording says request, not booking', /isn’t a confirmed booking/.test(await page.locator('#form-success').innerText()));
     check('payload carries the product and no date of birth', body.test === 'mens' && !Object.keys(body).some((k) => /birth|dob/i.test(k)), Object.keys(body).join(','));
     await ctx.close();
   }
@@ -237,12 +237,16 @@ try {
     check('contact page has no popup (the form is on the page)', (await page.locator('#enquiry-dialog').count()) === 0);
     for (const slug of ['fulham', 'canary-wharf', 'chiswick', 'westfield-stratford', 'birmingham']) {
       await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'networkidle' });
-      check(`${slug}: no iframe and no third-party request until the map is requested`, (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
+      check(`${slug}: self-drawn city map, no iframe and no third-party request`, (await page.locator('svg[aria-label^="Map of"]').count()) === 1 && (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
+      check(`${slug}: its own pin is highlighted and links to this page`, (await page.locator(`.citymap__pin.is-active[href="/clinics/${slug}/"]`).count()) === 1);
       check(`${slug}: address, h1 and breadcrumb schema present`, /SW6|E14|W4|E20|B4/.test(await page.locator('address').innerText()) && (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('script[type="application/ld+json"]').allInnerTexts()).some((t) => /BreadcrumbList/.test(t)));
       check(`${slug}: direction links open safely`, (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
+      check(`${slug}: no show-map button`, (await page.getByRole('button', { name: /show the map/i }).count()) === 0);
     }
-    await page.goto(BASE + '/clinics/fulham/'); await page.getByRole('button', { name: 'Show the map' }).click();
-    check('map iframe loads only after the visitor asks, from Google with no referrer', (await page.locator('iframe').getAttribute('src')).startsWith('https://www.google.com/maps') && (await page.locator('iframe').getAttribute('referrerpolicy')) === 'no-referrer');
+    await page.goto(BASE + '/clinics/', { waitUntil: 'networkidle' });
+    check('finder: a map for each city with every clinic pinned', (await page.locator('.citymap').count()) === 2 && (await page.locator('.citymap__pin').count()) === 5);
+    await page.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
+    check('tests page has no male-versus-female comparison table', (await page.locator('table').count()) === 0);
     await ctx.close();
   }
 } finally { await browser.close(); server.kill(); }

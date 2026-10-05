@@ -1,0 +1,22 @@
+---
+// An example evening-to-appointment timeline for a morning blood test. Illustrative times, labelled as such.
+import Icon from './Icon.astro';
+const steps = [
+  { time: '8 pm', icon: 'utensils', title: 'Finish eating', text: 'Your last meal the evening before.' },
+  { time: 'Overnight', icon: 'moon', title: 'Water only', text: 'Sip water if you’re thirsty. It helps.' },
+  { time: '7 am', icon: 'pill', title: 'Medication as usual', text: 'Take what you’re prescribed, with water.' },
+  { time: '8–9 am', icon: 'droplets', title: 'Your appointment', text: 'About 15 minutes at the clinic.' },
+];
+---
+<div class="prep" role="group" aria-label="An example evening before a morning appointment">
+  <p class="prep__eyebrow">An example evening</p>
+  <ol class="prep__list">
+    {steps.map((s) => (
+      <li class="prep__step" data-reveal>
+        <span class="prep__ic" aria-hidden="true"><Icon name={s.icon} /></span>
+        <div><p class="prep__time">{s.time}</p><h3>{s.title}</h3><p class="prep__text">{s.text}</p></div>
+      </li>
+    ))}
+  </ol>
+  <p class="prep__note">That’s about 12 hours without food. Anything from 8 to 12 hours is fine. Skip intense exercise for 24 hours beforehand.</p>
+</div>

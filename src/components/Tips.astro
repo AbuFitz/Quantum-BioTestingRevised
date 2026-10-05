@@ -1,10 +1,10 @@
 ---
 import Icon from './Icon.astro';
-interface Props { items: { icon: string; title: string; text: string }[]; grid?: boolean }
-const { items, grid = false } = Astro.props;
+interface Props { items: { icon: string; title: string; text: string }[]; grid?: boolean; compact?: boolean }
+const { items, grid = false, compact = false } = Astro.props;
 ---
 {grid ? (
-  <ul class:list={['grid-tiles', { 'grid-tiles--4': items.length === 4 }]}>
+  <ul class:list={['grid-tiles', { 'grid-tiles--4': items.length === 4, 'grid-tiles--compact': compact }]}>
     {items.map((t, i) => (
       <li class="tile" data-reveal style={`--d:${i * 0.06}s`}><Icon name={t.icon} /><h3>{t.title}</h3><p>{t.text}</p></li>
     ))}

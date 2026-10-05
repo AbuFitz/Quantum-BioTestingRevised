@@ -32,13 +32,13 @@ UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "
 Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
 **Provisional (new in this pass)**
-Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (confirm the RRP is a genuine reference price before advertising a saving); the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (mantel clock, woman at a window, beach walk) now appear without that label.
+Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (the client has confirmed the RRP is genuine); the map pin positions are approximate; the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (gloved hand with a blood tube, beach walk) now appear without that label; the blood-tube photograph is only 1024 px wide (rawpixel, CC0) and should be replaced with commissioned photography.
 
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
 2. **Confirmed contact route.** No phone or email is published. Privacy/Terms direct rights requests, cancellations and complaints to the enquiry form as an interim; replace with real addresses.
 3. **Legal review** of Privacy and Terms (refund tiers leave 48 h–3 days undefined; £50/£75 fees, retention periods, GMC wording, eligibility, jurisdiction) and the "Last updated" date.
-4. **Photography licence.** `sample-collection.webp` and `report-review.webp` are carried over from the old repo as temporary stock-style images with no source or licence record, captioned "Illustrative photograph". Replace or document rights. Swap by replacing the files in `src/assets/photos/` (same names).
+4. **Photography licence.** The hero photograph (`visit.jpg`) is carried over from the old repo with no source or licence record. Replace it or document the rights. The other photographs are CC0 (see `brand/photo-sources/PROVENANCE.md`). Swap by replacing the files in `src/assets/photos/` (same names).
 5. **Marker lists, counts and turnaround** confirmed against laboratory documentation (see provisional list).
 6. **Production domain.** Set `PUBLIC_SITE_URL` when the final domain is confirmed (drives canonical, sitemap, robots, social tags).
 7. Company number / registered address, if wanted in the footer and legal pages.
@@ -55,7 +55,7 @@ Clinic addresses (carried over from the old site, unconfirmed); the saving figur
 |---|---|
 | `/` | Home |
 | `/tests/`, `/tests/mens-health-check/`, `/tests/womens-health-check/` | Overview and per-product detail |
-| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, optional map, both tests, FAQ and schema |
+| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, a self-drawn city map, both tests, FAQ and schema |
 | `/how-it-works/` | Process, preparation, clinics, results, FAQs |
 | `/contact/` | Full-page enquiry form: the no-JavaScript fallback and deep link (`?test=mens\|womens&clinic=Name` preselects). Not in the navigation by request; linked from the footer |
 | `/privacy/`, `/terms/`, `/cookies/` | Legal, linked from the footer |
@@ -74,11 +74,11 @@ Two plain emails per enquiry, no marketing content: a team notification (check, 
 
 ## SEO
 
-One `<h1>` per page, unique titles and descriptions, absolute canonicals, sitemap and robots, Open Graph image. Structured data: Organization and FAQPage (home), BreadcrumbList on every inner page, FAQPage (home, how it works, each clinic page), Service with the agreed price (test pages), ItemList (clinic finder) and MedicalBusiness with the postal address (clinic pages). No ratings, reviews, phone numbers, opening hours or coordinates are published because none have been supplied. Clinic pages are written around the clinic's own address, area and FAQs; the content is deliberately plain so it stays true. Internal links: homepage clinic list, footer clinics column, clinic pages link to both tests and to each other, test pages link to clinics.
+One `<h1>` per page, unique titles and descriptions, absolute canonicals, sitemap and robots, Open Graph image. Structured data: Organization and FAQPage (home), BreadcrumbList on every inner page, FAQPage (home, how it works, each clinic page), Service with the agreed price (test pages), ItemList (clinic finder) and MedicalBusiness with the postal address (clinic pages). No ratings, reviews, phone numbers, opening hours or coordinates are published because none have been supplied. The Men's and Women's checks are presented as separate products, not compared against each other, so there is no comparison table. Clinic pages are written around the clinic's own address, area and FAQs; the content is deliberately plain so it stays true. Internal links: homepage clinic list, footer clinics column, clinic pages link to both tests and to each other, test pages link to clinics.
 
 ## Privacy and cookie behaviour as implemented
 
-By default: no cookies, no `localStorage`, no analytics, no third-party requests (fonts self-hosted). That is why there is no sitewide cookie banner: nothing needs consent, and a banner would suggest otherwise. The one third-party feature is the optional map on each clinic page. It is off until the visitor presses "Show the map" (that notice and button are the consent prompt); only then does an iframe load from Google (`referrerpolicy="no-referrer"`), which may set its own cookies. Address and "Open in Google Maps" and "Get directions" links work without it. `/cookies/` and the Privacy Policy describe exactly this. If analytics are ever added, add a consent banner and update both pages. **The map embed was verified to stay off by default and to insert the correct iframe on request; whether Google renders it could not be tested from the sandbox.**
+No cookies, no `localStorage`, no analytics and no third-party requests of any kind (fonts self-hosted). The city maps on the home page, the clinic finder and each clinic page are drawn as inline SVG by `CityMap.astro`, so they contact no one and need no consent. Pin positions come from approximate coordinates in `src/data/clinics.ts` and the map is labelled "schematic, not to scale"; the coordinates are never published as structured data. Each clinic page also links to Google Maps and directions as ordinary links that open in a new tab. Because nothing needs consent, there is no cookie banner, and `/cookies/` and the Privacy Policy say so. If analytics are ever added, add a consent banner and update both pages.
 
 ## Edits to legal text (for the reviewer)
 
