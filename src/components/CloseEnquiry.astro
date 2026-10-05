@@ -1,23 +1,18 @@
 ---
-// Closing enquiry route. Either test pre-selects the form.
+// Closing banner: a rounded photograph with both tests as equal buttons.
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
-import man from '../assets/photos/man.jpg';
-import woman from '../assets/photos/woman.jpg';
+import walk from '../assets/photos/walk.jpg';
 import { TESTS } from '../data/tests';
 ---
-<section class="close" aria-labelledby="close-title">
-  <div class="wrap close__grid">
-    <div class="close__copy">
-      <h2 class="display" id="close-title" data-reveal>Tell us which check you would like</h2>
-      <div class="close__actions" data-reveal style="--d:.1s">
-        {TESTS.map((t) => <a class="btn" href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
-      </div>
-      <p class="close__note" data-reveal style="--d:.18s">An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
+<section class="close-wrap" aria-labelledby="close-title">
+  <div class="banner">
+    <div class="banner__bg" aria-hidden="true"><Image src={walk} alt="" widths={[640, 960, 1280]} sizes="100vw" loading="lazy" /></div>
+    <h2 id="close-title" data-reveal>Tell us which check you would like</h2>
+    <p data-reveal style="--d:.06s">Send an enquiry for either test. The team replies by email to confirm your clinic and time.</p>
+    <div class="banner__actions" data-reveal style="--d:.12s">
+      {TESTS.map((t, i) => <a class={['btn', i ? 'btn--ghost-light' : 'btn--light'].join(' ')} href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
     </div>
-    <div class="close__arches" aria-hidden="true">
-      <div class="arch"><Image src={man} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
-      <div class="arch"><Image src={woman} alt="" widths={[300, 480]} sizes="14rem" loading="lazy" /></div>
-    </div>
+    <p class="banner__note">An enquiry is a request, not a confirmed booking.</p>
   </div>
 </section>

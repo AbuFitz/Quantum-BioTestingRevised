@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Intro from '../components/Intro.astro';
-import VisitChapter from '../components/VisitChapter.astro';
+import Journey from '../components/Journey.astro';
 import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
@@ -16,7 +16,7 @@ import { PREPARATION, CLINICS, FAQS } from '../data/tests';
 >
   <Intro title="How it works" lead="From enquiry to report, and what to do before your appointment." crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]} />
 
-  <VisitChapter id="process-title" heading="The process" lead="Sending the enquiry form does not confirm a booking. Your appointment is confirmed when the team emails you the clinic and time." more={false} photo={false} />
+  <Journey id="process-title" heading="The process" lead="Sending the enquiry form does not confirm a booking. Your appointment is confirmed when the team emails you the clinic and time." more={false} photo={false} />
 
   <section class="section" id="preparation" aria-labelledby="prep-title">
     <div class="wrap">

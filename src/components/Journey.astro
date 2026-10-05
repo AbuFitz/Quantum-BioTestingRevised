@@ -1,0 +1,29 @@
+---
+// The deep colour chapter: the visit in four steps, with an optional photograph.
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import results from '../assets/photos/results.jpg';
+import { STEPS } from '../data/tests';
+interface Props { id?: string; heading: string; lead: string; more?: boolean; photo?: boolean }
+const { id = 'journey-title', heading, lead, more = true, photo = true } = Astro.props;
+---
+<section class="journey" aria-labelledby={id}>
+  <div class:list={['wrap journey__grid', { 'journey__grid--solo': !photo }]}>
+    <div>
+      <h2 class="display" id={id} data-reveal>{heading}</h2>
+      <p class="lead" data-reveal style="--d:.08s">{lead}</p>
+      <ol class="steps">
+        {STEPS.map((s, i) => (
+          <li class="step" data-reveal style={`--d:${i * 0.07}s`}><h3>{s.title}</h3><p>{s.text}</p></li>
+        ))}
+      </ol>
+      {more && <p class="journey__cta"><a class="btn btn--light" href="/how-it-works/">How it works <Icon name="arrow-right" /></a></p>}
+    </div>
+    {photo && (
+      <figure class="journey__photo" data-reveal>
+        <Image src={results} alt="A clinician explaining test results to a colleague at a computer" widths={[480, 720, 900]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+        <figcaption>Illustrative photograph</figcaption>
+      </figure>
+    )}
+  </div>
+</section>

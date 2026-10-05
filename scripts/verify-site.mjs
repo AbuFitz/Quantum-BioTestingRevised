@@ -113,8 +113,8 @@ try {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
     await page.goto(BASE + '/');
     for (const [label, path] of [['Tests', '/tests/'], ['How it works', '/how-it-works/'], ['Contact', '/contact/'], ['Home', '/']]) {
-      await page.locator('.hdr__list').getByRole('link', { name: label, exact: true }).click(); await page.waitForURL('**' + path);
-      check(`nav → ${label} marks current page`, (await page.locator('.hdr__list [aria-current=page]').innerText()) === label);
+      await page.locator('.hdr__nav').getByRole('link', { name: label, exact: true }).click(); await page.waitForURL('**' + path);
+      check(`nav → ${label} marks current page`, (await page.locator('.hdr__nav [aria-current=page]').innerText()) === label);
     }
     for (const [key, slug] of [['mens', 'mens-health-check'], ['womens', 'womens-health-check']]) {
       for (const [from, sel] of [['/', `#t-${key}`], ['/tests/', `#t-${key}`]]) {
@@ -123,7 +123,7 @@ try {
       }
       await page.goto(BASE + `/tests/${slug}/`); await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForURL(`**/contact/?test=${key}`);
       check(`${slug} enquire preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
-      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.close__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForURL(`**/contact/?test=${key}`);
+      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.banner__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForURL(`**/contact/?test=${key}`);
       check(`${slug} closing enquiry preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
     }
     await page.goto(BASE + '/tests/mens-health-check/'); const mens = await page.locator('main').innerText();
@@ -176,10 +176,10 @@ try {
     await page.goto(BASE + '/contact/'); for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
     check('visible focus ring (>= 2px)', await page.evaluate(() => { const s = getComputedStyle(document.activeElement); return s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) >= 2; }));
     await page.close(); const m = await ctx.newPage(); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
-    const btn = m.getByRole('button', { name: 'Menu' }); check('mobile nav closed initially', !(await m.locator('#nav').isVisible()));
-    await btn.click(); check('menu opens', (await btn.getAttribute('aria-expanded')) === 'true' && await m.locator('#nav').isVisible());
-    await m.keyboard.press('Escape'); check('Escape closes the menu and returns focus', !(await m.locator('#nav').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
-    await btn.click(); await m.locator('#nav').getByRole('link', { name: 'How it works' }).click(); await m.waitForURL('**/how-it-works/'); check('menu link navigates', true);
+    const btn = m.getByRole('button', { name: /menu/i }); check('mobile nav closed initially', !(await m.locator('#menu').isVisible()));
+    await btn.click(); check('menu opens', (await btn.getAttribute('aria-expanded')) === 'true' && await m.locator('#menu').isVisible());
+    await m.keyboard.press('Escape'); check('Escape closes the menu and returns focus', !(await m.locator('#menu').isVisible()) && await btn.evaluate((e) => e === document.activeElement));
+    await btn.click(); await m.locator('#menu').getByRole('link', { name: 'How it works' }).click(); await m.waitForURL('**/how-it-works/'); check('menu link navigates', true);
     await ctx.close();
   }
 
@@ -190,13 +190,13 @@ try {
     await ctx.close();
     const rm = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } }); const p = await rm.newPage();
     await p.goto(BASE + '/', { waitUntil: 'networkidle' });
-    const st = await p.evaluate(() => ({ anim: getComputedStyle(document.querySelector('.hero__arch img')).animationName, rev: [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).opacity === '1') }));
+    const st = await p.evaluate(() => ({ anim: getComputedStyle(document.querySelector('.hero__bg img')).animationName, rev: [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).opacity === '1') }));
     check('reduced motion: no hero animation, all content visible', st.anim === 'none' && st.rev, JSON.stringify(st));
     check('no cookies and no localStorage', (await rm.cookies()).length === 0 && (await p.evaluate(() => localStorage.length)) === 0);
     const cls = await p.evaluate(() => new Promise((res) => { let v = 0; new PerformanceObserver((l) => l.getEntries().forEach((e) => !e.hadRecentInput && (v += e.value))).observe({ type: 'layout-shift', buffered: true }); setTimeout(() => res(v), 700); })); check('layout shift < 0.05 on home', cls < 0.05, String(cls));
     await rm.close();
     const nj = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } }); const q = await nj.newPage();
-    for (const r of ['/', '/tests/']) { await q.goto(BASE + r); check(`${r} without JS: navigation and content visible`, await q.evaluate(() => getComputedStyle(document.querySelector('#nav')).display !== 'none' && [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).transform === 'none'))); }
+    for (const r of ['/', '/tests/']) { await q.goto(BASE + r); check(`${r} without JS: navigation and content visible`, await q.evaluate(() => getComputedStyle(document.querySelector('#menu')).display !== 'none' && [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).transform === 'none'))); }
     await nj.close();
   }
 } finally { await browser.close(); server.kill(); }

@@ -4,8 +4,6 @@ import Intro from '../../components/Intro.astro';
 import MarkerGroups from '../../components/MarkerGroups.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import Icon from '../../components/Icon.astro';
-import man from '../../assets/photos/man.jpg';
-import woman from '../../assets/photos/woman.jpg';
 import { TESTS, MENS_GROUPS, WOMENS_AREAS, MENU_NOTE, type TestProduct } from '../../data/tests';
 import { PRICE, RRP, SITE } from '../../data/site';
 
@@ -16,8 +14,6 @@ const { test } = Astro.props as { test: TestProduct };
 const other = TESTS.find((t) => t.key !== test.key)!;
 const isMens = test.key === 'mens';
 const tone = isMens ? 'sky' : 'blush';
-const photo = isMens ? man : woman;
-const photoAlt = isMens ? 'A smiling man holding a coffee' : 'A woman holding a bunch of flowers';
 
 const ld = {
   '@context': 'https://schema.org',
@@ -34,7 +30,7 @@ const ld = {
   description={`${test.name}: ${test.biomarkers.toLowerCase()}, ${PRICE} (RRP ${RRP}). See everything the test covers and send an appointment enquiry.`}
   jsonLd={ld}
 >
-  <Intro title={test.name} lead={test.summary} tone={tone} photo={photo} photoAlt={photoAlt} crumbs={[{ href: '/', label: 'Home' }, { href: '/tests/', label: 'Tests' }, { label: test.name }]} />
+  <Intro title={test.name} lead={test.summary} tone={tone} crumbs={[{ href: '/', label: 'Home' }, { href: '/tests/', label: 'Tests' }, { label: test.name }]} />
 
   <section class="section" aria-labelledby="included-title">
     <div class="wrap facts-split">
@@ -45,7 +41,7 @@ const ld = {
           <li><Icon name="clock" /><span>Results in {test.results}</span></li>
         </ul>
       </div>
-      <aside class:list={['panel panel--stick', { 'panel--blush': !isMens }]} aria-label="Price and enquiry">
+      <aside class="panel panel--stick" aria-label="Price and enquiry">
         <p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p>
         <p>An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
         <p><a class="btn" href={`/contact/?test=${test.key}`}>Enquire about this test <Icon name="arrow-right" /></a></p>

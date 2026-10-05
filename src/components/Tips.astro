@@ -3,11 +3,16 @@ import Icon from './Icon.astro';
 interface Props { items: { icon: string; title: string; text: string }[]; grid?: boolean }
 const { items, grid = false } = Astro.props;
 ---
-<ul class:list={['tips', { 'tips--grid': grid }]}>
-  {items.map((t, i) => (
-    <li class="tip" data-reveal style={`--d:${i * 0.08}s`}>
-      <span class="tip__ic" aria-hidden="true"><Icon name={t.icon} /></span>
-      <div><h3>{t.title}</h3><p>{t.text}</p></div>
-    </li>
-  ))}
-</ul>
+{grid ? (
+  <ul class:list={['grid-tiles', { 'grid-tiles--4': items.length === 4 }]}>
+    {items.map((t, i) => (
+      <li class="tile" data-reveal style={`--d:${i * 0.06}s`}><Icon name={t.icon} /><h3>{t.title}</h3><p>{t.text}</p></li>
+    ))}
+  </ul>
+) : (
+  <ul class="tips">
+    {items.map((t, i) => (
+      <li class="tip" data-reveal style={`--d:${i * 0.08}s`}><span class="tip__ic" aria-hidden="true"><Icon name={t.icon} /></span><div><h3>{t.title}</h3><p>{t.text}</p></div></li>
+    ))}
+  </ul>
+)}

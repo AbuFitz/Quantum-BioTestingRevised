@@ -2,15 +2,14 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import OfferPanels from '../components/OfferPanels.astro';
-import VisitChapter from '../components/VisitChapter.astro';
+import TestCards from '../components/TestCards.astro';
+import Journey from '../components/Journey.astro';
 import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
 import orange from '../assets/photos/orange.jpg';
-import walk from '../assets/photos/walk.jpg';
-import { SITE, PRICE } from '../data/site';
+import { SITE, PRICE, RRP } from '../data/site';
 import { FAQS } from '../data/tests';
 
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, legalName: SITE.legalName, url: Astro.site!.href, logo: new URL('/icon-512.png', Astro.site).href };
@@ -19,6 +18,14 @@ const tips = [
   { icon: 'pill', title: 'Keep taking your medication', text: 'Take prescribed medication as normal unless your doctor has advised otherwise.' },
   { icon: 'dumbbell', title: 'Skip hard exercise', text: 'Avoid intense exercise for 24 hours beforehand, as it can affect some results.' },
 ];
+const included = [
+  { icon: 'droplets', title: 'A trained phlebotomist', text: 'Your blood sample is taken at the clinic. The appointment takes about 15 minutes.' },
+  { icon: 'microscope', title: 'Laboratory analysis', text: 'Your sample is analysed in the laboratory on automated platforms.' },
+  { icon: 'clipboard-check', title: 'Clinical specialist review', text: 'Every result is reviewed by a clinical specialist before your report is issued.' },
+  { icon: 'file-text', title: 'A plain-English report', text: 'A digital report arrives by email with commentary you can follow.' },
+  { icon: 'share-2', title: 'Share it with your GP', text: 'The report can be shared with your GP or any other healthcare provider.' },
+  { icon: 'stethoscope', title: 'Extras with the Women’s check', text: 'A private remote GP consultation and a 6-month repeat test are included.' },
+];
 ---
 <Base
   title="Private Blood Tests for Men and Women | Quantum BioTesting"
@@ -26,65 +33,79 @@ const tips = [
   jsonLd={orgLd}
 >
   <section class="hero" aria-labelledby="hero-title">
-    <div class="wrap hero__grid">
+    <div class="hero__bg" aria-hidden="true">
+      <Image src={visit} alt="" widths={[640, 960, 1200]} sizes="100vw" loading="eager" fetchpriority="high" />
+    </div>
+    <div class="wrap hero__inner">
       <div class="hero__copy">
-        <h1 class="display" id="hero-title">Private blood tests, without the fuss.</h1>
-        <p class="lead">Choose the Men’s or Women’s Health Check, send an enquiry, and the team will confirm your clinic and appointment time by email.</p>
+        <p class="hero__kicker">Private blood tests in the UK</p>
+        <h1 id="hero-title">Know what is going on inside, without the fuss.</h1>
+        <p class="hero__lead">Choose the Men’s or Women’s Health Check, send an enquiry, and the team will confirm your clinic and appointment time by email.</p>
         <div class="hero__actions">
-          <a class="btn" href="#choose">Choose your test <Icon name="arrow-down" /></a>
-          <a class="link" href="/how-it-works/">How it works</a>
+          <a class="btn" href="/contact/?test=mens">Men’s Health Check <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost-light" href="/contact/?test=womens">Women’s Health Check <Icon name="arrow-right" /></a>
         </div>
-        <ul class="facts" aria-label="At a glance">
-          <li><Icon name="pound-sterling" />{PRICE} each</li>
-          <li><Icon name="clock" />15-minute visit</li>
-          <li><Icon name="circle-check" />No GP referral</li>
-        </ul>
       </div>
-      <div class="hero__art">
-        <div class="arch hero__arch">
-          <Image src={visit} alt="A clinician applying a plaster to a patient’s arm after a blood sample" widths={[480, 720, 960]} sizes="(min-width: 48em) 34rem, 92vw" loading="eager" fetchpriority="high" />
-        </div>
-        <p class="hero__note">Illustrative photograph</p>
-      </div>
+      <ul class="hero__facts" aria-label="At a glance">
+        <li><Icon name="pound-sterling" /><strong>{PRICE} each</strong><span>RRP {RRP}</span></li>
+        <li><Icon name="clock" /><strong>15-minute visit</strong><span>At a clinic</span></li>
+        <li><Icon name="circle-check" /><strong>No GP referral</strong><span>Enquire directly</span></li>
+        <li><Icon name="file-text" /><strong>Specialist-reviewed</strong><span>Plain-English report</span></li>
+      </ul>
+      <p class="hero__note">Illustrative photograph</p>
     </div>
   </section>
 
-  <section class="choose" id="choose" aria-labelledby="choose-title">
+  <section class="section" id="choose" aria-labelledby="choose-title">
     <div class="wrap">
-      <div class="choose__head">
-        <h2 class="display" id="choose-title" data-reveal>Choose your health check</h2>
-        <p class="muted" data-reveal style="--d:.08s">Both tests are {PRICE}. Open a test to see everything it covers.</p>
+      <div class="section__head center">
+        <h2 class="display" id="choose-title">Choose your health check</h2>
+        <p class="lead">Both tests are {PRICE}. Open a test to see everything it covers.</p>
       </div>
-      <OfferPanels />
+      <TestCards />
     </div>
   </section>
 
-  <VisitChapter heading="A quick visit, then back to your day" lead="The appointment takes about 15 minutes. Your sample goes to the laboratory, a clinical specialist reviews the results, and your report arrives by email." />
-
-  <figure class="band" data-reveal>
-    <div class="band__img"><Image src={walk} alt="Three people walking along a misty beach" widths={[640, 960, 1280]} sizes="(min-width: 78em) 78rem, 92vw" loading="lazy" /></div>
-  </figure>
-
-  <section class="before" aria-labelledby="before-title">
+  <section class="section section--tight" aria-label="Key figures">
     <div class="wrap">
-      <div class="before__grid">
-      <div class="before__main">
-      <div class="before__head">
+      <ul class="trio">
+        <li class="feature" data-reveal><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">300+</p><p class="feature__label">Men’s Health Check</p><p>Biomarkers across 11 groups, from heart and cholesterol to hormones and vitamins.</p></li>
+        <li class="feature" data-reveal style="--d:.08s"><span class="feature__icon" aria-hidden="true"><Icon name="pound-sterling" /></span><p class="feature__big">{PRICE}</p><p class="feature__label">Each test</p><p>One price for either check, against a recommended retail price of {RRP}.</p></li>
+        <li class="feature" data-reveal style="--d:.16s"><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">Up to 350</p><p class="feature__label">Women’s Health Check</p><p>Biomarkers across 27 health areas, with a GP consultation and repeat test included.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <Journey heading="A quick visit, then back to your day" lead="Your sample goes to the laboratory, a clinical specialist reviews the results, and your report arrives by email." />
+
+  <section class="section" aria-labelledby="included-title">
+    <div class="wrap">
+      <div class="section__head center">
+        <h2 class="display" id="included-title">What every test includes</h2>
+        <p class="lead">From the blood draw to the report, it is all in the {PRICE}.</p>
+      </div>
+      <Tips grid items={included} />
+    </div>
+  </section>
+
+  <section class="section section--white" aria-labelledby="before-title">
+    <div class="wrap split">
+      <div class="split__text">
         <h2 class="display" id="before-title" data-reveal>Before you come in</h2>
-        <p class="muted" data-reveal style="--d:.08s">Three small things that help your results be as accurate as possible.</p>
+        <p class="lead" data-reveal style="--d:.06s">Three small things that help your results be as accurate as possible.</p>
+        <Tips items={tips} />
+        <div class="split__foot">
+          <a class="btn btn--outline" href="/how-it-works/#preparation">Full preparation guide <Icon name="arrow-right" /></a>
+          <p class="muted">If you have a health condition or are unsure, contact the team before your appointment.</p>
+        </div>
       </div>
-      <Tips items={tips} />
-      <div class="before__foot">
-        <a class="btn btn--ghost" href="/how-it-works/#preparation">Full preparation guide <Icon name="arrow-right" /></a>
-        <p class="muted">If you have a health condition or are unsure, contact the team before your appointment.</p>
-      </div>
-      </div>
-      <figure class="before__img" data-reveal><div class="arch"><Image src={orange} alt="Hands cutting an orange on a wooden board" widths={[400, 640, 900]} sizes="(min-width: 62em) 26rem, 90vw" loading="lazy" /></div></figure>
-      </div>
+      <figure class="split__photo" data-reveal>
+        <Image src={orange} alt="Hands cutting an orange on a wooden board" widths={[480, 720, 960]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+      </figure>
     </div>
   </section>
 
-  <FaqSection items={FAQS.slice(0, 5)} />
+  <FaqSection items={FAQS.slice(0, 5)} more />
 
   <CloseEnquiry />
 </Base>

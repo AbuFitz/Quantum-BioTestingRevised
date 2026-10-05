@@ -1,27 +1,19 @@
 ---
-// Page introduction for every inner page: breadcrumbs, one h1, one lead, optional photograph.
-import { Image } from 'astro:assets';
-interface Props { title: string; lead?: string; crumbs?: { href?: string; label: string }[]; tone?: 'sand' | 'sky' | 'blush'; photo?: ImageMetadata; photoAlt?: string }
-const { title, lead, crumbs, tone = 'sand', photo, photoAlt = '' } = Astro.props;
+// Page head for inner pages: breadcrumbs, one h1, one lead. Sits under the floating navigation.
+interface Props { title: string; lead?: string; crumbs?: { href?: string; label: string }[]; tone?: 'blush' | 'sky' }
+const { title, lead, crumbs, tone = 'blush' } = Astro.props;
 ---
 <div class:list={['intro', `intro--${tone}`]}>
-  <div class:list={['wrap intro__grid', { 'intro__grid--photo': !!photo }]}>
-    <div class="intro__copy">
-      {crumbs && (
-        <nav aria-label="Breadcrumb">
-          <ol class="crumbs">
-            {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
-          </ol>
-        </nav>
-      )}
-      <h1 class="display">{title}</h1>
-      {lead && <p class="lead">{lead}</p>}
-      <slot />
-    </div>
-    {photo && (
-      <div class="intro__art">
-        <div class="arch"><Image src={photo} alt={photoAlt} widths={[400, 640, 900]} sizes="(min-width: 48em) 22rem, 90vw" loading="eager" fetchpriority="high" /></div>
-      </div>
+  <div class="wrap intro__copy">
+    {crumbs && (
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs">
+          {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
+        </ol>
+      </nav>
     )}
+    <h1 class="display">{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
   </div>
 </div>

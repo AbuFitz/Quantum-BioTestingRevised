@@ -29,7 +29,7 @@ Repositories: **NEW** (this one, implementation) · **OLD** `AbuFitz/Quantum-Bio
 UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "145+ countries", "7-day availability"; "most comprehensive in the UK"; NHS comparison table (15–20 markers, 1–3 weeks); "was £2,000 / save £1,005" (superseded by the supplied RRP); "cancel up to 48 hours before" (conflicts with the Terms tiers); express-results as a headline claim; Men's APOE/autoimmune notes that refer to a physician consultation men are not stated to receive; card-payment and VAT-exemption statements in Terms.
 
 **Inferred (reversible decisions)**
-Astro static site + one Vercel function; Bricolage Grotesque + DM Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
+Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
@@ -74,17 +74,17 @@ Source retained untouched at `brand/source/quantum-logo-source.png` (2000×2000 
 
 ## Typography
 
-Bricolage Grotesque (headlines, prices, offer names, menu) and DM Sans (text and controls), both SIL OFL, axis-limited and subset to Latin by `scripts/subset-fonts.py` (about 82 KB for both), preloaded, with metric-matched fallbacks. Chosen after rendering the real headline, prices and mobile menu in six display faces and three text faces; see `docs/design-research.md`. Newsreader and Figtree (an earlier pass) and Public Sans (the first pass) are no longer used.
+Fraunces (display headlines, big figures, legal headings) and Plus Jakarta Sans (text, controls, prices, card headings), both SIL OFL, axis-limited and subset to Latin by `scripts/subset-fonts.py` (about 57 KB for both), preloaded, with metric-matched fallbacks. Chosen to match the client's references (BioClin pairs Fraunces with a clean sans; Medichecks uses Plus Jakarta Sans); see `docs/design-research.md`. Bricolage Grotesque, DM Sans, Newsreader, Figtree and Public Sans (earlier passes) are no longer used and their files are removed.
 
 **Accepted risk:** the Greek letter ε in "APOE ε2/ε3/ε4" (men's marker list) is in neither typeface and falls back to the system sans-serif. It is a single glyph on one page.
 
-# Delivered design: "a good local" (all pages)
+# Delivered design: BioClin and Medichecks patterns (all pages)
 
-A welcoming, people-first identity: warm cream paper, the logo's blue for headlines, buttons and one full colour chapter, pale blue and blush tints (from the logo's blue and red) for the two tests, the Q's red as the accent and the closing chapter, arches and circles drawn from the Q, and warm graded photography. It replaced earlier proposals (first-pass clinical theme, "clear sample", and a "menu-style" recomposition that was reverted at the client's request; all recoverable from git).
+Built at the client's request from two reference sites, replacing every earlier theme completely (earlier themes are recoverable from git). An announcement bar (Medichecks) sits above a floating pill navigation (BioClin) that expands inside itself on phones. The homepage runs: full-bleed hero with both test buttons and a four-item feature strip; two equal product cards (Medichecks anatomy: tag strip, name, description, biomarkers, results time, price, buttons); a feature trio; a deep blue journey chapter with the four visit steps and a photograph; an icon grid of what every test includes; a preparation split; FAQ rows; a rounded photographic banner with both tests as buttons; a light footer. What was adopted and what was deliberately not copied is in `docs/design-research.md`.
 
-**Structure.** One stylesheet (`src/styles/site.css`), one layout (`src/layouts/Base.astro`), shared components in `src/components/` (Header, Footer, Intro, OfferPanels, VisitChapter, Tips, FaqSection, CloseEnquiry, MarkerGroups, LegalLayout, EnquiryForm). Content lives in `src/data/`. Every page is built from the same components, so the offers, the visit steps, the FAQ and the closing enquiry are identical wherever they appear. The homepage keeps a compact hero with a full-width test choice straight after it.
+**Structure.** One stylesheet (`src/styles/site.css`), one layout (`src/layouts/Base.astro`), shared components in `src/components/` (Header with announcement bar, Footer, Intro, TestCards, Journey, Tips, FaqSection, CloseEnquiry, MarkerGroups, LegalLayout, EnquiryForm). Content lives in `src/data/`. Every page is built from the same components, so the test cards, the visit steps, the FAQ and the closing banner are identical wherever they appear.
 
-**Photography.** Hero: the client's clinician-and-patient photograph. People photography for the two tests, the visit chapter and the closing section: CC0 StockSnap images, graded into the palette (`scripts/make-photo-assets.mjs`; greens and teals pulled toward the logo blue and red). How it works: the client's "clinician explaining results" photograph. Sources, licences and the gaps are in `brand/photo-sources/PROVENANCE.md`. The two client photographs have no licence record; the StockSnap files are 960 px, the largest obtainable without an account. All are captioned or described as illustrative.
+**Photography.** Hero: the client's clinician-and-patient photograph. Preparation split and closing banner: CC0 StockSnap images, graded into the palette (`scripts/make-photo-assets.mjs`; greens and teals pulled toward the logo blue and red). Journey chapter (home and How it works): the client's "clinician explaining results" photograph. Sources, licences and the gaps are in `brand/photo-sources/PROVENANCE.md`. The two client photographs have no licence record; the StockSnap files are 960 px, the largest obtainable without an account. All are captioned or described as illustrative.
 
 ## Release evidence (production build)
 
@@ -105,4 +105,4 @@ A welcoming, people-first identity: warm cream paper, the logo's blue for headli
 | Real enquiry delivery | needs `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM`; no email has been sent from this build | **blocked** (client input) |
 | Content truth | provisional facts listed in the ledger above (marker counts and lists, turnaround, GP consultation and repeat test, clinic addresses, photo rights) | **blocked** (client confirmation) |
 
-Run them with `npm run verify` (all pages, about 6 minutes because of the axe scans), `npm run verify:home` (homepage detail, 92 checks) and `npm test`. Lighthouse was run separately against `scripts/preview-server.mjs`.
+Run them with `npm run verify` (all pages, about 6 minutes because of the axe scans), `npm run verify:home` (homepage detail, 88 checks) and `npm test`. Lighthouse was run separately against `scripts/preview-server.mjs`.

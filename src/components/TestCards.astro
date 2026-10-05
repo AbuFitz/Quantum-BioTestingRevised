@@ -1,0 +1,35 @@
+---
+// The two tests as equal, comparable product cards. Used on the homepage and /tests/.
+import Icon from './Icon.astro';
+import { PRICE, RRP } from '../data/site';
+import { TESTS } from '../data/tests';
+interface Props { headingLevel?: 'h2' | 'h3' }
+const { headingLevel: H = 'h3' } = Astro.props;
+const copy = {
+  mens: { tag: 'For men', desc: 'Heart and cholesterol, blood count, metabolism, liver and kidney, thyroid, hormones, inflammation, vitamins and minerals, cancer screening markers and more, in 11 groups.' },
+  womens: { tag: 'For women', desc: 'Hormone balance, heart health, stress, nutrition, tumour markers and more across 27 health areas, with a private GP consultation and a repeat test included.' },
+};
+---
+<div class="cards">
+  {TESTS.map((t, i) => (
+    <article class:list={['card', { 'card--women': t.key === 'womens' }]} aria-labelledby={`t-${t.key}`} data-reveal style={`--d:${i * 0.1}s`}>
+      <p class="card__tag">{copy[t.key].tag}</p>
+      <div class="card__body">
+        <H id={`t-${t.key}`}>{t.name}</H>
+        <p class="card__desc">{copy[t.key].desc}</p>
+        <ul class="card__meta">
+          <li><Icon name="flask-conical" />{t.biomarkers}</li>
+          <li><Icon name="clock" />Results in {t.results}</li>
+        </ul>
+        <ul class="ticks">
+          {t.inclusions.slice(1).map((inc) => <li><Icon name="check" /><span>{inc.text}</span></li>)}
+        </ul>
+        <p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p>
+        <div class="card__actions">
+          <a class="btn" href={`/contact/?test=${t.key}`}>Enquire<span class="vh"> about the {t.name}</span> <Icon name="arrow-right" /></a>
+          <a class="btn btn--outline" href={`/tests/${t.slug}/`}>What is tested<span class="vh"> in the {t.name}</span></a>
+        </div>
+      </div>
+    </article>
+  ))}
+</div>

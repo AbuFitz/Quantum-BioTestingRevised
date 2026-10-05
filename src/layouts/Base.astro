@@ -2,8 +2,8 @@
 import '../styles/site.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import bricolage from '../assets/fonts/bricolage-subset.woff2?url';
-import dmsans from '../assets/fonts/dmsans-subset.woff2?url';
+import fraunces from '../assets/fonts/fraunces-subset.woff2?url';
+import jakarta from '../assets/fonts/jakarta-subset.woff2?url';
 import { SITE } from '../data/site';
 
 interface Props { title: string; description: string; jsonLd?: object | object[] }
@@ -20,14 +20,14 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#fcf6ec" />
+    <meta name="theme-color" content="#fbf3ef" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
     <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preload" href={bricolage} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={dmsans} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fraunces} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jakarta} as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content="en_GB" />
@@ -48,14 +48,16 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <main id="main" tabindex="-1"><slot /></main>
     <Footer />
     <script>
-      // Navigation disclosure on small screens; Escape closes and returns focus.
+      // Floating navigation: the menu expands inside the pill on small screens; Escape closes and returns focus.
       const toggle = document.querySelector<HTMLButtonElement>('[data-toggle]');
       const nav = document.querySelector<HTMLElement>('[data-nav]');
       if (toggle && nav) {
-        const mq = window.matchMedia('(min-width: 48em)');
+        const mq = window.matchMedia('(min-width: 62em)');
         const set = (open: boolean, restore = false) => {
           toggle.setAttribute('aria-expanded', String(open));
-          nav.hidden = !open && !mq.matches;
+          toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          nav.classList.toggle('is-open', open);
+          nav.toggleAttribute('inert', !open);
           if (!open && restore) toggle.focus();
         };
         set(false);
@@ -64,9 +66,6 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
         nav.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) set(false); });
         mq.addEventListener('change', () => set(false));
       }
-      // Header gains a hairline once the page scrolls under it.
-      const hdr = document.querySelector('[data-hdr]');
-      if (hdr) { const f = () => hdr.classList.toggle('is-stuck', scrollY > 4); f(); addEventListener('scroll', f, { passive: true }); }
       // Quiet entrance for chapters; everything is visible without JS or with reduced motion.
       const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
       if (items.length && 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

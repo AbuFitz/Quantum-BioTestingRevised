@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Intro from '../../components/Intro.astro';
-import OfferPanels from '../../components/OfferPanels.astro';
+import TestCards from '../../components/TestCards.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import Icon from '../../components/Icon.astro';
 import { TESTS, MENU_NOTE } from '../../data/tests';
@@ -17,7 +17,7 @@ const [men, women] = TESTS;
   <section class="section" aria-labelledby="choose-title">
     <div class="wrap">
       <h2 id="choose-title" class="vh">The two tests</h2>
-      <OfferPanels headingLevel="h3" />
+      <TestCards headingLevel="h3" />
     </div>
   </section>
 
