@@ -8,11 +8,11 @@ import { TESTS } from '../data/tests';
 <section class="close-wrap" aria-labelledby="close-title">
   <div class="banner">
     <div class="banner__bg" aria-hidden="true"><Image src={walk} alt="" widths={[640, 960, 1280]} sizes="100vw" loading="lazy" /></div>
-    <h2 id="close-title" data-reveal>Tell us which check you would like</h2>
-    <p data-reveal style="--d:.06s">Send an enquiry for either test. The team replies by email to confirm your clinic and time.</p>
+    <h2 id="close-title" data-reveal>Ready when you are</h2>
+    <p data-reveal style="--d:.06s">Tell us which check you’d like and we’ll email you to confirm your clinic and time.</p>
     <div class="banner__actions" data-reveal style="--d:.12s">
       {TESTS.map((t, i) => <a class={['btn', i ? 'btn--ghost-light' : 'btn--light'].join(' ')} href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
     </div>
-    <p class="banner__note">An enquiry is a request, not a confirmed booking.</p>
+    <p class="banner__note">Sending an enquiry isn’t a booking. Your appointment is confirmed when we reply.</p>
   </div>
 </section>

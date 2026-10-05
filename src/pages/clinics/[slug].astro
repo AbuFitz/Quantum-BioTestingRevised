@@ -1,0 +1,100 @@
+---
+import Base from '../../layouts/Base.astro';
+import Intro from '../../components/Intro.astro';
+import Icon from '../../components/Icon.astro';
+import ClinicMap from '../../components/ClinicMap.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import CloseEnquiry from '../../components/CloseEnquiry.astro';
+import { CLINICS, fullAddress, type Clinic } from '../../data/clinics';
+import { TESTS, STEPS } from '../../data/tests';
+import { PRICE, RRP, SAVING, SITE } from '../../data/site';
+import { breadcrumbLd, faqLd } from '../../data/seo';
+
+export function getStaticPaths() {
+  return CLINICS.map((c) => ({ params: { slug: c.slug }, props: { clinic: c } }));
+}
+const { clinic } = Astro.props as { clinic: Clinic };
+const others = CLINICS.filter((c) => c.slug !== clinic.slug);
+const faqs = [
+  { q: `Where is the ${clinic.name} clinic?`, a: `It is ${clinic.where}: ${fullAddress(clinic)}. We confirm the exact clinic details by email when your appointment is arranged.` },
+  { q: `Can I get a private blood test in ${clinic.name} without a GP referral?`, a: `Yes. You don’t need a GP referral. Send us an enquiry for the Men’s or Women’s Health Check and we’ll email you to confirm your time at ${clinic.name}.` },
+  { q: 'How long does the appointment take?', a: 'About 15 minutes. A trained phlebotomist takes your sample, and your report follows by email in 2–5 working days (4 for the Women’s Health Check).' },
+  { q: 'How much does it cost?', a: `Each Health Check is ${PRICE} (RRP ${RRP}), whichever clinic you choose.` },
+];
+const ld = [
+  breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Clinics', path: '/clinics/' }, { name: clinic.name }]),
+  faqLd(faqs),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalBusiness',
+    name: `${SITE.name}, ${clinic.name}`,
+    url: Astro.url.href,
+    parentOrganization: { '@type': 'Organization', name: SITE.name, url: Astro.site!.href },
+    address: { '@type': 'PostalAddress', streetAddress: clinic.street, addressLocality: clinic.city, postalCode: clinic.postcode, addressCountry: 'GB' },
+    medicalSpecialty: 'Diagnostic',
+  },
+];
+---
+<Base
+  title={`Private Blood Tests in ${clinic.name}, ${clinic.city} | Quantum BioTesting`}
+  description={`Private blood tests ${clinic.where}. Men’s and Women’s Health Checks at ${PRICE} each, no GP referral needed. Send an enquiry and we’ll confirm your time by email.`}
+  jsonLd={ld}
+>
+  <Intro title={`Private blood tests in ${clinic.name}`} lead={`Our ${clinic.name} clinic is ${clinic.where}. Choose the Men’s or Women’s Health Check and we’ll arrange your visit.`} crumbs={[{ href: '/', label: 'Home' }, { href: '/clinics/', label: 'Clinics' }, { label: clinic.name }]} />
+
+  <section class="section" aria-labelledby="find-title">
+    <div class="wrap facts-split">
+      <div>
+        <h2 class="display" id="find-title" style="margin-bottom:1.25rem">Finding us</h2>
+        <address class="addr"><Icon name="map-pin" /><span>{clinic.street}<br />{clinic.locality}<br />{clinic.postcode}</span></address>
+        <ClinicMap clinic={clinic} />
+      </div>
+      <aside class="panel panel--stick" aria-label="Book at this clinic">
+        <h2>Visit {clinic.name}</h2>
+        <p>Choose your check and we’ll reply by email to confirm your time. It isn’t a booking until you hear from us.</p>
+        {TESTS.map((t) => <p><a class="btn btn--block" href={`/contact/?test=${t.key}&clinic=${encodeURIComponent(clinic.name)}`}>{t.name} <Icon name="arrow-right" /></a></p>)}
+              </aside>
+    </div>
+  </section>
+
+  <section class="section section--tight" aria-labelledby="tests-title">
+    <div class="wrap">
+      <div class="section__head"><h2 class="display" id="tests-title">Tests available in {clinic.name}</h2></div>
+      <div class="cards">
+        {TESTS.map((t) => (
+          <article class:list={['card', { 'card--women': t.key === 'womens' }]}>
+            <p class="card__tag">{t.key === 'mens' ? 'For men' : 'For women'}</p>
+            <div class="card__body">
+              <h3>{t.name}</h3>
+              <p class="card__desc">{t.biomarkers}. Results in {t.results}.</p>
+              <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
+              <div class="card__actions"><a class="btn btn--outline" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a></div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight" aria-labelledby="expect-title">
+    <div class="wrap">
+      <div class="section__head"><h2 class="display" id="expect-title">What to expect</h2></div>
+      <ol class="expect">
+        {STEPS.map((s) => <li><h3>{s.title}</h3><p class="muted">{s.text}</p></li>)}
+      </ol>
+      <p style="margin-top:1.5rem"><a class="link" href="/how-it-works/#preparation">How to prepare <Icon name="arrow-right" /></a></p>
+    </div>
+  </section>
+
+  <FaqSection id="faq-title" heading={`${clinic.name} questions`} items={faqs} />
+
+  <section class="section section--tight" aria-labelledby="other-title">
+    <div class="wrap">
+      <div class="section__head"><h2 class="display" id="other-title">Other clinics</h2></div>
+      <ul class="jump jump--big">
+        {others.map((c) => <li><a href={`/clinics/${c.slug}/`}>{c.name}</a></li>)}
+      </ul>
+    </div>
+  </section>
+  <CloseEnquiry />
+</Base>

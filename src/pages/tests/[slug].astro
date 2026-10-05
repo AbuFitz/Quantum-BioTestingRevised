@@ -5,7 +5,8 @@ import MarkerGroups from '../../components/MarkerGroups.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import Icon from '../../components/Icon.astro';
 import { TESTS, MENS_GROUPS, WOMENS_AREAS, MENU_NOTE, type TestProduct } from '../../data/tests';
-import { PRICE, RRP, SITE } from '../../data/site';
+import { PRICE, RRP, SAVING, SITE } from '../../data/site';
+import { breadcrumbLd } from '../../data/seo';
 
 export function getStaticPaths() {
   return TESTS.map((t) => ({ params: { slug: t.slug }, props: { test: t } }));
@@ -15,7 +16,7 @@ const other = TESTS.find((t) => t.key !== test.key)!;
 const isMens = test.key === 'mens';
 const tone = isMens ? 'sky' : 'blush';
 
-const ld = {
+const ld0 = {
   '@context': 'https://schema.org',
   '@type': 'Service',
   name: test.name,
@@ -24,6 +25,7 @@ const ld = {
   areaServed: { '@type': 'Country', name: 'United Kingdom' },
   offers: { '@type': 'Offer', price: String(SITE.price), priceCurrency: 'GBP', url: Astro.url.href },
 };
+const ld = [ld0, breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Tests', path: '/tests/' }, { name: test.name }])];
 ---
 <Base
   title={`${test.name} | ${PRICE} | Quantum BioTesting`}
@@ -35,17 +37,17 @@ const ld = {
   <section class="section" aria-labelledby="included-title">
     <div class="wrap facts-split">
       <div>
-        <h2 class="display" id="included-title" style="margin-bottom:1.25rem">What is included</h2>
+        <h2 class="display" id="included-title" style="margin-bottom:1.25rem">What’s included</h2>
         <ul class="ticks">
           {test.inclusions.map((i) => <li><Icon name={i.icon} /><span>{i.text}</span></li>)}
           <li><Icon name="clock" /><span>Results in {test.results}</span></li>
         </ul>
       </div>
       <aside class="panel panel--stick" aria-label="Price and enquiry">
-        <p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p>
-        <p>An enquiry is a request, not a confirmed booking. The team replies by email to confirm your clinic and time.</p>
+        <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
+        <p>Send us an enquiry and we’ll email you to confirm your clinic and time. It isn’t a booking until you hear from us.</p>
         <p><a class="btn" href={`/contact/?test=${test.key}`}>Enquire about this test <Icon name="arrow-right" /></a></p>
-        <p>Looking for the other test? <a href={`/tests/${other.slug}/`}>{other.name}</a></p>
+        <p>Thinking about the other check? <a href={`/tests/${other.slug}/`}>{other.name}</a></p>
       </aside>
     </div>
   </section>
@@ -53,10 +55,10 @@ const ld = {
   <section class="section section--tight" aria-labelledby="markers-title">
     <div class="wrap">
       <div class="section__head">
-        <h2 class="display" id="markers-title">{isMens ? 'Biomarkers by group' : 'Health areas covered'}</h2>
+        <h2 class="display" id="markers-title">{isMens ? 'Biomarkers, group by group' : 'The health areas covered'}</h2>
         <p class="muted">
           {isMens
-            ? 'Open a group to see the markers in it.'
+            ? 'Open a group to see exactly what’s measured.'
             : `The Women’s Health Check covers ${WOMENS_AREAS.length} health areas, with up to 350 biomarkers in total.`}
         </p>
       </div>
@@ -68,7 +70,7 @@ const ld = {
   <section class="section section--tight" aria-labelledby="before-title">
     <div class="wrap"><div class="prose">
       <h2 class="display" id="before-title">Before your appointment</h2>
-      <p>Fast for 8–12 hours beforehand (water is fine) and avoid strenuous exercise for 24 hours. <a href="/how-it-works/#preparation">Read the full preparation guidance</a>.</p>
+      <p>Most people fast for 8–12 hours beforehand (water is fine) and skip hard exercise for 24 hours. <a href="/how-it-works/#preparation">Read the full guide</a>, or <a href="/clinics/">find a clinic</a>.</p>
     </div>
     </div>
   </section>

@@ -31,6 +31,9 @@ UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "
 **Inferred (reversible decisions)**
 Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
+**Provisional (new in this pass)**
+Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (confirm the RRP is a genuine reference price before advertising a saving); the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (mantel clock, woman at a window, beach walk) now appear without that label.
+
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
 2. **Confirmed contact route.** No phone or email is published. Privacy/Terms direct rights requests, cancellations and complaints to the enquiry form as an interim; replace with real addresses.
@@ -52,17 +55,30 @@ Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated
 |---|---|
 | `/` | Home |
 | `/tests/`, `/tests/mens-health-check/`, `/tests/womens-health-check/` | Overview and per-product detail |
-| `/how-it-works/` | Process, preparation, clinic, results, FAQs |
-| `/contact/` | Appointment enquiry (`?test=mens\|womens` preselects) |
-| `/privacy/`, `/terms/` | Legal, linked from the footer |
+| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, optional map, both tests, FAQ and schema |
+| `/how-it-works/` | Process, preparation, clinics, results, FAQs |
+| `/contact/` | Full-page enquiry form: the no-JavaScript fallback and deep link (`?test=mens\|womens&clinic=Name` preselects). Not in the navigation by request; linked from the footer |
+| `/privacy/`, `/terms/`, `/cookies/` | Legal, linked from the footer |
 | `/api/enquiry` | Delivery function |
-| `/sitemap.xml`, `/robots.txt` | Generated from the configured domain |
+| `/sitemap.xml`, `/robots.txt` | Generated from the configured domain (sitemap lists every page above) |
 
-Old public routes redirect (301) via `vercel.json`: `/testing.html` → `/tests/`, `/privacy.html`, `/terms.html`, `/index.html`, `/book.html`.
+Old public routes redirect (301) via `vercel.json`: `/testing.html` to `/tests/`, `/privacy.html`, `/terms.html`, `/index.html`, `/book.html`.
+
+## Enquiry popup
+
+Every Enquire button and any link to `/contact/` opens a native `<dialog>` with a three-step form (check, contact details, preferences and consent) when JavaScript is available; without it the link goes to `/contact/`. It is a bottom sheet on phones and a centred card on larger screens, validates per step, keeps what was typed when going back, closes with Escape, the close button, the backdrop or the browser Back button, and returns focus to the button that opened it. Choosing a check (from a button or a card) starts on step 2. The same form component and the same `/api/enquiry` function serve the popup and `/contact/`.
+
+## Emails
+
+Two plain emails per enquiry, no marketing content: a team notification (check, name, email, phone, clinic, date, notes; reply goes to the customer) and a short acknowledgement to the customer (first name, what they asked for, "this isn't a confirmed booking yet", reply goes to the team). The acknowledgement is best effort: if it fails the enquiry still succeeds because the team already has it. Both use distinct idempotency keys. Subject lines and bodies avoid dashes and filler. **Needs client approval of the wording and a verified sending domain.**
+
+## SEO
+
+One `<h1>` per page, unique titles and descriptions, absolute canonicals, sitemap and robots, Open Graph image. Structured data: Organization and FAQPage (home), BreadcrumbList on every inner page, FAQPage (home, how it works, each clinic page), Service with the agreed price (test pages), ItemList (clinic finder) and MedicalBusiness with the postal address (clinic pages). No ratings, reviews, phone numbers, opening hours or coordinates are published because none have been supplied. Clinic pages are written around the clinic's own address, area and FAQs; the content is deliberately plain so it stays true. Internal links: homepage clinic list, footer clinics column, clinic pages link to both tests and to each other, test pages link to clinics.
 
 ## Privacy and cookie behaviour as implemented
 
-No cookies, no `localStorage`, no analytics, no third-party requests (font self-hosted). Hence no cookie banner, and the Privacy Policy says so. Adding analytics later requires updating the policy and adding consent.
+By default: no cookies, no `localStorage`, no analytics, no third-party requests (fonts self-hosted). That is why there is no sitewide cookie banner: nothing needs consent, and a banner would suggest otherwise. The one third-party feature is the optional map on each clinic page. It is off until the visitor presses "Show the map" (that notice and button are the consent prompt); only then does an iframe load from Google (`referrerpolicy="no-referrer"`), which may set its own cookies. Address and "Open in Google Maps" and "Get directions" links work without it. `/cookies/` and the Privacy Policy describe exactly this. If analytics are ever added, add a consent banner and update both pages. **The map embed was verified to stay off by default and to insert the correct iframe on request; whether Google renders it could not be tested from the sandbox.**
 
 ## Edits to legal text (for the reviewer)
 

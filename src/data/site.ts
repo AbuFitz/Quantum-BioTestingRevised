@@ -6,18 +6,20 @@ export const SITE = {
   // Client-supplied pricing. Keep these as the only place the figures are written.
   price: 995,
   rrp: 2112,
-  updated: '4 October 2026',
+  updated: '5 October 2026',
 } as const;
 
 export const money = (n: number) => `£${n.toLocaleString('en-GB')}`;
 export const PRICE = money(SITE.price);
 export const RRP = money(SITE.rrp);
+// Derived from the client-supplied price and RRP; never typed by hand.
+export const SAVING = money(SITE.rrp - SITE.price);
 
 export const NAV = [
   { href: '/', label: 'Home' },
   { href: '/tests/', label: 'Tests' },
+  { href: '/clinics/', label: 'Clinics' },
   { href: '/how-it-works/', label: 'How it works' },
-  { href: '/contact/', label: 'Contact' },
 ] as const;
 
 export const ENQUIRE_LABEL = 'Enquire';

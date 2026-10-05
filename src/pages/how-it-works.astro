@@ -7,25 +7,28 @@ import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
 import Icon from '../components/Icon.astro';
-import results from '../assets/photos/results.jpg';
-import { PREPARATION, CLINICS, FAQS } from '../data/tests';
+import visit from '../assets/photos/visit.jpg';
+import { PREPARATION, FAQS } from '../data/tests';
+import { CLINICS, fullAddress } from '../data/clinics';
+import { breadcrumbLd, faqLd } from '../data/seo';
 ---
 <Base
-  title="How It Works: Appointment, Preparation and Results | Quantum BioTesting"
-  description="How an enquiry becomes an appointment, how to prepare for your blood test, what happens at the clinic and when results arrive."
+  title="How It Works: Appointments, Preparation and Results | Quantum BioTesting"
+  description="From enquiry to report: how to arrange a private blood test, how to prepare, what happens at the clinic and when your results arrive."
+  jsonLd={[breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'How it works' }]), faqLd(FAQS)]}
 >
-  <Intro title="How it works" lead="From enquiry to report, and what to do before your appointment." crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]} />
+  <Intro title="How it works" lead="From your first enquiry to your report, here’s what to expect." crumbs={[{ href: '/', label: 'Home' }, { label: 'How it works' }]} />
 
-  <Journey id="process-title" heading="The process" lead="Sending the enquiry form does not confirm a booking. Your appointment is confirmed when the team emails you the clinic and time." more={false} photo={false} />
+  <Journey id="process-title" heading="From enquiry to report" lead="Sending an enquiry isn’t a booking. Your appointment is confirmed when we email you your clinic and time." more={false} photo={false} />
 
   <section class="section" id="preparation" aria-labelledby="prep-title">
     <div class="wrap">
       <div class="section__head">
-        <h2 class="display" id="prep-title">Preparing for your test</h2>
-        <p class="muted">Following these guidelines helps your results be as accurate as possible.</p>
+        <h2 class="display" id="prep-title">Getting ready</h2>
+        <p class="muted">A little preparation helps your results be as accurate as they can be.</p>
       </div>
       <Tips grid items={PREPARATION.map((p) => ({ icon: p.icon, title: p.title, text: p.text }))} />
-      <p class="note" style="margin-top:1.75rem">If you take regular medication, have a health condition or are unsure about preparation, please contact the team before your appointment.</p>
+      <p class="note" style="margin-top:1.75rem">If you take regular medication, have a health condition or aren’t sure how to prepare, please ask us before your appointment.</p>
     </div>
   </section>
 
@@ -34,17 +37,16 @@ import { PREPARATION, CLINICS, FAQS } from '../data/tests';
       <div>
         <div class="section__head">
           <h2 class="display" id="clinic-title">At the clinic</h2>
-          <p class="muted">The appointment takes about 15 minutes. A trained phlebotomist takes your blood sample. Wear a short-sleeved or loose-fitting top.</p>
+          <p class="muted">Your appointment takes about 15 minutes. A trained phlebotomist takes your sample, so a short-sleeved or loose-fitting top helps.</p>
         </div>
-        <h3 class="display" style="font-size:1.4rem">Clinic locations</h3>
+        <h3 class="display" style="font-size:1.4rem">Our clinics</h3>
         <ul class="clinics">
-          {CLINICS.map((c) => <li class="clinic"><Icon name="map-pin" /><div><strong>{c.name}</strong><span>{c.address}</span></div></li>)}
+          {CLINICS.map((c) => <li class="clinic"><Icon name="map-pin" /><div><strong><a href={`/clinics/${c.slug}/`}>{c.name}</a></strong><span>{fullAddress(c)}</span></div></li>)}
         </ul>
-        <p class="muted" style="margin-top:1rem;max-width:36rem">Tell us your preferred clinic or area when you enquire. The team confirms the location with you by email.</p>
+        <p class="muted" style="margin-top:1rem;max-width:36rem">Tell us your preferred clinic or area when you enquire, and we’ll confirm the location by email.</p>
       </div>
       <figure class="photo">
-        <Image src={results} alt="A clinician explaining test results to a colleague at a computer" widths={[480, 720, 960]} sizes="(min-width: 62em) 30rem, 92vw" loading="lazy" />
-        <figcaption>Illustrative photograph</figcaption>
+        <Image src={visit} alt="A clinician applying a plaster to a patient’s arm after a blood sample" widths={[480, 720, 960]} sizes="(min-width: 62em) 30rem, 92vw" loading="lazy" />
       </figure>
     </div>
   </section>
@@ -52,13 +54,13 @@ import { PREPARATION, CLINICS, FAQS } from '../data/tests';
   <section class="section section--tight" aria-labelledby="results-title">
     <div class="wrap"><div class="prose">
       <h2 class="display" id="results-title">Your results</h2>
-      <p>Your sample is analysed in the laboratory and every result is reviewed by a clinical specialist. The digital report arrives by email with plain-English commentary on your results.</p>
-      <p>Standard results take 2–5 working days from sample receipt at the laboratory, and 4 working days for the Women’s Health Check. An express service may return results in as little as 2 hours; ask the team about availability when you enquire.</p>
-      <p>Your report can be shared with your GP or any other healthcare provider.</p>
+      <p>Your sample is analysed in the laboratory and a clinical specialist reviews every result. Your digital report then arrives by email, with plain-English commentary on what it all means.</p>
+      <p>Results usually take 2–5 working days from the moment your sample reaches the laboratory, or 4 working days for the Women’s Health Check. An express service may return results in as little as 2 hours, so ask us about availability when you enquire.</p>
+      <p>You’re welcome to share your report with your GP or any other healthcare provider.</p>
     </div>
     </div>
   </section>
 
-  <FaqSection id="faq-title" heading="Questions" items={FAQS} />
+  <FaqSection id="faq-title" heading="Good questions" items={FAQS} />
   <CloseEnquiry />
 </Base>

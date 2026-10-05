@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import handler, { validate, buildMessage } from '../api/enquiry.js';
+import handler, { validate, buildMessage, buildConfirmation } from '../api/enquiry.js';
 
 const good = { submissionId: 'abc-123', test: 'mens', name: 'A Person', email: 'a@example.com', phone: '07700 900123', clinic: 'Fulham', date: '2027-01-05', notes: 'Mornings', consent: true, website: '' };
 const ENV = { RESEND_API_KEY: 'k', ENQUIRY_TO: 'team@example.com', ENQUIRY_FROM: 'Site <site@example.com>' };
@@ -54,7 +54,7 @@ test('honeypot is acknowledged without contacting the provider', async () => {
 test('success only when the provider accepts; idempotency key and reply-to are sent', async () => {
   let seen;
   const orig = globalThis.fetch;
-  globalThis.fetch = async (url, init) => { seen = { url, init }; return new Response('{"id":"1"}', { status: 200 }); };
+  globalThis.fetch = async (url, init) => { seen = seen || { url, init }; return new Response('{"id":"1"}', { status: 200 }); };
   const r = await call('POST', good, ENV);
   globalThis.fetch = orig;
   assert.equal(r.statusCode, 200); assert.equal(r.body.ok, true);
@@ -80,4 +80,31 @@ test('html in fields is escaped in the email body', () => {
   const m = buildMessage({ ...good, name: '<b>x</b>', notes: '<script>1</script>' }, ENV);
   assert.equal(m.html.includes('<script>'), false);
   assert.ok(m.html.includes('&lt;b&gt;'));
+});
+
+test('phone numbers with letters are rejected', () => {
+  const { fields } = validate({ ...good, phone: 'call me maybe 123' });
+  assert.ok(fields.phone);
+});
+
+test('customer acknowledgement is short, personal, escaped and never implies a booking', () => {
+  const m = buildConfirmation({ ...good, name: 'Jane <b>Smith' }, ENV);
+  assert.equal(m.to[0], good.email);
+  assert.equal(m.reply_to, ENV.ENQUIRY_TO);
+  assert.match(m.text, /^Hi Jane,/);
+  assert.match(m.text, /isn’t a confirmed booking/);
+  assert.equal(m.html.includes('<b>'), false);
+  assert.equal(/--|—|–/.test(m.text), false);
+  assert.ok(m.text.length < 600);
+});
+
+test('a failed acknowledgement does not fail an enquiry the team already has', async () => {
+  const orig = globalThis.fetch; let n = 0;
+  globalThis.fetch = async () => { n += 1; if (n === 2) throw new Error('boom'); return new Response('{"id":"1"}'); };
+  process.env.RESEND_API_KEY = 'k'; process.env.ENQUIRY_TO = 't@example.com'; process.env.ENQUIRY_FROM = 'f@example.com';
+  const res = { setHeader() {}, end(b) { this.body = b; } };
+  await handler({ method: 'POST', body: good }, res);
+  globalThis.fetch = orig;
+  assert.equal(res.statusCode, 200);
+  assert.equal(n, 2);
 });

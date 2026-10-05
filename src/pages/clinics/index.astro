@@ -1,0 +1,44 @@
+---
+import Base from '../../layouts/Base.astro';
+import Intro from '../../components/Intro.astro';
+import Icon from '../../components/Icon.astro';
+import CloseEnquiry from '../../components/CloseEnquiry.astro';
+import { CLINICS, fullAddress } from '../../data/clinics';
+import { breadcrumbLd } from '../../data/seo';
+import { PRICE } from '../../data/site';
+const cities = ['London', 'Birmingham'] as const;
+const ld = [
+  breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Clinics' }]),
+  { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Quantum BioTesting clinics', itemListElement: CLINICS.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: `Private blood tests in ${c.name}`, url: new URL(`/clinics/${c.slug}/`, Astro.site).href })) },
+];
+---
+<Base
+  title="Private Blood Test Clinics in London and Birmingham | Quantum BioTesting"
+  description={`Find a clinic for the Men’s or Women’s Health Check (${PRICE} each): Fulham, Canary Wharf, Chiswick and Westfield Stratford in London, and Birmingham city centre.`}
+  jsonLd={ld}
+>
+  <Intro title="Find a clinic" lead="Five clinics across London and Birmingham. Pick the one that’s easiest for you and we’ll confirm your time by email." crumbs={[{ href: '/', label: 'Home' }, { label: 'Clinics' }]} />
+  {cities.map((city) => (
+    <section class="section section--tight" aria-labelledby={`c-${city}`}>
+      <div class="wrap">
+        <div class="section__head"><h2 class="display" id={`c-${city}`}>{city}</h2></div>
+        <ul class="clinic-cards">
+          {CLINICS.filter((c) => c.city === city).map((c) => (
+            <li class="clinic-card" data-reveal>
+              <span class="clinic-card__pin" aria-hidden="true"><Icon name="map-pin" /></span>
+              <div>
+                <h3><a href={`/clinics/${c.slug}/`}>Private blood tests in {c.name}</a></h3>
+                <p class="muted">{fullAddress(c)}</p>
+              </div>
+              <a class="btn btn--outline btn--sm" href={`/clinics/${c.slug}/`}>View clinic<span class="vh">: {c.name}</span></a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+  <section class="section section--tight">
+    <div class="wrap"><div class="prose"><p>Not sure which clinic is closest? Tell us the area when you enquire and we’ll suggest one. We confirm the exact clinic and time by email before anything is booked.</p></div></div>
+  </section>
+  <CloseEnquiry />
+</Base>

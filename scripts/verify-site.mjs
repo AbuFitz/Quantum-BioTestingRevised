@@ -8,7 +8,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const PORT = 4397, BASE = `http://localhost:${PORT}`;
 const EXE = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
-const ROUTES = ['/', '/tests/', '/tests/mens-health-check/', '/tests/womens-health-check/', '/how-it-works/', '/contact/', '/privacy/', '/terms/'];
+const ROUTES = ['/', '/tests/', '/tests/mens-health-check/', '/tests/womens-health-check/', '/clinics/', '/clinics/fulham/', '/clinics/canary-wharf/', '/clinics/chiswick/', '/clinics/westfield-stratford/', '/clinics/birmingham/', '/how-it-works/', '/contact/', '/privacy/', '/terms/', '/cookies/'];
 const WIDTHS = [[320, 640], [360, 740], [390, 844], [768, 1024], [1440, 900]];
 mkdirSync('verification', { recursive: true });
 const server = spawn('node', ['scripts/preview-server.mjs'], { env: { ...process.env, PORT }, stdio: 'ignore' });
@@ -102,9 +102,9 @@ try {
     const vj = JSON.parse(readFileSync('vercel.json', 'utf8'));
     check('legacy routes redirect to existing pages', vj.redirects.every((x) => x.permanent && ROUTES.includes(x.destination)), JSON.stringify(vj.redirects.map((x) => x.source)));
     const ldOf = async (r) => { await page.goto(BASE + r); return page.locator('script[type="application/ld+json"]').allInnerTexts(); };
-    const home = await ldOf('/'); check('home structured data is Organization only', home.length === 1 && /"Organization"/.test(home[0]) && !/review|rating|telephone|address/i.test(home[0]));
+    const home = await ldOf('/'); check('home structured data is Organization and FAQPage only', home.length === 2 && /"Organization"/.test(home[0]) && /"FAQPage"/.test(home[1]) && !/review|rating|telephone|address/i.test(home.join('')));
     for (const r of ['/tests/mens-health-check/', '/tests/womens-health-check/']) { const l = await ldOf(r); check(`${r} structured data is a Service with the agreed price`, l.length === 1 && /"Service"/.test(l[0]) && /"price":"995"/.test(l[0]) && /GBP/.test(l[0])); }
-    for (const r of ROUTES) { const t = await (await ctx.request.get(BASE + r)).text(); const prices = [...new Set(t.replace(/<script[\s\S]*?<\/script>/g, '').match(/£\d(?:[\d,]*\d)?/g) || [])].filter((p) => !['£50', '£75'].includes(p)); check(`prices consistent ${r}`, prices.every((p) => ['£995', '£2,112'].includes(p)), prices.join(' ')); }
+    for (const r of ROUTES) { const t = await (await ctx.request.get(BASE + r)).text(); const prices = [...new Set(t.replace(/<script[\s\S]*?<\/script>/g, '').match(/£\d(?:[\d,]*\d)?/g) || [])].filter((p) => !['£50', '£75'].includes(p)); check(`prices consistent ${r}`, prices.every((p) => ['£995', '£2,112', '£1,117'].includes(p)), prices.join(' ')); }
     await ctx.close();
   }
 
@@ -112,18 +112,18 @@ try {
   {
     const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
     await page.goto(BASE + '/');
-    for (const [label, path] of [['Tests', '/tests/'], ['How it works', '/how-it-works/'], ['Contact', '/contact/'], ['Home', '/']]) {
+    for (const [label, path] of [['Tests', '/tests/'], ['Clinics', '/clinics/'], ['How it works', '/how-it-works/'], ['Home', '/']]) {
       await page.locator('.hdr__nav').getByRole('link', { name: label, exact: true }).click(); await page.waitForURL('**' + path);
       check(`nav → ${label} marks current page`, (await page.locator('.hdr__nav [aria-current=page]').innerText()) === label);
     }
     for (const [key, slug] of [['mens', 'mens-health-check'], ['womens', 'womens-health-check']]) {
       for (const [from, sel] of [['/', `#t-${key}`], ['/tests/', `#t-${key}`]]) {
-        await page.goto(BASE + from); await page.locator(sel).locator('xpath=ancestor::article').getByRole('link', { name: /^Enquire/ }).click(); await page.waitForURL(`**/contact/?test=${key}`);
+        await page.goto(BASE + from); await page.locator(sel).locator('xpath=ancestor::article').getByRole('link', { name: /^Enquire/ }).click(); await page.waitForSelector('#enquiry-dialog[open]');
         check(`${from} ${key} enquire preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
       }
-      await page.goto(BASE + `/tests/${slug}/`); await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForURL(`**/contact/?test=${key}`);
+      await page.goto(BASE + `/tests/${slug}/`); await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForSelector('#enquiry-dialog[open]');
       check(`${slug} enquire preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
-      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.banner__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForURL(`**/contact/?test=${key}`);
+      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.banner__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForSelector('#enquiry-dialog[open]');
       check(`${slug} closing enquiry preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
     }
     await page.goto(BASE + '/tests/mens-health-check/'); const mens = await page.locator('main').innerText();
@@ -198,6 +198,52 @@ try {
     const nj = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } }); const q = await nj.newPage();
     for (const r of ['/', '/tests/']) { await q.goto(BASE + r); check(`${r} without JS: navigation and content visible`, await q.evaluate(() => getComputedStyle(document.querySelector('#menu')).display !== 'none' && [...document.querySelectorAll('[data-reveal]')].every((e) => getComputedStyle(e).transform === 'none'))); }
     await nj.close();
+  }
+
+  // 10. Enquiry popup, clinic pages and the optional map
+  {
+    for (const [w, h] of [[390, 780], [1440, 900]]) {
+      const ctx = await browser.newContext({ viewport: { width: w, height: h } }); const page = await ctx.newPage();
+      const errs = []; page.on('pageerror', (e) => errs.push(String(e)));
+      await page.goto(BASE + '/', { waitUntil: 'networkidle' });
+      const open = () => page.evaluate(() => document.getElementById('enquiry-dialog').open);
+      await page.locator('.hdr__enquire').click(); await page.waitForTimeout(450);
+      check(`popup opens from the header @${w}`, await open());
+      check(`popup starts on step 1 of 3 @${w}`, /Step 1 of 3/.test(await page.locator('[data-enq-step]').innerText()));
+      check(`background is inert while the popup is open @${w}`, await page.evaluate(() => getComputedStyle(document.documentElement).overflow === 'hidden'));
+      await page.getByRole('button', { name: 'Continue' }).click();
+      check(`continue without a choice shows an error and stays on step 1 @${w}`, (await page.locator('#err-test').isVisible()) && /Step 1/.test(await page.locator('[data-enq-step]').innerText()));
+      await page.locator('input[name=test][value=womens]').check({ force: true }); await page.waitForTimeout(500);
+      check(`choosing a check moves to step 2 @${w}`, /Step 2 of 3/.test(await page.locator('[data-enq-step]').innerText()));
+      await page.getByRole('button', { name: 'Continue' }).click();
+      check(`step 2 validates name, phone and email @${w}`, (await page.locator('.field__error:visible').count()) === 3);
+      await page.fill('#f-name', 'Test Person'); await page.fill('#f-phone', '07700 900123'); await page.fill('#f-email', 'test@example.com');
+      await page.getByRole('button', { name: 'Continue' }).click();
+      check(`step 3 shows the send button and consent @${w}`, (await page.getByRole('button', { name: 'Send enquiry' }).isVisible()) && (await page.locator('input[name=consent]').isVisible()));
+      await page.getByRole('button', { name: 'Back' }).click(); check(`back returns to step 2 and keeps what was typed @${w}`, (await page.inputValue('#f-name')) === 'Test Person' && /Step 2/.test(await page.locator('[data-enq-step]').innerText()));
+      await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+      check(`escape closes the popup and returns focus to the button @${w}`, !(await open()) && (await page.evaluate(() => document.activeElement?.classList.contains('hdr__enquire'))));
+      await page.locator('.hero__actions a[href$="test=mens"]').click(); await page.waitForTimeout(450);
+      check(`a test button opens the popup straight on step 2 @${w}`, /Step 2 of 3/.test(await page.locator('[data-enq-step]').innerText()) && (await page.locator('input[name=test][value=mens]').isChecked()));
+      const box = await page.locator('.enq__sheet').boundingBox(); check(`popup fits the viewport @${w}`, box.height <= h + 1 && box.width <= w + 1, JSON.stringify(box));
+      await page.goBack(); await page.waitForTimeout(300); check(`browser back closes the popup @${w}`, !(await open()) && new URL(page.url()).pathname === '/');
+      check(`no script errors @${w}`, errs.length === 0, errs.join(' | '));
+      await ctx.close();
+    }
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } }); const page = await ctx.newPage();
+    const external = []; page.on('request', (r) => { if (!r.url().startsWith(BASE)) external.push(r.url()); });
+    await page.goto(BASE + '/contact/?test=womens&clinic=Fulham', { waitUntil: 'networkidle' });
+    check('contact page preselects test and clinic from the link', (await page.locator('input[name=test][value=womens]').isChecked()) && (await page.inputValue('#f-clinic')) === 'Fulham');
+    check('contact page has no popup (the form is on the page)', (await page.locator('#enquiry-dialog').count()) === 0);
+    for (const slug of ['fulham', 'canary-wharf', 'chiswick', 'westfield-stratford', 'birmingham']) {
+      await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'networkidle' });
+      check(`${slug}: no iframe and no third-party request until the map is requested`, (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
+      check(`${slug}: address, h1 and breadcrumb schema present`, /SW6|E14|W4|E20|B4/.test(await page.locator('address').innerText()) && (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('script[type="application/ld+json"]').allInnerTexts()).some((t) => /BreadcrumbList/.test(t)));
+      check(`${slug}: direction links open safely`, (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
+    }
+    await page.goto(BASE + '/clinics/fulham/'); await page.getByRole('button', { name: 'Show the map' }).click();
+    check('map iframe loads only after the visitor asks, from Google with no referrer', (await page.locator('iframe').getAttribute('src')).startsWith('https://www.google.com/maps') && (await page.locator('iframe').getAttribute('referrerpolicy')) === 'no-referrer');
+    await ctx.close();
   }
 } finally { await browser.close(); server.kill(); }
 console.log(`${results.filter(Boolean).length}/${results.length} checks passed`);

@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import wordmark from '../assets/brand/logo-wordmark.png';
 import { SITE } from '../data/site';
 import { TESTS } from '../data/tests';
+import { CLINICS } from '../data/clinics';
 ---
 <footer class="ftr">
   <div class="wrap">
@@ -20,7 +21,14 @@ import { TESTS } from '../data/tests';
           </ul>
         </nav>
         <nav aria-labelledby="f-i">
-          <h2 id="f-i">Information</h2>
+          <h2 id="f-i">Clinics</h2>
+          <ul>
+            <li><a href="/clinics/">All clinics</a></li>
+            {CLINICS.map((c) => <li><a href={`/clinics/${c.slug}/`}>{c.name}</a></li>)}
+          </ul>
+        </nav>
+        <nav aria-labelledby="f-h">
+          <h2 id="f-h">Help</h2>
           <ul>
             <li><a href="/how-it-works/">How it works</a></li>
             <li><a href="/contact/">Appointment enquiry</a></li>
@@ -30,6 +38,7 @@ import { TESTS } from '../data/tests';
           <h2 id="f-l">Legal</h2>
           <ul>
             <li><a href="/privacy/">Privacy Policy</a></li>
+            <li><a href="/cookies/">Cookies</a></li>
             <li><a href="/terms/">Terms &amp; Conditions</a></li>
           </ul>
         </nav>

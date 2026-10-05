@@ -1,0 +1,76 @@
+---
+// The enquiry popup: a native <dialog> holding the stepped form. Any link to /contact/ opens it when
+// JavaScript is available; without JavaScript the link goes to the full /contact/ page.
+import EnquiryForm from './EnquiryForm.astro';
+import Icon from './Icon.astro';
+---
+<dialog class="enq" id="enquiry-dialog" aria-labelledby="enq-title" data-enq>
+  <div class="enq__sheet">
+    <header class="enq__head">
+      <div>
+        <p class="enq__step" data-enq-step aria-live="polite">Step 1 of 3</p>
+        <h2 id="enq-title">Request an appointment</h2>
+      </div>
+      <button class="enq__close" type="button" aria-label="Close" data-enq-close><Icon name="x" /></button>
+    </header>
+    <div class="enq__bar" aria-hidden="true"><span data-enq-bar></span></div>
+    <div class="enq__body" data-enq-body>
+      <EnquiryForm steps />
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const dlg = document.getElementById('enquiry-dialog') as HTMLDialogElement | null;
+  if (dlg && typeof dlg.showModal === 'function') {
+    const stepEl = dlg.querySelector('[data-enq-step]')!;
+    const bar = dlg.querySelector<HTMLElement>('[data-enq-bar]')!;
+    const title = dlg.querySelector('#enq-title')!;
+    let opener: HTMLElement | null = null;
+    let pushed = false;
+
+    const open = (preset: { test?: string; clinic?: string }, from: HTMLElement | null) => {
+      opener = from;
+      if (!dlg.open) dlg.showModal();
+      document.dispatchEvent(new CustomEvent('enquiry:preset', { detail: preset }));
+      if (!pushed) { history.pushState({ enq: 1 }, ''); pushed = true; }
+    };
+    const close = () => { if (dlg.open) dlg.close(); };
+
+    dlg.addEventListener('close', () => {
+      document.documentElement.classList.remove('enq-open');
+      if (pushed) { pushed = false; if (history.state && history.state.enq) history.back(); }
+      opener?.focus?.();
+    });
+    dlg.addEventListener('toggle', () => document.documentElement.classList.toggle('enq-open', dlg.open));
+    const observer = new MutationObserver(() => document.documentElement.classList.toggle('enq-open', dlg.open));
+    observer.observe(dlg, { attributes: true, attributeFilter: ['open'] });
+    window.addEventListener('popstate', () => { if (dlg.open) { pushed = false; dlg.close(); } });
+
+    dlg.querySelector('[data-enq-close]')!.addEventListener('click', close);
+    // Click on the dimmed backdrop closes; clicks inside the sheet do not
+    dlg.addEventListener('mousedown', (e) => { if (e.target === dlg) close(); });
+    document.addEventListener('enquiry:close', close);
+    document.addEventListener('enquiry:step', ((e: CustomEvent) => {
+      const { step, total } = e.detail;
+      stepEl.textContent = `Step ${step} of ${total}`;
+      bar.style.width = `${(step / total) * 100}%`;
+    }) as EventListener);
+    document.addEventListener('enquiry:sent', () => {
+      stepEl.textContent = 'Done';
+      bar.style.width = '100%';
+      title.textContent = 'Enquiry sent';
+      dlg.querySelector<HTMLElement>('[data-enq-body]')!.scrollTop = 0;
+    });
+
+    // Open from any link to the contact page
+    document.addEventListener('click', (e) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="/contact/"]');
+      if (!a) return;
+      e.preventDefault();
+      const u = new URL(a.href);
+      open({ test: u.searchParams.get('test') || undefined, clinic: u.searchParams.get('clinic') || undefined }, a);
+    });
+  }
+</script>

@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { TESTS } from '../data/tests';
+import { CLINICS } from '../data/clinics';
 
-const paths = ['/', '/tests/', ...TESTS.map((t) => `/tests/${t.slug}/`), '/how-it-works/', '/contact/', '/privacy/', '/terms/'];
+const paths = ['/', '/tests/', ...TESTS.map((t) => `/tests/${t.slug}/`), '/how-it-works/', '/clinics/', ...CLINICS.map((c) => `/clinics/${c.slug}/`), '/contact/', '/cookies/', '/privacy/', '/terms/'];
 
 export const GET: APIRoute = ({ site }) => {
   const urls = paths.map((p) => `  <url><loc>${new URL(p, site).href}</loc></url>`).join('\n');

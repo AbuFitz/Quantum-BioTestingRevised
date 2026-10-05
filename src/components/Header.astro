@@ -2,14 +2,14 @@
 // Announcement bar + floating pill navigation. The menu expands inside the pill on small screens.
 import { Image } from 'astro:assets';
 import wordmark from '../assets/brand/logo-wordmark.png';
-import { NAV, SITE, PRICE } from '../data/site';
+import { NAV, SITE } from '../data/site';
 const path = Astro.url.pathname;
 const current = (h: string) => (h === '/' ? path === '/' : path.startsWith(h));
 ---
 <div class="announce" role="region" aria-label="Announcement">
   <div class="announce__in">
     <span class="announce__spacer" aria-hidden="true"></span>
-    <p>Men’s and Women’s Health Checks · {PRICE} each<span class="announce__more"> · No GP referral needed</span></p>
+    <p>Private blood tests for men and women<span class="announce__more"> · No GP referral needed</span></p>
     <span class="announce__links"><a href="/tests/">Compare tests</a><a href="/how-it-works/">How it works</a></span>
   </div>
 </div>

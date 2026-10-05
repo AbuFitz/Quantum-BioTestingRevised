@@ -30,28 +30,49 @@ export function validate(input) {
   const fields = {};
   if (!TESTS[data.test]) fields.test = 'Choose the test you are asking about.';
   if (!data.name) fields.name = 'Enter your full name.';
-  if (data.phone.replace(/\D/g, '').length < 7) fields.phone = 'Enter a phone number we can reach you on.';
+  if (!/^[+()\d\s.-]+$/.test(data.phone) || data.phone.replace(/\D/g, '').length < 7) fields.phone = 'Enter a phone number we can reach you on.';
   if (!EMAIL.test(data.email)) fields.email = 'Enter a valid email address.';
   if (data.date && !/^\d{4}-\d{2}-\d{2}$/.test(data.date)) fields.date = 'Choose a valid date.';
   if (!data.consent) fields.consent = 'Confirm you have read the Privacy Policy and agree to be contacted.';
   return { data, fields };
 }
 
+const row = (k, v) => `<tr><td style="padding:6px 16px 6px 0;color:#4b5870;vertical-align:top">${esc(k)}</td><td style="padding:6px 0;color:#0f1d36">${esc(String(v))}</td></tr>`;
+const shell = (inner) => `<div style="font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.55;color:#0f1d36;max-width:34rem">${inner}</div>`;
+
+// Email to the team: everything needed to reply, nothing else.
 export function buildMessage(d, env) {
   const test = TESTS[d.test];
   const rows = [
-    ['Test', test], ['Name', d.name], ['Email', d.email], ['Phone', d.phone],
-    ['Preferred clinic or area', d.clinic || 'Not given'],
-    ['Preferred date (a request, not confirmed)', d.date || 'Not given'],
+    ['Check', test], ['Name', d.name], ['Email', d.email], ['Phone', d.phone],
+    ['Clinic or area', d.clinic || 'Not given'],
+    ['Preferred date', d.date ? `${d.date} (a request, not confirmed)` : 'Not given'],
     ['Notes', d.notes || 'None'],
   ];
   return {
     from: env.ENQUIRY_FROM,
     to: [env.ENQUIRY_TO],
     reply_to: d.email,
-    subject: oneLine(`Appointment enquiry: ${test} (${d.name})`),
-    text: `New appointment enquiry from the website. This is not a confirmed booking.\n\n${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n`,
-    html: `<p>New appointment enquiry from the website. This is not a confirmed booking.</p><table cellpadding="6">${rows.map(([k, v]) => `<tr><th align="left">${esc(k)}</th><td>${esc(String(v))}</td></tr>`).join('')}</table>`,
+    subject: oneLine(`New enquiry: ${test}, ${d.name}`),
+    text: `A new appointment enquiry has come in from the website.\n\n${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\nReply to this email to reach ${d.name}. It is not a confirmed booking until you confirm the clinic and time.\n`,
+    html: shell(`<p>A new appointment enquiry has come in from the website.</p><table cellpadding="0" cellspacing="0" style="border-collapse:collapse">${rows.map(([k, v]) => row(k, v)).join('')}</table><p style="color:#4b5870">Reply to this email to reach ${esc(d.name)}. It is not a confirmed booking until you confirm the clinic and time.</p>`),
+  };
+}
+
+// Short acknowledgement to the customer. It confirms receipt only and never implies a booking.
+export function buildConfirmation(d, env) {
+  const test = TESTS[d.test];
+  const first = oneLine(d.name.split(/\s+/)[0] || d.name);
+  const lines = [`Check: ${test}`];
+  if (d.clinic) lines.push(`Clinic or area: ${d.clinic}`);
+  if (d.date) lines.push(`Preferred date: ${d.date}`);
+  return {
+    from: env.ENQUIRY_FROM,
+    to: [d.email],
+    reply_to: env.ENQUIRY_TO,
+    subject: 'We’ve received your enquiry',
+    text: `Hi ${first},\n\nThanks for getting in touch about the ${test}. We’ve got your enquiry and will email you again soon to confirm your clinic and appointment time.\n\n${lines.join('\n')}\n\nThis isn’t a confirmed booking yet. If you need to change anything, just reply to this email.\n\nQuantum BioTesting\n`,
+    html: shell(`<p>Hi ${esc(first)},</p><p>Thanks for getting in touch about the ${esc(test)}. We’ve got your enquiry and will email you again soon to confirm your clinic and appointment time.</p><p style="margin:0 0 1em;padding:12px 16px;background:#f6e5e0;border-radius:8px">${lines.map(esc).join('<br>')}</p><p>This isn’t a confirmed booking yet. If you need to change anything, just reply to this email.</p><p>Quantum BioTesting</p>`),
   };
 }
 
@@ -99,21 +120,26 @@ export default async function handler(req, res) {
     return send(res, 503, { error: 'not_configured' });
   }
 
-  try {
-    const upstream = await fetch(env.RESEND_API_URL || 'https://api.resend.com/emails', {
+  const deliver = (message, key) =>
+    fetch(env.RESEND_API_URL || 'https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
         'Content-Type': 'application/json',
         // Retries of the same submission cannot create a second email.
-        ...(data.submissionId ? { 'Idempotency-Key': `enquiry-${data.submissionId}` } : {}),
+        ...(data.submissionId ? { 'Idempotency-Key': `${key}-${data.submissionId}` } : {}),
       },
-      body: JSON.stringify(buildMessage(data, env)),
+      body: JSON.stringify(message),
       signal: AbortSignal.timeout(10000),
     });
+
+  try {
+    const upstream = await deliver(buildMessage(data, env), 'enquiry');
     if (!upstream.ok) return send(res, 502, { error: 'delivery_failed' });
-    return send(res, 200, { ok: true });
   } catch {
     return send(res, 502, { error: 'delivery_failed' });
   }
+  // The team has the enquiry. The acknowledgement is a courtesy: if it fails the enquiry still stands.
+  try { await deliver(buildConfirmation(data, env), 'ack'); } catch { /* ignore */ }
+  return send(res, 200, { ok: true });
 }

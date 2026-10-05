@@ -48,7 +48,7 @@ try {
     if (w >= 768) check(`product cards equal size ${tag}`, Math.abs(cards[0][0] - cards[1][0]) < 1 && Math.abs(cards[0][1] - cards[1][1]) < 2, JSON.stringify(cards));
     const text = await page.locator('main').innerText();
     const prices = [...new Set(text.match(/£\d(?:[\d,]*\d)?/g) || [])];
-    check(`prices consistent ${tag}`, prices.every((p) => ['£995', '£2,112'].includes(p)) && prices.includes('£995') && prices.includes('£2,112'), prices.join(' '));
+    check(`prices consistent ${tag}`, prices.every((p) => ['£995', '£2,112', '£1,117'].includes(p)) && prices.includes('£995') && prices.includes('£2,112'), prices.join(' '));
     check(`no date-of-birth or invented contact claims ${tag}`, !/date of birth|\bdob\b|customer reviews|star rating|trustpilot|\d{5} ?\d{5,6}|accredit/i.test(text));
     // Fonts actually loaded
     const fonts = await page.evaluate(async () => { await document.fonts.ready; return [...document.fonts].filter((f) => f.status === 'loaded').map((f) => f.family.replace(/"/g, '')); });

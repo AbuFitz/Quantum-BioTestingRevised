@@ -1,0 +1,42 @@
+---
+import LegalLayout from '../components/LegalLayout.astro';
+const S = [
+  { id: 'summary', title: 'In short' },
+  { id: 'used', title: 'What this website stores' },
+  { id: 'maps', title: 'The optional map' },
+  { id: 'choices', title: 'Your choices' },
+  { id: 'changes', title: 'If this changes' },
+];
+---
+<LegalLayout title="Cookies | Quantum BioTesting" description="Quantum BioTesting does not set cookies or use analytics. The only optional third-party content is a map on each clinic page, loaded only if you ask for it." heading="Cookies" sections={S}>
+  <section id="summary">
+    <h2>1. In short</h2>
+    <p>This website does not set cookies, does not use analytics or advertising trackers, and does not store anything on your device. That is why you will not see a cookie banner when you arrive.</p>
+  </section>
+  <section id="used">
+    <h2>2. What this website stores</h2>
+    <table>
+      <thead><tr><th scope="col">Item</th><th scope="col">Purpose</th><th scope="col">Stored?</th></tr></thead>
+      <tbody>
+        <tr><td>Cookies</td><td>None are used</td><td>No</td></tr>
+        <tr><td>Local or session storage</td><td>None is used</td><td>No</td></tr>
+        <tr><td>Analytics or advertising</td><td>None is used</td><td>No</td></tr>
+        <tr><td>Fonts and images</td><td>Served from this website, not from a third party</td><td>No</td></tr>
+      </tbody>
+    </table>
+    <p>Our hosting provider keeps standard server logs, such as IP address and pages requested, to run and secure the website. See the <a href="/privacy/">Privacy Policy</a>.</p>
+  </section>
+  <section id="maps">
+    <h2>3. The optional map</h2>
+    <p>Each clinic page has a map. It is switched off until you press “Show the map”, so visiting the page does not contact anyone else. If you choose to show it, the map is provided by Google. Google receives your request and may set cookies under <a href="https://policies.google.com/privacy">its own privacy policy</a>. Those cookies are Google’s, not ours.</p>
+    <p>You can skip the map entirely. Every clinic page also shows the full address and links to open it in Google Maps or get directions.</p>
+  </section>
+  <section id="choices">
+    <h2>4. Your choices</h2>
+    <p>You decide whether to load the map each time you visit. You can also block or delete cookies in your browser settings at any time. The website works fully without any cookies.</p>
+  </section>
+  <section id="changes">
+    <h2>5. If this changes</h2>
+    <p>If we ever add analytics or other tracking, we will update this page and the Privacy Policy, and ask for your consent first where the law requires it. The date at the top of this page shows when it last changed.</p>
+  </section>
+</LegalLayout>

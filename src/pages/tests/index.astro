@@ -6,13 +6,15 @@ import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import Icon from '../../components/Icon.astro';
 import { TESTS, MENU_NOTE } from '../../data/tests';
 import { PRICE, RRP } from '../../data/site';
+import { breadcrumbLd } from '../../data/seo';
 const [men, women] = TESTS;
 ---
 <Base
   title="Men’s and Women’s Health Checks | Quantum BioTesting"
   description={`Compare the Men’s Health Check (300+ biomarkers) and Women’s Health Check (up to 350 biomarkers). ${PRICE} each, RRP ${RRP}.`}
+  jsonLd={breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Tests' }])}
 >
-  <Intro title="Our tests" lead={`Two health checks, each ${PRICE}. Open a test for the full list of what it covers.`} crumbs={[{ href: '/', label: 'Home' }, { label: 'Tests' }]} />
+  <Intro title="Our health checks" lead="Two checks, designed around you. Compare them below, or open one to see everything it covers." crumbs={[{ href: '/', label: 'Home' }, { label: 'Tests' }]} />
 
   <section class="section" aria-labelledby="choose-title">
     <div class="wrap">
@@ -23,17 +25,17 @@ const [men, women] = TESTS;
 
   <section class="section section--tight" aria-labelledby="compare-title">
     <div class="wrap">
-      <div class="section__head"><h2 class="display" id="compare-title">Side by side</h2></div>
+      <div class="section__head"><h2 class="display" id="compare-title">Compare them side by side</h2></div>
       <div class="table-wrap" role="region" aria-label="Comparison table (scrolls sideways on small screens)" tabindex="0">
         <table class="compare">
           <thead>
             <tr><th scope="col"><span class="vh">Feature</span></th><th scope="col">{men.name}</th><th scope="col">{women.name}</th></tr>
           </thead>
           <tbody>
-            <tr><th scope="row">Price</th><td><p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p></td><td><p class="price"><strong>{PRICE}</strong><span>RRP <s>{RRP}</s></span></p></td></tr>
+            <tr><th scope="row">Price</th><td><p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span></p></td><td><p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span></p></td></tr>
             <tr><th scope="row">Biomarkers</th><td>300+ in 11 groups</td><td>Up to 350 in 27 health areas</td></tr>
             <tr><th scope="row">Clinical specialist review</th><td>Included</td><td>Included</td></tr>
-            <tr><th scope="row">Extras</th><td>Optional follow-up telephone consultation; ask the team</td><td>Private remote GP consultation and a 6-month repeat test included</td></tr>
+            <tr><th scope="row">Extras</th><td>Optional follow-up telephone consultation; ask us</td><td>A private remote GP consultation and a 6-month repeat test</td></tr>
             <tr><th scope="row">Results</th><td>{men.results}</td><td>{women.results}</td></tr>
             <tr><th scope="row">Appointment</th><td>About 15 minutes</td><td>About 15 minutes</td></tr>
             <tr><th scope="row"><span class="vh">Details</span></th>

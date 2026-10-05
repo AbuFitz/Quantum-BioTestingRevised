@@ -1,81 +1,96 @@
 ---
 import Icon from './Icon.astro';
 import { TESTS } from '../data/tests';
-import { PRICE } from '../data/site';
+import { CLINICS } from '../data/clinics';
+interface Props { steps?: boolean }
+const { steps = false } = Astro.props;
 ---
-<form class="form" id="enquiry-form" novalidate method="post" action="/api/enquiry" aria-describedby="form-note">
+<form class:list={['form', { 'form--steps': steps }]} id="enquiry-form" novalidate method="post" action="/api/enquiry" aria-describedby="form-note" data-steps={steps ? '' : undefined}>
   <div id="form-error" class="alert alert--error" role="alert" tabindex="-1" hidden>
     <Icon name="circle-alert" class="icon--lg" />
-    <div><h2>Your enquiry has not been sent</h2><p data-error-text></p></div>
+    <div><h2>We couldn’t send your enquiry</h2><p data-error-text></p></div>
   </div>
 
-  <fieldset class="field" data-field="test">
-    <legend>Which test are you asking about?</legend>
-    <div class="choices" role="radiogroup">
-      {TESTS.map((t) => (
-        <label class="choice">
-          <input type="radio" name="test" value={t.key} required aria-describedby="err-test" />
-          <span><strong>{t.name}</strong><small>{t.biomarkers} · {PRICE}</small></span>
-        </label>
-      ))}
-    </div>
-    <p class="field__error" id="err-test" hidden></p>
-  </fieldset>
-
-  <div class="form-row form-row--2">
-    <div class="field" data-field="name">
-      <label class="field__label" for="f-name">Full name</label>
-      <input class="input" id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="err-name" />
-      <p class="field__error" id="err-name" hidden></p>
-    </div>
-    <div class="field" data-field="phone">
-      <label class="field__label" for="f-phone">Phone number</label>
-      <input class="input" id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="30" aria-describedby="err-phone" />
-      <p class="field__error" id="err-phone" hidden></p>
-    </div>
+  <div class="step-pane" data-step="1">
+    {steps && <h3 class="step-title" tabindex="-1">Which check would you like?</h3>}
+    <fieldset class="field" data-field="test">
+      <legend class:list={{ vh: steps }}>Which check would you like?</legend>
+      <div class="choices" role="radiogroup">
+        {TESTS.map((t) => (
+          <label class="choice">
+            <input type="radio" name="test" value={t.key} required aria-describedby="err-test" />
+            <span><strong>{t.name}</strong><small>{t.biomarkers}</small></span>
+          </label>
+        ))}
+      </div>
+      <p class="field__error" id="err-test" hidden></p>
+      <p class="field__hint">Not sure yet? <a href="/tests/">See what each one covers</a>.</p>
+    </fieldset>
   </div>
 
-  <div class="field" data-field="email">
-    <label class="field__label" for="f-email">Email address</label>
-    <input class="input" id="f-email" name="email" type="email" autocomplete="email" required maxlength="200" aria-describedby="hint-email err-email" />
-    <p class="field__hint" id="hint-email">The team replies to this address to confirm your appointment.</p>
-    <p class="field__error" id="err-email" hidden></p>
-  </div>
-
-  <div class="form-row form-row--2">
-    <div class="field" data-field="clinic">
-      <label class="field__label" for="f-clinic">Clinic or area <span class="field__opt">(optional)</span></label>
-      <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" aria-describedby="err-clinic" />
-      <p class="field__error" id="err-clinic" hidden></p>
+  <div class="step-pane" data-step="2">
+    {steps && <h3 class="step-title" tabindex="-1">Where can we reach you?</h3>}
+    <div class="form-row form-row--2">
+      <div class="field" data-field="name">
+        <label class="field__label" for="f-name">Full name</label>
+        <input class="input" id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" aria-describedby="err-name" />
+        <p class="field__error" id="err-name" hidden></p>
+      </div>
+      <div class="field" data-field="phone">
+        <label class="field__label" for="f-phone">Phone number</label>
+        <input class="input" id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="30" aria-describedby="err-phone" />
+        <p class="field__error" id="err-phone" hidden></p>
+      </div>
     </div>
-    <div class="field" data-field="date">
-      <label class="field__label" for="f-date">Preferred date <span class="field__opt">(optional)</span></label>
-      <input class="input" id="f-date" name="date" type="date" aria-describedby="hint-date err-date" />
-      <p class="field__hint" id="hint-date">A request only. Availability is confirmed by the team.</p>
-      <p class="field__error" id="err-date" hidden></p>
+    <div class="field" data-field="email">
+      <label class="field__label" for="f-email">Email address</label>
+      <input class="input" id="f-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" inputmode="email" required maxlength="200" aria-describedby="hint-email err-email" />
+      <p class="field__hint" id="hint-email">We’ll reply to this address to confirm your appointment.</p>
+      <p class="field__error" id="err-email" hidden></p>
     </div>
   </div>
 
-  <div class="field" data-field="notes">
-    <label class="field__label" for="f-notes">Notes <span class="field__opt">(optional)</span></label>
-    <textarea class="input" id="f-notes" name="notes" rows="4" maxlength="1000" aria-describedby="hint-notes err-notes"></textarea>
-    <p class="field__hint" id="hint-notes">For example, preferred times. Please do not include health details here.</p>
-    <p class="field__error" id="err-notes" hidden></p>
+  <div class="step-pane" data-step="3">
+    {steps && <h3 class="step-title" tabindex="-1">Any preferences?</h3>}
+    <div class="form-row form-row--2">
+      <div class="field" data-field="clinic">
+        <label class="field__label" for="f-clinic">Clinic or area <span class="field__opt">(optional)</span></label>
+        <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" list="clinic-list" autocomplete="off" aria-describedby="err-clinic" />
+        <datalist id="clinic-list">{CLINICS.map((c) => <option value={c.name} />)}</datalist>
+        <p class="field__error" id="err-clinic" hidden></p>
+      </div>
+      <div class="field" data-field="date">
+        <label class="field__label" for="f-date">Preferred date <span class="field__opt">(optional)</span></label>
+        <input class="input" id="f-date" name="date" type="date" aria-describedby="hint-date err-date" />
+        <p class="field__hint" id="hint-date">Just a request. We’ll confirm availability.</p>
+        <p class="field__error" id="err-date" hidden></p>
+      </div>
+    </div>
+    <div class="field" data-field="notes">
+      <label class="field__label" for="f-notes">Anything else? <span class="field__opt">(optional)</span></label>
+      <textarea class="input" id="f-notes" name="notes" rows="3" maxlength="1000" aria-describedby="hint-notes err-notes"></textarea>
+      <p class="field__hint" id="hint-notes">For example, the times that suit you. Please don’t include health details.</p>
+      <p class="field__error" id="err-notes" hidden></p>
+    </div>
+
+    <div class="hp" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+    <div class="field" data-field="consent">
+      <label class="consent">
+        <input type="checkbox" name="consent" required aria-describedby="err-consent" />
+        <span>I’ve read the <a href="/privacy/" target={steps ? '_blank' : undefined} rel={steps ? 'noopener' : undefined}>Privacy Policy</a> and I’m happy for you to contact me about this enquiry.</span>
+      </label>
+      <p class="field__error" id="err-consent" hidden></p>
+    </div>
   </div>
 
-  <div class="hp" aria-hidden="true"><label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
-
-  <div class="field" data-field="consent">
-    <label class="consent">
-      <input type="checkbox" name="consent" required aria-describedby="err-consent" />
-      <span>I have read the <a href="/privacy/">Privacy Policy</a> and agree to be contacted about this enquiry.</span>
-    </label>
-    <p class="field__error" id="err-consent" hidden></p>
-  </div>
-
-  <div>
-    <button class="btn" type="submit" data-submit><Icon name="loader-circle" class="spin" /><span data-label>Send enquiry</span></button>
-    <p class="field__hint" id="form-note" style="margin-top:0.6rem">Sending this form is an enquiry. It does not confirm a booking.</p>
+  <div class="form-foot">
+    <p class="field__hint" id="form-note">Sending an enquiry isn’t a booking. We’ll email you to confirm your clinic and time.</p>
+    <div class="form-actions">
+      {steps && <button class="btn btn--ghost" type="button" data-back hidden><Icon name="arrow-left" />Back</button>}
+      {steps && <button class="btn" type="button" data-next>Continue <Icon name="arrow-right" /></button>}
+      <button class="btn" type="submit" data-submit hidden={steps}><Icon name="loader-circle" class="spin" /><span data-label>Send enquiry</span></button>
+    </div>
   </div>
   <noscript><p class="alert alert--error">This form needs JavaScript to send. Please enable it and reload the page.</p></noscript>
 </form>
@@ -83,10 +98,10 @@ import { PRICE } from '../data/site';
 <div id="form-success" class="alert alert--ok" role="status" tabindex="-1" hidden>
   <Icon name="circle-check" class="icon--lg" />
   <div>
-    <h2>Enquiry sent</h2>
-    <p>Thank you. The team will reply to <strong data-sent-email></strong> to confirm the clinic and appointment time.</p>
-    <p>This is a request, not a confirmed booking. Your appointment is confirmed only when you receive that email.</p>
-    <p><a href="/">Back to home</a></p>
+    <h2>Thank you, your enquiry is with us</h2>
+    <p>We’ll reply to <strong data-sent-email></strong> to confirm your clinic and appointment time.</p>
+    <p>Until you hear from us it isn’t a confirmed booking, so please keep an eye on your inbox.</p>
+    <p><button class="link link--btn" type="button" data-close-success>Close</button></p>
   </div>
 </div>
 
@@ -117,7 +132,7 @@ import { PRICE } from '../data/site';
   const rules: Record<string, () => string> = {
     test: () => (form.querySelector('input[name="test"]:checked') ? '' : 'Choose the test you are asking about.'),
     name: () => (val('name') ? '' : 'Enter your full name.'),
-    phone: () => (val('phone').replace(/\D/g, '').length >= 7 ? '' : 'Enter a phone number we can reach you on.'),
+    phone: () => (/^[+()\d\s.-]+$/.test(val('phone')) && val('phone').replace(/\D/g, '').length >= 7 ? '' : 'Enter a phone number we can reach you on, using digits only.'),
     email: () => (EMAIL.test(val('email')) ? '' : 'Enter a valid email address, such as name@example.com.'),
     date: () => {
       const v = val('date');
@@ -136,9 +151,10 @@ import { PRICE } from '../data/site';
     p.textContent = msg;
     wrap.querySelectorAll<HTMLElement>('input:not([type=radio]), textarea').forEach((el) => (msg ? el.setAttribute('aria-invalid', 'true') : el.removeAttribute('aria-invalid')));
   };
-  const validate = () => {
+  const validate = (only?: string[]) => {
     let first: HTMLElement | null = null;
     for (const [field, rule] of Object.entries(rules)) {
+      if (only && !only.includes(field)) continue;
       const msg = rule();
       setError(field, msg);
       if (msg && !first) first = form.querySelector<HTMLElement>(`[data-field="${field}"] input, [data-field="${field}"] textarea`);
@@ -155,6 +171,48 @@ import { PRICE } from '../data/site';
     if (f && rules[f.dataset.field!] && f.classList.contains('field--error')) setError(f.dataset.field!, rules[f.dataset.field!]());
   });
 
+  // Guided steps (used when the form is shown in the enquiry popup)
+  const stepped = form.hasAttribute('data-steps');
+  const panes = Array.from(form.querySelectorAll<HTMLElement>('[data-step]'));
+  const STEP_FIELDS: string[][] = [['test'], ['name', 'phone', 'email'], ['date', 'consent']];
+  const next = form.querySelector<HTMLButtonElement>('[data-next]');
+  const back = form.querySelector<HTMLButtonElement>('[data-back]');
+  let step = 0;
+  const showStep = (n: number, focus = true) => {
+    step = Math.max(0, Math.min(panes.length - 1, n));
+    panes.forEach((p, i) => (p.hidden = i !== step));
+    if (back) back.hidden = step === 0;
+    if (next) next.hidden = step === panes.length - 1;
+    submit.hidden = step !== panes.length - 1;
+    document.dispatchEvent(new CustomEvent('enquiry:step', { detail: { step: step + 1, total: panes.length } }));
+    if (focus) {
+      const target = panes[step].querySelector<HTMLElement>('input:not([type=radio]):not([type=hidden]):not([tabindex="-1"]), textarea') || panes[step].querySelector<HTMLElement>('.step-title');
+      (step === 0 ? panes[0].querySelector<HTMLElement>('input[type=radio]:checked, input[type=radio]') : target)?.focus({ preventScroll: false });
+    }
+  };
+  if (stepped) {
+    showStep(0, false);
+    next?.addEventListener('click', () => { if (validate(STEP_FIELDS[step])) showStep(step + 1); });
+    back?.addEventListener('click', () => showStep(step - 1));
+    // choosing a check moves straight on
+    form.querySelectorAll<HTMLInputElement>('input[name="test"]').forEach((r) => r.addEventListener('change', () => setTimeout(() => { if (step === 0) showStep(1); }, 220)));
+    // Enter on a text field continues instead of submitting early
+    form.addEventListener('keydown', (e) => {
+      const t = e.target as HTMLElement;
+      if (e.key === 'Enter' && step < panes.length - 1 && t.tagName === 'INPUT' && (t as HTMLInputElement).type !== 'radio') { e.preventDefault(); next?.click(); }
+    });
+  }
+  // The popup (or a link with ?test=&clinic=) can preset the form
+  document.addEventListener('enquiry:preset', ((e: CustomEvent) => {
+    const { test, clinic } = (e.detail || {}) as { test?: string; clinic?: string };
+    if (test && TEST_NAMES[test]) { const r = form.querySelector<HTMLInputElement>(`input[name="test"][value="${test}"]`); if (r) r.checked = true; }
+    if (clinic) (form.elements.namedItem('clinic') as HTMLInputElement).value = clinic;
+    if (stepped) showStep(form.querySelector('input[name="test"]:checked') ? 1 : 0);
+  }) as EventListener);
+  document.querySelector('[data-close-success]')?.addEventListener('click', () => document.dispatchEvent(new CustomEvent('enquiry:close')));
+  const clinicParam = new URLSearchParams(location.search).get('clinic');
+  if (clinicParam) (form.elements.namedItem('clinic') as HTMLInputElement).value = clinicParam;
+
   let submissionId = crypto.randomUUID();
   let sending = false;
   const fail = (msg: string) => {
@@ -167,7 +225,13 @@ import { PRICE } from '../data/site';
     e.preventDefault();
     if (sending) return; // duplicate-submit guard
     errBox.hidden = true;
-    if (!validate()) return;
+    if (!validate()) {
+      if (stepped) {
+        const bad = STEP_FIELDS.findIndex((fs) => fs.some((f) => rules[f]()));
+        if (bad >= 0 && bad !== step) { showStep(bad, false); validate(STEP_FIELDS[bad]); }
+      }
+      return;
+    }
     sending = true;
     submit.setAttribute('aria-busy', 'true');
     submit.disabled = true;
@@ -183,6 +247,7 @@ import { PRICE } from '../data/site';
         form.hidden = true;
         success.querySelector('[data-sent-email]')!.textContent = payload.email;
         success.hidden = false;
+        document.dispatchEvent(new CustomEvent('enquiry:sent'));
         success.focus();
         return;
       }

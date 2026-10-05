@@ -5,20 +5,20 @@ import EnquiryForm from '../components/EnquiryForm.astro';
 ---
 <Base
   title="Appointment Enquiry | Quantum BioTesting"
-  description="Send an appointment enquiry for the Men’s or Women’s Health Check. An enquiry is a request: the team replies by email to confirm the clinic and time."
+  description="Enquire about an appointment for the Men’s or Women’s Health Check. We’ll email you to confirm your clinic and time."
 >
-  <Intro title="Appointment enquiry" lead="Tell us which test you want and when suits you. This is a request, not a confirmed booking." crumbs={[{ href: '/', label: 'Home' }, { label: 'Contact' }]} />
+  <Intro title="Appointment enquiry" lead="Tell us which check you’d like and when suits you. We’ll reply by email to confirm. It isn’t a booking until you hear from us." crumbs={[{ href: '/', label: 'Home' }, { label: 'Contact' }]} />
   <section class="section">
     <div class="wrap enquiry">
       <div><EnquiryForm /></div>
       <aside class="panel" aria-labelledby="next-title">
         <h2 id="next-title">What happens next</h2>
         <ol>
-          <li>The team reads your enquiry.</li>
-          <li>They email you to confirm the clinic, date and time, or to suggest an alternative.</li>
-          <li>Payment and cancellation details are given when your appointment is confirmed. See the <a href="/terms/">Terms &amp; Conditions</a>.</li>
+          <li>We read your enquiry.</li>
+          <li>We email you to confirm your clinic, date and time, or to suggest another that suits.</li>
+          <li>Payment and cancellation details come with your confirmation. You can read the <a href="/terms/">Terms &amp; Conditions</a> in the meantime.</li>
         </ol>
-        <p class="muted">Before you enquire: <a href="/how-it-works/#preparation">how to prepare for your test</a>. For the tests themselves, see <a href="/tests/">Tests</a>.</p>
+        <p class="muted">Looking ahead? Read <a href="/how-it-works/#preparation">how to prepare</a>, see <a href="/tests/">the health checks</a> or <a href="/clinics/">find a clinic</a>.</p>
       </aside>
     </div>
   </section>
