@@ -91,11 +91,11 @@ Built at the client's request from two reference sites, replacing every earlier 
 | Area | Evidence | Status |
 |---|---|---|
 | Build, types, unit tests | `astro build`, `astro check` (0 errors, 0 warnings), 9 enquiry-function tests | pass |
-| Layout | all 8 pages plus 404 at 320, 360, 390, 768 and 1440 px: no horizontal overflow, one h1, no skipped heading level, images load with alt text, controls at least 44 px | pass |
-| Accessibility | axe (WCAG 2.0/2.1/2.2 A and AA plus best-practice) on all 8 pages at 390 and 1440 px: no violations after a duplicate region name on `/tests/` was fixed; skip link first on every page; visible focus; mobile menu opens, closes on Escape and returns focus | pass (fixed one) |
+| Layout | all 8 pages plus 404 at 320, 360, 390, 768 and 1440 px: no horizontal overflow (a 2 px overflow at 320 px in the header was fixed), one h1, no skipped heading level, images load with alt text, controls at least 44 px | pass |
+| Accessibility | axe (WCAG 2.0/2.1/2.2 A and AA plus best-practice) on all 8 pages at 390 and 1440 px: no violations after the announcement bar was given a landmark; skip link first on every page; visible focus; mobile menu opens, closes on Escape and returns focus | pass (fixed one) |
 | Reflow and zoom | every page at a 720×450 viewport (a 200% zoom of 1440×900): no horizontal scroll | pass |
 | Contrast | every text and background pairing of the palette checked against WCAG AA (`verify-home.mjs`) | pass |
-| Performance (Lighthouse, mobile profile) | all pages 99–100 for performance, accessibility, best practices and SEO; CLS 0; TBT 0 ms; LCP 1.7–2.2 s (limit 2.5 s). Stylesheet inlined to remove a render-blocking request | pass |
+| Performance (Lighthouse, mobile profile) | all pages 99–100 for performance, accessibility, best practices and SEO; CLS 0; TBT 0 ms; LCP 1.5–2.0 s (limit 2.5 s). Stylesheet inlined to remove a render-blocking request | pass |
 | Links | every internal link and anchor resolves (no empty or `#` links); the only external link is the ICO | pass |
 | Metadata | unique titles and descriptions, absolute canonicals, sitemap lists all 8 pages, robots, favicon set, Apple touch icon, social image all load; structured data is Organization (home) and Service with the agreed price (test pages) only | pass |
 | Legacy routes | `vercel.json` 301s `/testing.html`, `/privacy.html`, `/terms.html`, `/index.html`, `/book.html` to existing pages (config checked; redirects run on Vercel, not in the local preview) | pass (config), untested on Vercel |
