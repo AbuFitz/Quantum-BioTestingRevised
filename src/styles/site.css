@@ -552,3 +552,6 @@ html.enq-open { overflow: hidden; }
 .card .price { margin-top: auto; }
 .card .card__actions { margin-top: 0; }
 .card__body { display: flex; flex-direction: column; gap: 1.1rem; }
+/* clinic page: the map block must never be wider than the column */
+.facts-split > * { min-width: 0; }
+@media (max-width: 61.99em) { .map__stage { aspect-ratio: auto; } }

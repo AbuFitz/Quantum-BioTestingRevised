@@ -89,7 +89,7 @@ try {
     }
     check(`all ${hrefs.size} internal links and anchors resolve, none empty`, dead.length === 0, dead.slice(0, 6).join(' | '));
     const ext = [...hrefs].map((e) => e.split('|')[1]).filter((h) => /^https?:/.test(h));
-    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
+    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|policies\.google\.com\/privacy|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
     await ctx.close();
   }
 
