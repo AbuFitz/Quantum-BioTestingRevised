@@ -8,10 +8,11 @@ import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
-import reception from '../assets/photos/reception.jpg';
 import { SITE, PRICE, RRP } from '../data/site';
-import { FAQS } from '../data/tests';
+import { FAQS, INCLUDED } from '../data/tests';
 import { CLINICS } from '../data/clinics';
+import CityMap from '../components/CityMap.astro';
+import reception from '../assets/photos/reception.jpg';
 import { faqLd } from '../data/seo';
 
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, legalName: SITE.legalName, url: Astro.site!.href, logo: new URL('/icon-512.png', Astro.site).href };
@@ -19,14 +20,6 @@ const tips = [
   { icon: 'utensils-crossed', title: 'Fast for 8–12 hours', text: 'Water is fine, and encouraged. A morning appointment makes this easiest.' },
   { icon: 'pill', title: 'Carry on with medication', text: 'Take prescribed medication as usual, unless your doctor has told you otherwise.' },
   { icon: 'dumbbell', title: 'Go easy on exercise', text: 'Skip intense workouts for 24 hours beforehand, as they can affect some results.' },
-];
-const included = [
-  { icon: 'droplets', title: 'A trained phlebotomist', text: 'Your sample is taken by a trained phlebotomist in an appointment of about 15 minutes.' },
-  { icon: 'microscope', title: 'Laboratory analysis', text: 'Your sample is analysed in the laboratory on automated platforms.' },
-  { icon: 'clipboard-check', title: 'Clinical specialist review', text: 'A clinical specialist reviews every result before your report reaches you.' },
-  { icon: 'file-text', title: 'A report in plain English', text: 'Your digital report arrives by email, with commentary that’s easy to follow.' },
-  { icon: 'share-2', title: 'Easy to share with your GP', text: 'Take your report to your GP or any other healthcare provider if you’d like to.' },
-  { icon: 'stethoscope', title: 'Extras with the Women’s check', text: 'A private remote GP consultation and a 6-month repeat test are included.' },
 ];
 ---
 <Base
@@ -75,41 +68,31 @@ const included = [
     </div>
   </section>
 
-  <section class="section section--tight" aria-label="Highlights">
-    <div class="wrap">
-      <ul class="trio">
-        <li class="feature" data-reveal><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">300+</p><p class="feature__label">Men’s Health Check</p><p>Biomarkers across 11 groups, from heart and cholesterol to hormones and vitamins.</p></li>
-        <li class="feature" data-reveal style="--d:.08s"><span class="feature__icon" aria-hidden="true"><Icon name="clock" /></span><p class="feature__big">15 min</p><p class="feature__label">The appointment</p><p>A quick visit to the clinic, then results by email in 2–5 working days.</p></li>
-        <li class="feature" data-reveal style="--d:.16s"><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">Up to 350</p><p class="feature__label">Women’s Health Check</p><p>Biomarkers across 27 health areas, with a GP consultation and a repeat test included.</p></li>
-      </ul>
-    </div>
-  </section>
-
   <Journey heading="A quick visit, then back to your day" lead="You pop in, we take a sample, and a clinical specialist looks over your results. Your report lands in your inbox, written in plain English." />
 
-  <section class="section" aria-labelledby="included-title">
+  <section class="section section--white" aria-labelledby="included-title">
     <div class="wrap">
       <div class="section__head center">
         <h2 class="display" id="included-title">Everything is included</h2>
         <p class="lead">From the blood draw to your report, there’s nothing extra to add.</p>
       </div>
-      <Tips grid items={included} />
+      <Tips grid compact items={INCLUDED} />
     </div>
   </section>
 
-  <section class="section section--white" aria-labelledby="before-title">
+  <section class="section" aria-labelledby="before-title">
     <div class="wrap split">
       <div class="split__text">
         <h2 class="display" id="before-title" data-reveal>A little preparation goes a long way</h2>
         <p class="lead" data-reveal style="--d:.06s">A few simple things help your results be as accurate as they can be.</p>
-        <Tips items={tips} />
+        <div class="hide-sm"><Tips items={tips} /></div>
         <div class="split__foot">
           <a class="btn btn--outline" href="/how-it-works/#preparation">Read the full guide <Icon name="arrow-right" /></a>
           <p class="muted">Have a health condition, or not sure about something? Just ask us before your appointment.</p>
         </div>
       </div>
       <figure class="split__photo" data-reveal>
-        <Image src={reception} alt="The Quantum reception wall with the logo, a marble desk and a plant" widths={[480, 720, 960]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+        <Image src={reception} alt="The Quantum reception wall with the logo, a marble desk and a plant" widths={[480, 720, 960, 1200]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
       </figure>
     </div>
   </section>
@@ -118,11 +101,12 @@ const included = [
     <div class="wrap">
       <div class="section__head center">
         <h2 class="display" id="where-title">Find a clinic near you</h2>
-        <p class="lead">Four clinics in London and one in Birmingham. Tell us which suits you best.</p>
+        <p class="lead">Four clinics in London and one in Birmingham. Select a pin to see the clinic.</p>
       </div>
-      <ul class="jump jump--big jump--center">
-        {CLINICS.map((c) => <li><a href={`/clinics/${c.slug}/`}>{c.name}</a></li>)}
-      </ul>
+      <div class="maps">
+        <div><h3 class="maps__city">London</h3><CityMap city="London" /></div>
+        <div><h3 class="maps__city">Birmingham</h3><CityMap city="Birmingham" /></div>
+      </div>
     </div>
   </section>
 

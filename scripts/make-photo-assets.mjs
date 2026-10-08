@@ -32,5 +32,5 @@ const palette = async (src, dst, { sat = 1.04, warm = [1.02, 1.0, 0.97], green =
 await palette('stocksnap-GU5GXVZDIY-beach-walk.jpg', 'walk.jpg', { sat: 1.05 });
 // Client reception image: used as supplied (brand colours must not be graded)
 await sharp(IN + 'client-reception-logo-wall.webp').resize({ width: 1600, withoutEnlargement: true }).jpeg({ quality: 90 }).toFile(OUT + 'reception.jpg');
-await palette('stocksnap-ZMTW3XX4SO-woman-tablet.jpg', 'report.jpg', { warm: [1.02, 1.0, 0.98], sat: 1.04 });
+await palette('rawpixel-3338342-blood-tube.jpg', 'sample.jpg', { warm: [0.98, 1.0, 1.04], sat: 1.0, green: 1 });
 console.log('photos graded');

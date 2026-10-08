@@ -2,7 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import Intro from '../../components/Intro.astro';
 import Icon from '../../components/Icon.astro';
-import ClinicMap from '../../components/ClinicMap.astro';
+import TestCards from '../../components/TestCards.astro';
+import CityMap from '../../components/CityMap.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import { CLINICS, fullAddress, type Clinic } from '../../data/clinics';
@@ -16,7 +17,7 @@ export function getStaticPaths() {
 const { clinic } = Astro.props as { clinic: Clinic };
 const others = CLINICS.filter((c) => c.slug !== clinic.slug);
 const faqs = [
-  { q: `Where is the ${clinic.name} clinic?`, a: `It is ${clinic.where}: ${fullAddress(clinic)}. We confirm the exact clinic details by email when your appointment is arranged.` },
+  { q: `Where is the ${clinic.name} clinic?`, a: `It is ${clinic.where}: ${fullAddress(clinic)}. We confirm the exact details by email when your appointment is arranged.` },
   { q: `Can I get a private blood test in ${clinic.name} without a GP referral?`, a: `Yes. You don’t need a GP referral. Send us an enquiry for the Men’s or Women’s Health Check and we’ll email you to confirm your time at ${clinic.name}.` },
   { q: 'How long does the appointment take?', a: 'About 15 minutes. A trained phlebotomist takes your sample, and your report follows by email in 2–5 working days (4 for the Women’s Health Check).' },
   { q: 'How much does it cost?', a: `Each Health Check is ${PRICE} (RRP ${RRP}), whichever clinic you choose.` },
@@ -47,7 +48,8 @@ const ld = [
       <div>
         <h2 class="display" id="find-title" style="margin-bottom:1.25rem">Finding us</h2>
         <address class="addr"><Icon name="map-pin" /><span>{clinic.street}<br />{clinic.locality}<br />{clinic.postcode}</span></address>
-        <ClinicMap clinic={clinic} />
+        <CityMap city={clinic.city} active={clinic.slug} />
+        <p class="map__links"><a class="link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Open in Google Maps<span class="vh"> (opens in a new tab)</span></a> <a class="link" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></p>
       </div>
       <aside class="panel panel--stick" aria-label="Book at this clinic">
         <h2>Visit {clinic.name}</h2>
@@ -60,19 +62,7 @@ const ld = [
   <section class="section section--tight" aria-labelledby="tests-title">
     <div class="wrap">
       <div class="section__head"><h2 class="display" id="tests-title">Tests available in {clinic.name}</h2></div>
-      <div class="cards">
-        {TESTS.map((t) => (
-          <article class:list={['card', { 'card--women': t.key === 'womens' }]}>
-            <p class="card__tag">{t.key === 'mens' ? 'For men' : 'For women'}</p>
-            <div class="card__body">
-              <h3>{t.name}</h3>
-              <p class="card__desc">{t.biomarkers}. Results in {t.results}.</p>
-              <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
-              <div class="card__actions"><a class="btn btn--quiet" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a></div>
-            </div>
-          </article>
-        ))}
-      </div>
+      <TestCards headingLevel="h3" clinic={clinic.name} />
     </div>
   </section>
 

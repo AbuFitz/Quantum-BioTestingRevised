@@ -7,6 +7,7 @@ import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
 import Icon from '../components/Icon.astro';
+import PrepTimeline from '../components/PrepTimeline.astro';
 import visit from '../assets/photos/visit.jpg';
 import { PREPARATION, FAQS } from '../data/tests';
 import { CLINICS, fullAddress } from '../data/clinics';
@@ -28,6 +29,7 @@ import { breadcrumbLd, faqLd } from '../data/seo';
         <p class="muted">A little preparation helps your results be as accurate as they can be.</p>
       </div>
       <Tips grid items={PREPARATION.map((p) => ({ icon: p.icon, title: p.title, text: p.text }))} />
+      <div style="margin-top:2rem;max-width:34rem"><PrepTimeline /></div>
       <p class="note" style="margin-top:1.75rem">If you take regular medication, have a health condition or aren’t sure how to prepare, please ask us before your appointment.</p>
     </div>
   </section>

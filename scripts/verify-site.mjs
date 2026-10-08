@@ -89,7 +89,7 @@ try {
     }
     check(`all ${hrefs.size} internal links and anchors resolve, none empty`, dead.length === 0, dead.slice(0, 6).join(' | '));
     const ext = [...hrefs].map((e) => e.split('|')[1]).filter((h) => /^https?:/.test(h));
-    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|policies\.google\.com\/privacy|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
+    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
     await ctx.close();
   }
 
@@ -237,12 +237,16 @@ try {
     check('contact page has no popup (the form is on the page)', (await page.locator('#enquiry-dialog').count()) === 0);
     for (const slug of ['fulham', 'canary-wharf', 'chiswick', 'westfield-stratford', 'birmingham']) {
       await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'networkidle' });
-      check(`${slug}: no iframe and no third-party request until the map is requested`, (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
+      check(`${slug}: self-drawn city map, no iframe and no third-party request`, (await page.locator('svg[aria-label^="Map of"]').count()) === 1 && (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
+      check(`${slug}: its own pin is highlighted and links to this page`, (await page.locator(`.citymap__pin.is-active[href="/clinics/${slug}/"]`).count()) === 1);
       check(`${slug}: address, h1 and breadcrumb schema present`, /SW6|E14|W4|E20|B4/.test(await page.locator('address').innerText()) && (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('script[type="application/ld+json"]').allInnerTexts()).some((t) => /BreadcrumbList/.test(t)));
       check(`${slug}: direction links open safely`, (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
+      check(`${slug}: no show-map button`, (await page.getByRole('button', { name: /show the map/i }).count()) === 0);
     }
-    await page.goto(BASE + '/clinics/fulham/'); await page.getByRole('button', { name: 'Show the map' }).click();
-    check('map iframe loads only after the visitor asks, from Google with no referrer', (await page.locator('iframe').getAttribute('src')).startsWith('https://www.google.com/maps') && (await page.locator('iframe').getAttribute('referrerpolicy')) === 'no-referrer');
+    await page.goto(BASE + '/clinics/', { waitUntil: 'networkidle' });
+    check('finder: a map for each city with every clinic pinned', (await page.locator('.citymap').count()) === 2 && (await page.locator('.citymap__pin').count()) === 5);
+    await page.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
+    check('tests page has no male-versus-female comparison table', (await page.locator('table').count()) === 0);
     await ctx.close();
   }
 } finally { await browser.close(); server.kill(); }

@@ -1,6 +1,6 @@
 ---
 // Page head for inner pages: breadcrumbs, one h1, one lead. Sits under the floating navigation.
-interface Props { title: string; lead?: string; crumbs?: { href?: string; label: string }[]; tone?: 'blush' | 'sky' }
+interface Props { title: string; lead?: string; crumbs?: { href?: string; label: string }[]; tone?: 'blush' | 'sky' | 'pink' }
 const { title, lead, crumbs, tone = 'blush' } = Astro.props;
 ---
 <div class:list={['intro', `intro--${tone}`]}>
