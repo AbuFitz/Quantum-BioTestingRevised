@@ -32,7 +32,7 @@ UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "
 Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
 **Provisional (new in this pass)**
-Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (confirm the RRP is a genuine reference price before advertising a saving); the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (mantel clock, woman at a window, beach walk) now appear without that label.
+Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (confirm the RRP is a genuine reference price before advertising a saving); the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (woman at a window, beach walk) appear without that label. The reception-wall image in the preparation section was supplied by the client; it looks like a rendered mock-up of a reception, not a real clinic, so confirm its origin and that it may represent the business.
 
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
@@ -63,6 +63,10 @@ Clinic addresses (carried over from the old site, unconfirmed); the saving figur
 | `/sitemap.xml`, `/robots.txt` | Generated from the configured domain (sitemap lists every page above) |
 
 Old public routes redirect (301) via `vercel.json`: `/testing.html` to `/tests/`, `/privacy.html`, `/terms.html`, `/index.html`, `/book.html`.
+
+## Design decisions at the client's direction
+
+All buttons are outlines (red primary, blue secondary, white on photographs). The two checks use soft blue (men) and soft pink (women) outlines on tinted, not filled, panels. After the pass at `0a25fa2` (reworked package cards, SVG city maps, preparation timeline, comparison table removed) the client asked to return to the version that still had the clock (`301fcc0`); `002bc4b` reverts those two commits and the changes above were made on top of it. The reworked cards and maps remain in git history if wanted.
 
 ## Enquiry popup
 
@@ -96,9 +100,9 @@ Fraunces (display headlines, big figures, legal headings) and Plus Jakarta Sans 
 
 # Delivered design: BioClin and Medichecks patterns (all pages)
 
-Built at the client's request from two reference sites, replacing every earlier theme completely (earlier themes are recoverable from git). An announcement bar (Medichecks) sits above a floating pill navigation (BioClin) that expands inside itself on phones. The homepage runs: full-bleed hero with both test buttons and a four-item feature strip; two equal product cards (Medichecks anatomy: tag strip, name, description, biomarkers, results time, price, buttons); a feature trio; a deep blue journey chapter with the four visit steps and a photograph; an icon grid of what every test includes; a preparation split; FAQ rows; a rounded photographic banner with both tests as buttons; a light footer. What was adopted and what was deliberately not copied is in `docs/design-research.md`.
+Built at the client's request from two reference sites, replacing every earlier theme completely (earlier themes are recoverable from git). A floating pill navigation (BioClin) sits straight on the hero and expands inside itself on phones; there is no top banner (removed at the client's request). The homepage runs: full-bleed hero with both test buttons and a four-item feature strip; two equal product cards (Medichecks anatomy: tag strip, name, description, biomarkers, results time, price, buttons); a feature trio; a deep blue journey chapter with the four visit steps and a photograph; an icon grid of what every test includes; a preparation split; FAQ rows; a rounded photographic banner with both tests as buttons; a light footer. What was adopted and what was deliberately not copied is in `docs/design-research.md`.
 
-**Structure.** One stylesheet (`src/styles/site.css`), one layout (`src/layouts/Base.astro`), shared components in `src/components/` (Header with announcement bar, Footer, Intro, TestCards, Journey, Tips, FaqSection, CloseEnquiry, MarkerGroups, LegalLayout, EnquiryForm). Content lives in `src/data/`. Every page is built from the same components, so the test cards, the visit steps, the FAQ and the closing banner are identical wherever they appear.
+**Structure.** One stylesheet (`src/styles/site.css`), one layout (`src/layouts/Base.astro`), shared components in `src/components/` (Header, Footer, Intro, TestCards, Journey, Tips, FaqSection, CloseEnquiry, MarkerGroups, LegalLayout, EnquiryForm). Content lives in `src/data/`. Every page is built from the same components, so the test cards, the visit steps, the FAQ and the closing banner are identical wherever they appear.
 
 **Photography.** Hero: the client's clinician-and-patient photograph. Preparation split and closing banner: CC0 StockSnap images, graded into the palette (`scripts/make-photo-assets.mjs`; greens and teals pulled toward the logo blue and red). Journey chapter (home and How it works): the client's "clinician explaining results" photograph. Sources, licences and the gaps are in `brand/photo-sources/PROVENANCE.md`. The two client photographs have no licence record; the StockSnap files are 960 px, the largest obtainable without an account. All are captioned or described as illustrative.
 
@@ -108,7 +112,7 @@ Built at the client's request from two reference sites, replacing every earlier 
 |---|---|---|
 | Build, types, unit tests | `astro build`, `astro check` (0 errors, 0 warnings), 9 enquiry-function tests | pass |
 | Layout | all 8 pages plus 404 at 320, 360, 390, 768 and 1440 px: no horizontal overflow (a 2 px overflow at 320 px in the header was fixed), one h1, no skipped heading level, images load with alt text, controls at least 44 px | pass |
-| Accessibility | axe (WCAG 2.0/2.1/2.2 A and AA plus best-practice) on all 8 pages at 390 and 1440 px: no violations after the announcement bar was given a landmark; skip link first on every page; visible focus; mobile menu opens, closes on Escape and returns focus | pass (fixed one) |
+| Accessibility | axe (WCAG 2.0/2.1/2.2 A and AA plus best-practice) on all 8 pages at 390 and 1440 px: no violations; skip link first on every page; visible focus; mobile menu opens, closes on Escape and returns focus | pass (fixed one) |
 | Reflow and zoom | every page at a 720×450 viewport (a 200% zoom of 1440×900): no horizontal scroll | pass |
 | Contrast | every text and background pairing of the palette checked against WCAG AA (`verify-home.mjs`) | pass |
 | Performance (Lighthouse, mobile profile) | all pages 99–100 for performance, accessibility, best practices and SEO; CLS 0; TBT 0 ms; LCP 1.5–2.0 s (limit 2.5 s). Stylesheet inlined to remove a render-blocking request | pass |

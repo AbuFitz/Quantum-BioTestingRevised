@@ -46,7 +46,7 @@ const ld = [ld0, breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name:
       <aside class="panel panel--stick" aria-label="Price and enquiry">
         <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
         <p>Send us an enquiry and we’ll email you to confirm your clinic and time. It isn’t a booking until you hear from us.</p>
-        <p><a class="btn" href={`/contact/?test=${test.key}`}>Enquire about this test <Icon name="arrow-right" /></a></p>
+        <p><a class:list={['btn', isMens ? 'btn--men' : 'btn--women']} href={`/contact/?test=${test.key}`}>Enquire about this test <Icon name="arrow-right" /></a></p>
         <p>Thinking about the other check? <a href={`/tests/${other.slug}/`}>{other.name}</a></p>
       </aside>
     </div>

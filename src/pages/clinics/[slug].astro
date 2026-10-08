@@ -52,7 +52,7 @@ const ld = [
       <aside class="panel panel--stick" aria-label="Book at this clinic">
         <h2>Visit {clinic.name}</h2>
         <p>Choose your check and we’ll reply by email to confirm your time. It isn’t a booking until you hear from us.</p>
-        {TESTS.map((t) => <p><a class="btn btn--block" href={`/contact/?test=${t.key}&clinic=${encodeURIComponent(clinic.name)}`}>{t.name} <Icon name="arrow-right" /></a></p>)}
+        {TESTS.map((t) => <p><a class:list={['btn', 'btn--block', t.key === 'mens' ? 'btn--men' : 'btn--women']} href={`/contact/?test=${t.key}&clinic=${encodeURIComponent(clinic.name)}`}>{t.name} <Icon name="arrow-right" /></a></p>)}
               </aside>
     </div>
   </section>
@@ -68,7 +68,7 @@ const ld = [
               <h3>{t.name}</h3>
               <p class="card__desc">{t.biomarkers}. Results in {t.results}.</p>
               <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
-              <div class="card__actions"><a class="btn btn--outline" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a></div>
+              <div class="card__actions"><a class="btn btn--quiet" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a></div>
             </div>
           </article>
         ))}

@@ -20,7 +20,7 @@ for (const [name, fg, bg, min] of [
   ['blue on paper', '#013275', PAPER, 7], ['blue on white', '#013275', WHITE, 7], ['blue on sky', '#013275', SKY, 7],
   ['white on red (button)', '#ffffff', '#b02018', 4.5], ['white on red-dark (hover)', '#ffffff', '#8f1a13', 4.5],
   ['white on blue', '#ffffff', '#013275', 7], ['pale on blue', '#d6e3f6', '#013275', 4.5],
-  ['white on navy (announcement)', '#ffffff', '#01183a', 7], ['white on blue-dark (hover)', '#ffffff', '#00225a', 7],
+  ['men ink on men tint', '#17407f', '#e6eefa', 7], ['women ink on women tint', '#8f2f55', '#fbe9f0', 6.5], ['men blue on white (outline button)', '#1f4f9c', '#ffffff', 7], ['women rose on white (outline button)', '#a63a65', '#ffffff', 5], ['red on white (primary outline)', '#b02018', '#ffffff', 4.5], ['white on blue-dark (hover)', '#ffffff', '#00225a', 7],
   ['blue on white (light button)', '#013275', WHITE, 7], ['red on white (price strike)', '#b02018', WHITE, 4.5],
   ['white on red (feature card)', '#ffffff', '#b02018', 4.5],
 ]) check(`contrast ${name}`, ratio(fg, bg) >= min, ratio(fg, bg).toFixed(2));
@@ -35,7 +35,11 @@ try {
     check(`no horizontal overflow ${tag}`, (await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0);
     check(`no console errors ${tag}`, errors.length === 0, errors.join(' | '));
     check(`one h1 ${tag}`, (await page.locator('h1').count()) === 1);
-    check(`announcement bar and floating pill present ${tag}`, (await page.locator('.announce').isVisible()) && (await page.locator('.hdr__pill').isVisible()));
+    check(`no top banner and the floating pill is present ${tag}`, (await page.locator('.announce').count()) === 0 && (await page.locator('.hdr__pill').isVisible()));
+    const filled = await page.evaluate(() => [...document.querySelectorAll('.btn')].filter((b) => b.offsetParent && b.getBoundingClientRect().width).filter((b) => { const m = getComputedStyle(b).backgroundColor.match(/[\d.]+/g) || []; return m.length < 4 ? (m[0] !== undefined && !(+m[0] > 250 && +m[1] > 250 && +m[2] > 250)) : +m[3] > 0.1; }).map((b) => b.textContent.trim().slice(0, 30)));
+    check(`every button is an outline (no filled buttons) ${tag}`, filled.length === 0, filled.join(' | '));
+    const bc = await page.evaluate(() => [...document.querySelectorAll('.card')].map((c) => getComputedStyle(c).borderTopColor));
+    check(`men's card outline is blue and women's is pink ${tag}`, bc.length === 2 && bc[0] === 'rgb(91, 134, 201)' && bc[1] === 'rgb(213, 138, 169)', bc.join(' / '));
     // Both tests reachable in the first viewport, with equal prominence
     const men = page.locator('.hero__actions a[href$="test=mens"]'), wom = page.locator('.hero__actions a[href$="test=womens"]');
     const inView = async (l) => { const b = await l.boundingBox(); return !!b && b.y + b.height <= h && b.y >= 0; };

@@ -30,6 +30,7 @@ const palette = async (src, dst, { sat = 1.04, warm = [1.02, 1.0, 0.97], green =
   await sharp(data, { raw: info }).jpeg({ quality: 88 }).toFile(OUT + dst);
 };
 await palette('stocksnap-GU5GXVZDIY-beach-walk.jpg', 'walk.jpg', { sat: 1.05 });
-await palette('stocksnap-VI3GY3LRD4-mantel-clock.jpg', 'clock.jpg', { warm: [1, 1, 1.01], sat: 1.0 });
+// Client reception image: used as supplied (brand colours must not be graded)
+await sharp(IN + 'client-reception-logo-wall.webp').resize({ width: 1600, withoutEnlargement: true }).jpeg({ quality: 90 }).toFile(OUT + 'reception.jpg');
 await palette('stocksnap-ZMTW3XX4SO-woman-tablet.jpg', 'report.jpg', { warm: [1.02, 1.0, 0.98], sat: 1.04 });
 console.log('photos graded');

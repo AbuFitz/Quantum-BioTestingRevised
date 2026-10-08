@@ -8,7 +8,7 @@ import Tips from '../components/Tips.astro';
 import FaqSection from '../components/FaqSection.astro';
 import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
-import clock from '../assets/photos/clock.jpg';
+import reception from '../assets/photos/reception.jpg';
 import { SITE, PRICE, RRP } from '../data/site';
 import { FAQS } from '../data/tests';
 import { CLINICS } from '../data/clinics';
@@ -44,7 +44,7 @@ const included = [
         <h1 id="hero-title">A clearer picture of your health.</h1>
         <p class="hero__lead">Private blood tests for men and women, reviewed by a clinical specialist and explained in plain English. Pick the check that suits you and we’ll take care of the rest.</p>
         <div class="hero__actions">
-          <a class="btn" href="/contact/?test=mens">Men’s Health Check <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost-light" href="/contact/?test=mens">Men’s Health Check <Icon name="arrow-right" /></a>
           <a class="btn btn--ghost-light" href="/contact/?test=womens">Women’s Health Check <Icon name="arrow-right" /></a>
         </div>
       </div>
@@ -109,7 +109,7 @@ const included = [
         </div>
       </div>
       <figure class="split__photo" data-reveal>
-        <Image src={clock} alt="A cream-coloured mantel clock" widths={[480, 720, 960]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+        <Image src={reception} alt="The Quantum reception wall with the logo, a marble desk and a plant" widths={[480, 720, 960]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
       </figure>
     </div>
   </section>
