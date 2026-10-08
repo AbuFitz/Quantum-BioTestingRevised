@@ -3,12 +3,12 @@ import LegalLayout from '../components/LegalLayout.astro';
 const S = [
   { id: 'summary', title: 'In short' },
   { id: 'used', title: 'What this website stores' },
-  { id: 'maps', title: 'Maps' },
+  { id: 'maps', title: 'The optional map' },
   { id: 'choices', title: 'Your choices' },
   { id: 'changes', title: 'If this changes' },
 ];
 ---
-<LegalLayout title="Cookies | Quantum BioTesting" description="Quantum BioTesting does not set cookies, use analytics or load third-party content." heading="Cookies" sections={S}>
+<LegalLayout title="Cookies | Quantum BioTesting" description="Quantum BioTesting does not set cookies or use analytics. The only optional third-party content is a map on each clinic page, loaded only if you ask for it." heading="Cookies" sections={S}>
   <section id="summary">
     <h2>1. In short</h2>
     <p>This website does not set cookies, does not use analytics or advertising trackers, and does not store anything on your device. That is why you will not see a cookie banner when you arrive.</p>
@@ -27,12 +27,13 @@ const S = [
     <p>Our hosting provider keeps standard server logs, such as IP address and pages requested, to run and secure the website. See the <a href="/privacy/">Privacy Policy</a>.</p>
   </section>
   <section id="maps">
-    <h2>3. Maps</h2>
-    <p>The maps on our clinic pages are drawn by this website itself, so they set no cookies and contact no one else. Each clinic page also has links to open the address in Google Maps or get directions. Those open in a new tab, and Google’s own policies apply once you are there.</p>
+    <h2>3. The optional map</h2>
+    <p>Each clinic page has a map. It is switched off until you press “Show the map”, so visiting the page does not contact anyone else. If you choose to show it, the map is provided by Google. Google receives your request and may set cookies under <a href="https://policies.google.com/privacy">its own privacy policy</a>. Those cookies are Google’s, not ours.</p>
+    <p>You can skip the map entirely. Every clinic page also shows the full address and links to open it in Google Maps or get directions.</p>
   </section>
   <section id="choices">
     <h2>4. Your choices</h2>
-    <p>There is nothing to switch off, because nothing is switched on. You can still block or delete cookies in your browser settings at any time.</p>
+    <p>You decide whether to load the map each time you visit. You can also block or delete cookies in your browser settings at any time. The website works fully without any cookies.</p>
   </section>
   <section id="changes">
     <h2>5. If this changes</h2>

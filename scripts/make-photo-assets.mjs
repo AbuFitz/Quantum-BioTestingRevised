@@ -30,5 +30,6 @@ const palette = async (src, dst, { sat = 1.04, warm = [1.02, 1.0, 0.97], green =
   await sharp(data, { raw: info }).jpeg({ quality: 88 }).toFile(OUT + dst);
 };
 await palette('stocksnap-GU5GXVZDIY-beach-walk.jpg', 'walk.jpg', { sat: 1.05 });
-await palette('rawpixel-3338342-blood-tube.jpg', 'sample.jpg', { warm: [0.98, 1.0, 1.04], sat: 1.0, green: 1 });
+await palette('stocksnap-VI3GY3LRD4-mantel-clock.jpg', 'clock.jpg', { warm: [1, 1, 1.01], sat: 1.0 });
+await palette('stocksnap-ZMTW3XX4SO-woman-tablet.jpg', 'report.jpg', { warm: [1.02, 1.0, 0.98], sat: 1.04 });
 console.log('photos graded');

@@ -1,0 +1,36 @@
+---
+// A map that stays off until the visitor asks for it, so the page makes no third-party request,
+// and sets no cookies, by default. Without JavaScript the two links below still work.
+import Icon from './Icon.astro';
+import { fullAddress, type Clinic } from '../data/clinics';
+interface Props { clinic: Clinic }
+const { clinic } = Astro.props;
+const q = encodeURIComponent(clinic.mapQuery);
+const embed = `https://www.google.com/maps?q=${q}&output=embed`;
+const open = `https://www.google.com/maps/search/?api=1&query=${q}`;
+const dirs = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+---
+<div class="map" data-map data-embed={embed} data-title={`Map showing ${clinic.name}`}>
+  <div class="map__stage" data-map-stage>
+    <div class="map__ph">
+      <span class="map__pin" aria-hidden="true"><Icon name="map-pin" /></span>
+      <p class="map__addr">{fullAddress(clinic)}</p>
+      <button class="btn btn--sm" type="button" data-map-load hidden>Show the map</button>
+      <p class="map__note" data-map-note hidden>The map is provided by Google. Showing it sends your request to Google, which may set cookies. Nothing loads until you choose.</p>
+    </div>
+  </div>
+  <p class="map__links"><a class="link" href={open} target="_blank" rel="noopener">Open in Google Maps<span class="vh"> (opens in a new tab)</span></a> <a class="link" href={dirs} target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></p>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-map]').forEach((m) => {
+    const btn = m.querySelector<HTMLButtonElement>('[data-map-load]')!;
+    const note = m.querySelector<HTMLElement>('[data-map-note]')!;
+    const stage = m.querySelector<HTMLElement>('[data-map-stage]')!;
+    btn.hidden = false; note.hidden = false;
+    btn.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = m.dataset.embed!; f.title = m.dataset.title!; f.loading = 'lazy'; f.referrerPolicy = 'no-referrer'; f.className = 'map__frame';
+      stage.replaceChildren(f);
+    });
+  });
+</script>
