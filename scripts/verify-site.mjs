@@ -16,6 +16,11 @@ await new Promise((r) => setTimeout(r, 800));
 const results = []; const fail = [];
 const check = (n, ok, d = '') => { results.push(ok); if (!ok) fail.push(`${n} ${d}`); };
 const browser = await chromium.launch({ executablePath: EXE });
+// Map tiles come from OpenStreetMap. The verifier answers those requests with a stand-in image, so the checks test
+// this site (and still see which requests it makes) without depending on the network or on OpenStreetMap.
+const TILE = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64');
+const newContext = browser.newContext.bind(browser);
+browser.newContext = async (...args) => { const c = await newContext(...args); await c.route('https://tile.openstreetmap.org/**', (r) => r.fulfill({ status: 200, contentType: 'image/png', body: TILE })); return c; };
 const meta = {};
 try {
   // 1. Layout, errors, headings, images, tap targets at every width
