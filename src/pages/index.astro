@@ -11,7 +11,7 @@ import visit from '../assets/photos/visit.jpg';
 import { SITE, PRICE, RRP } from '../data/site';
 import { FAQS, INCLUDED } from '../data/tests';
 import { CLINICS } from '../data/clinics';
-import CityMap from '../components/CityMap.astro';
+import ClinicMap from '../components/ClinicMap.astro';
 import reception from '../assets/photos/reception.jpg';
 import { faqLd } from '../data/seo';
 
@@ -114,8 +114,8 @@ const tips = [
         <p class="lead">Four clinics in London and one in Birmingham. Select a pin to see the clinic.</p>
       </div>
       <div class="maps">
-        <div><h3 class="maps__city">London</h3><CityMap city="London" /></div>
-        <div><h3 class="maps__city">Birmingham</h3><CityMap city="Birmingham" /></div>
+        <div><h3 class="maps__city">London</h3><ClinicMap city="London" /></div>
+        <div><h3 class="maps__city">Birmingham</h3><ClinicMap city="Birmingham" /></div>
       </div>
     </div>
   </section>

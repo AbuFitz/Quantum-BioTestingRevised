@@ -601,23 +601,6 @@ html.enq-open { overflow: hidden; }
 .maps { display: grid; gap: 2rem; }
 @media (min-width: 62em) { .maps { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
 .maps__city { font: 800 1.0625rem/1.2 var(--text); margin-bottom: 0.75rem; }
-.citymap { margin: 0; }
-.citymap svg { display: block; width: 100%; height: auto; border-radius: var(--r-big); border: 1px solid var(--line); background: #eef3fb; box-shadow: var(--shadow); }
-.citymap figcaption { margin-top: 0.6rem; font-size: 0.8125rem; color: var(--muted); }
-.citymap text { font-family: var(--text); }
-.citymap__water { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; fill: #7e9ccc; }
-.citymap__lm text { font-size: 11px; font-weight: 600; fill: #4b5870; paint-order: stroke; stroke: #eef3fb; stroke-width: 3px; }
-.citymap__pin { cursor: pointer; outline: none; }
-.citymap__pin .halo { fill: var(--red); opacity: 0; transition: opacity 0.25s; }
-.citymap__pin .drop { fill: var(--red); stroke: #fff; stroke-width: 2; transition: transform 0.25s var(--ease); transform-origin: 0 0; }
-.citymap__pin .eye { fill: #fff; }
-.citymap__pin .lab { font-size: 13px; font-weight: 800; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
-.citymap__pin:hover .drop, .citymap__pin:focus-visible .drop { transform: scale(1.18); }
-.citymap__pin:hover .halo, .citymap__pin:focus-visible .halo, .citymap__pin.is-active .halo { opacity: 0.18; }
-.citymap__pin:focus-visible .lab { fill: var(--blue); }
-.citymap__pin.is-dim { opacity: 0.55; }
-.citymap__pin.is-active .drop { fill: var(--blue); }
-.citymap__pin.is-active .halo { fill: var(--blue); }
 .city-split { display: grid; gap: 1.5rem; align-items: start; }
 @media (min-width: 62em) { .city-split { grid-template-columns: 1.3fr 1fr; gap: 2.5rem; } }
 .map__links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.9rem; }
@@ -668,12 +651,6 @@ html.enq-open { overflow: hidden; }
 .pack .price__save { background: var(--men-bg); }
 .pack--womens .price__save { background: var(--women-bg); }
 .intro--pink { background: var(--women-bg); }
-/* phone: the map is drawn at 600 units wide, so its labels need to be larger in those units */
-@media (max-width: 47.99em) {
-  .citymap__pin .lab { font-size: 21px; stroke-width: 5px; }
-  .citymap__lm text { font-size: 18px; }
-  .citymap__water { font-size: 17px; }
-}
 
 /* the two checks: soft blue for men, soft pink for women, outlined rather than filled */
 .card { border: 2px solid var(--men-line); }
@@ -704,3 +681,29 @@ html.enq-open { overflow: hidden; }
   .enq .step-pane { gap: 1rem; }
   .enq textarea.input { min-height: 4.75rem; }
 }
+
+/* real map (Leaflet + OpenStreetMap) */
+.rmap { display: grid; gap: 0.75rem; }
+.rmap__canvas { position: relative; height: 22rem; border-radius: var(--r-big); overflow: hidden; border: 1px solid var(--line); background: var(--sky); box-shadow: var(--shadow); z-index: 0; }
+@media (min-width: 62em) { .rmap__canvas { height: 26rem; } }
+.rmap__wait { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--muted); font-weight: 600; }
+.rmap__links { display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; }
+.rmap__links a { display: inline-flex; align-items: center; padding: 0.4rem 0.9rem; border-radius: 999px; background: #fff; border: 1px solid var(--line); font: 700 0.8125rem/1.2 var(--text); text-decoration: none; color: var(--blue); }
+.rmap__links a:hover, .rmap__links a.is-active { background: var(--sky); border-color: var(--men-line); }
+.leaflet-container { font-family: var(--text); background: var(--sky); }
+.leaflet-container a { color: var(--blue); }
+.leaflet-control-attribution { font-size: 0.6875rem; }
+.leaflet-bar a, .leaflet-bar a:hover { color: var(--ink); }
+.rmap__pin { background: none; border: 0; }
+.rmap__pin svg { display: block; overflow: visible; filter: drop-shadow(0 4px 5px rgba(1, 24, 58, 0.35)); }
+.rmap__pin path { fill: var(--red); stroke: #fff; stroke-width: 2; }
+.rmap__pin.is-active path { fill: var(--blue); }
+.rmap__pin.is-dim { opacity: 0.7; }
+.leaflet-marker-icon:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
+.rmap__label.leaflet-tooltip { background: #fff; border: 0; border-radius: 999px; box-shadow: 0 4px 12px -4px rgba(1, 24, 58, 0.4); padding: 0.2rem 0.65rem; font: 800 0.75rem/1.3 var(--text); color: var(--ink); }
+.rmap__label.leaflet-tooltip::before { display: none; }
+.rmap__pop strong { display: block; font: 800 0.9375rem/1.3 var(--text); }
+.rmap__pop p { margin: 0.15rem 0 0.5rem; font-size: 0.8125rem; color: var(--muted); }
+.rmap__pop a { font-weight: 800; font-size: 0.8125rem; }
+.leaflet-popup-content-wrapper { border-radius: 1rem; }
+.leaflet-popup-content { margin: 0.8rem 1rem; }

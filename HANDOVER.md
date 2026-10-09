@@ -55,7 +55,7 @@ Clinic addresses (carried over from the old site, unconfirmed); the saving figur
 |---|---|
 | `/` | Home |
 | `/tests/`, `/tests/mens-health-check/`, `/tests/womens-health-check/` | Overview and per-product detail |
-| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, a self-drawn city map, both tests, FAQ and schema |
+| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, a real interactive map, both tests, FAQ and schema |
 | `/how-it-works/` | Process, preparation, clinics, results, FAQs |
 | `/contact/` | Full-page enquiry form: the no-JavaScript fallback and deep link (`?test=mens\|womens&clinic=Name` preselects). Not in the navigation by request; linked from the footer |
 | `/privacy/`, `/terms/`, `/cookies/` | Legal, linked from the footer |
@@ -87,7 +87,11 @@ One `<h1>` per page, unique titles and descriptions, absolute canonicals, sitema
 
 ## Privacy and cookie behaviour as implemented
 
-No cookies, no `localStorage`, no analytics and no third-party requests of any kind (fonts self-hosted). The city maps on the home page, the clinic finder and each clinic page are drawn as inline SVG by `CityMap.astro`, so they contact no one and need no consent. Pin positions come from approximate coordinates in `src/data/clinics.ts` and the map is labelled "schematic, not to scale"; the coordinates are never published as structured data. Each clinic page also links to Google Maps and directions as ordinary links that open in a new tab. Because nothing needs consent, there is no cookie banner, and `/cookies/` and the Privacy Policy say so. If analytics are ever added, add a consent banner and update both pages.
+No cookies, no `localStorage`, no analytics. Fonts and images are self-hosted. The one thing loaded from another host is the **map**: the home page, the clinic finder and each clinic page show a real interactive street map (Leaflet, bundled with the site, with OpenStreetMap tiles from `tile.openstreetmap.org`). The map sets up as it nears the viewport; one-finger drag is disabled on touch screens so the page still scrolls, and wheel zoom needs a click into the map first. When a map appears the visitor's browser requests tiles from OpenStreetMap, which therefore sees their IP address and browser details. A direct request to a tile showed no `Set-Cookie` header on the day of writing. `/privacy/` and `/cookies/` say exactly this and link to the OpenStreetMap Foundation's policy. The list of clinic links under every map and the address on each clinic page work without JavaScript. Each clinic page also has "Open in Google Maps" and "Get directions" links (new tab, `rel=noopener`).
+
+Pin positions are geocoded from the addresses with OpenStreetMap Nominatim (`src/data/clinics.ts`); confirm them against the real entrances. Coordinates are not published in structured data. The tile server is OpenStreetMap's public one, which asks for light use with attribution (shown on every map). If traffic grows, switch the tile URL in `src/components/ClinicMap.astro` to a paid tile provider.
+
+Because only map tiles come from elsewhere and no cookies are set, there is no cookie banner. If analytics are ever added, add a consent banner and update both legal pages.
 
 ## Edits to legal text (for the reviewer)
 

@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Intro from '../../components/Intro.astro';
 import Icon from '../../components/Icon.astro';
 import TestCards from '../../components/TestCards.astro';
-import CityMap from '../../components/CityMap.astro';
+import ClinicMap from '../../components/ClinicMap.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import { CLINICS, fullAddress, type Clinic } from '../../data/clinics';
@@ -48,7 +48,7 @@ const ld = [
       <div>
         <h2 class="display" id="find-title" style="margin-bottom:1.25rem">Finding us</h2>
         <address class="addr"><Icon name="map-pin" /><span>{clinic.street}<br />{clinic.locality}<br />{clinic.postcode}</span></address>
-        <CityMap city={clinic.city} active={clinic.slug} />
+        <ClinicMap city={clinic.city} active={clinic.slug} />
         <p class="map__links"><a class="link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Open in Google Maps<span class="vh"> (opens in a new tab)</span></a> <a class="link" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></p>
       </div>
       <aside class="panel panel--stick" aria-label="Book at this clinic">

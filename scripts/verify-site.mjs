@@ -89,7 +89,7 @@ try {
     }
     check(`all ${hrefs.size} internal links and anchors resolve, none empty`, dead.length === 0, dead.slice(0, 6).join(' | '));
     const ext = [...hrefs].map((e) => e.split('|')[1]).filter((h) => /^https?:/.test(h));
-    check('external links are limited to the ICO and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
+    check('external links are limited to the ICO, OpenStreetMap policy and Google Maps directions links', ext.every((h) => /^https:\/\/(ico\.org\.uk|osmfoundation\.org\/wiki\/Privacy_Policy|www\.google\.com\/maps\/(search|dir)\/)/.test(h)), ext.join(','));
     await ctx.close();
   }
 
@@ -235,16 +235,25 @@ try {
     await page.goto(BASE + '/contact/?test=womens&clinic=Fulham', { waitUntil: 'networkidle' });
     check('contact page preselects test and clinic from the link', (await page.locator('input[name=test][value=womens]').isChecked()) && (await page.inputValue('#f-clinic')) === 'Fulham');
     check('contact page has no popup (the form is on the page)', (await page.locator('#enquiry-dialog').count()) === 0);
+    const ready = async (pg) => { await pg.locator('[data-rmap]').first().scrollIntoViewIfNeeded(); await pg.waitForSelector('.leaflet-container', { timeout: 15000 }); await pg.waitForSelector('.leaflet-marker-icon'); };
+    const CITY_COUNT = { fulham: 4, 'canary-wharf': 4, chiswick: 4, 'westfield-stratford': 4, birmingham: 1 };
     for (const slug of ['fulham', 'canary-wharf', 'chiswick', 'westfield-stratford', 'birmingham']) {
-      await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'networkidle' });
-      check(`${slug}: self-drawn city map, no iframe and no third-party request`, (await page.locator('svg[aria-label^="Map of"]').count()) === 1 && (await page.locator('iframe').count()) === 0 && external.length === 0, external.join(','));
-      check(`${slug}: its own pin is highlighted and links to this page`, (await page.locator(`.citymap__pin.is-active[href="/clinics/${slug}/"]`).count()) === 1);
+      external.length = 0;
+      await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'load' }); await ready(page);
+      check(`${slug}: a real map with its clinic pinned, no iframe`, (await page.locator('.leaflet-marker-icon').count()) === CITY_COUNT[slug] && (await page.locator('.rmap__pin.is-active').count()) === 1 && (await page.locator('iframe').count()) === 0);
+      check(`${slug}: the only third-party requests are OpenStreetMap map tiles`, external.every((u) => new URL(u).host === 'tile.openstreetmap.org'), external.join(','));
       check(`${slug}: address, h1 and breadcrumb schema present`, /SW6|E14|W4|E20|B4/.test(await page.locator('address').innerText()) && (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('script[type="application/ld+json"]').allInnerTexts()).some((t) => /BreadcrumbList/.test(t)));
       check(`${slug}: direction links open safely`, (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
+      check(`${slug}: map attribution to OpenStreetMap is shown`, /OpenStreetMap/.test(await page.locator('.leaflet-control-attribution').innerText()));
       check(`${slug}: no show-map button`, (await page.getByRole('button', { name: /show the map/i }).count()) === 0);
     }
-    await page.goto(BASE + '/clinics/', { waitUntil: 'networkidle' });
-    check('finder: a map for each city with every clinic pinned', (await page.locator('.citymap').count()) === 2 && (await page.locator('.citymap__pin').count()) === 5);
+    await page.goto(BASE + '/clinics/', { waitUntil: 'load' }); await ready(page);
+    await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
+    check('finder: a real map for each city with every clinic pinned', (await page.locator('.leaflet-container').count()) === 2 && (await page.locator('.leaflet-marker-icon').count()) === 5);
+    await page.goto(BASE + '/', { waitUntil: 'load' }); await page.locator('.maps').scrollIntoViewIfNeeded(); await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
+    check('home: a real map for London and for Birmingham, pins link to the clinic pages', (await page.locator('.leaflet-marker-icon').count()) === 5 && (await page.locator('.rmap__links a').count()) === 5);
+    await page.locator('.rmap').first().locator('.leaflet-marker-icon').first().click(); await page.waitForSelector('.leaflet-popup a[href^="/clinics/"]');
+    check('clicking a pin shows the clinic name and a link to its page', (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
     await page.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
     check('tests page has no male-versus-female comparison table', (await page.locator('table').count()) === 0);
     await ctx.close();

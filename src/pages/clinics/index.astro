@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Intro from '../../components/Intro.astro';
 import Icon from '../../components/Icon.astro';
-import CityMap from '../../components/CityMap.astro';
+import ClinicMap from '../../components/ClinicMap.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
 import { CLINICS, fullAddress } from '../../data/clinics';
 import { breadcrumbLd } from '../../data/seo';
@@ -24,7 +24,7 @@ const ld = [
       <div class="wrap">
         <div class="section__head"><h2 class="display" id={`c-${city}`}>{city}</h2></div>
         <div class="city-split">
-        <CityMap city={city} />
+        <ClinicMap city={city} />
         <ul class="clinic-cards">
           {CLINICS.filter((c) => c.city === city).map((c) => (
             <li class="clinic-card" data-reveal>

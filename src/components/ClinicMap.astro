@@ -1,0 +1,71 @@
+---
+// A real, interactive street map (Leaflet with OpenStreetMap tiles) with the clinics as pins.
+// Leaflet is bundled with the site (no CDN). The map is set up when it nears the viewport, and the list of
+// clinic links below it works without JavaScript.
+import { CLINICS, fullAddress } from '../data/clinics';
+interface Props { city?: 'London' | 'Birmingham'; active?: string }
+const { city, active } = Astro.props;
+const list = CLINICS.filter((c) => !city || c.city === city);
+const pins = list.map((c) => ({ slug: c.slug, name: c.name, lat: c.lat, lng: c.lng, address: fullAddress(c) }));
+---
+<div class="rmap" data-rmap data-pins={JSON.stringify(pins)} data-active={active}>
+  <div class="rmap__canvas" data-rmap-canvas role="group" aria-label={`Map of our ${city ?? ''} clinics`.replace('  ', ' ')}>
+    <p class="rmap__wait">Loading map…</p>
+  </div>
+  <ul class="rmap__links">
+    {list.map((c) => <li><a class:list={{ 'is-active': c.slug === active }} href={`/clinics/${c.slug}/`} aria-current={c.slug === active ? 'page' : undefined}>{c.name}</a></li>)}
+  </ul>
+</div>
+<script>
+  import 'leaflet/dist/leaflet.css';
+  type Pin = { slug: string; name: string; lat: number; lng: number; address: string };
+  const pinSvg = (cls: string) => `<svg class="${cls}" viewBox="0 0 28 38" width="28" height="38" aria-hidden="true"><path d="M14 37C14 37 2 23.5 2 14.5a12 12 0 0 1 24 0C26 23.5 14 37 14 37Z" /><circle cx="14" cy="14.5" r="4.6" fill="#fff" /></svg>`;
+
+  const start = async (root: HTMLElement) => {
+    const canvas = root.querySelector<HTMLElement>('[data-rmap-canvas]')!;
+    const pins: Pin[] = JSON.parse(root.dataset.pins || '[]');
+    const active = root.dataset.active || '';
+    if (!pins.length) return;
+    const L = (await import('leaflet')).default;
+    canvas.replaceChildren();
+    const touch = L.Browser.mobile;
+    const map = L.map(canvas, { scrollWheelZoom: false, dragging: !touch, zoomControl: true, attributionControl: true, keyboard: true });
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
+    // Wheel zoom only after the visitor clicks into the map, so scrolling the page never gets hijacked
+    canvas.addEventListener('click', () => map.scrollWheelZoom.enable(), { once: true });
+    canvas.addEventListener('mouseleave', () => map.scrollWheelZoom.disable());
+    canvas.addEventListener('mouseenter', () => { if (canvas.dataset.zoomOn) map.scrollWheelZoom.enable(); });
+    canvas.addEventListener('click', () => { canvas.dataset.zoomOn = '1'; });
+
+    const group: L.LatLngExpression[] = [];
+    pins.forEach((p) => {
+      const isActive = p.slug === active;
+      const dim = !!active && !isActive;
+      const icon = L.divIcon({ className: `rmap__pin${isActive ? ' is-active' : ''}${dim ? ' is-dim' : ''}`, html: pinSvg('rmap__drop'), iconSize: [28, 38], iconAnchor: [14, 37], popupAnchor: [0, -34], tooltipAnchor: [14, -22] });
+      const m = L.marker([p.lat, p.lng], { icon, title: p.name, alt: `${p.name} clinic`, keyboard: true, riseOnHover: true, zIndexOffset: isActive ? 1000 : 0 }).addTo(map);
+      m.bindTooltip(p.name, { permanent: !dim || pins.length <= 5, direction: 'auto', className: 'rmap__label' });
+      const box = document.createElement('div');
+      box.className = 'rmap__pop';
+      const h = document.createElement('strong'); h.textContent = p.name;
+      const a = document.createElement('p'); a.textContent = p.address;
+      const l = document.createElement('a'); l.href = `/clinics/${p.slug}/`; l.textContent = isActive ? 'This clinic' : 'View clinic';
+      box.append(h, a, l);
+      m.bindPopup(box, { closeButton: true, autoPanPadding: [24, 24] });
+      group.push([p.lat, p.lng]);
+    });
+    if (active && pins.length > 1) {
+      const a = pins.find((p) => p.slug === active)!;
+      map.setView([a.lat, a.lng], 15);
+    } else if (pins.length === 1) {
+      map.setView([pins[0].lat, pins[0].lng], 15);
+    } else {
+      map.fitBounds(L.latLngBounds(group), { padding: [48, 48], maxZoom: 14 });
+    }
+    // Re-measure once the layout has settled
+    requestAnimationFrame(() => map.invalidateSize());
+  };
+
+  const roots = document.querySelectorAll<HTMLElement>('[data-rmap]');
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => entries.forEach((e) => { if (e.isIntersecting) { io!.unobserve(e.target); start(e.target as HTMLElement); } }), { rootMargin: '300px 0px' }) : null;
+  roots.forEach((r) => (io ? io.observe(r) : start(r)));
+</script>
