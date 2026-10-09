@@ -15,7 +15,7 @@
 **Fraunces** (variable, optical size and soft axes, SIL OFL) for display headlines, big figures and legal headings. **Plus Jakarta Sans** (variable, SIL OFL) for text, controls, prices and card headings. Both axis-limited and subset to Latin (about 57 KB together), self-hosted with metric-matched fallbacks. Inter (BioClin's text face) was replaced by Plus Jakarta Sans so one text face serves both reference patterns.
 
 ## Palette (roles)
-White canvas with a very light cool tint (`#f5f8fc`) on alternating sections · **logo blue `#013275`** for the deep chapter and secondary actions · **the Q's red `#b02018`** for the primary outline button and accents · soft blue (`#e6eefa`, outline `#5b86c9`) for the Men's check and soft pink (`#fbe9f0`, outline `#d58aa9`) for the Women's check, outlined and tinted rather than filled. Every button is an outline.
+Warm blush paper (`#fbf3ef`) canvas with white on alternating sections · **logo blue `#013275`** for the deep chapter and secondary actions · **the Q's red `#b02018`** for the primary outline button and accents · soft blue (`#e6eefa`, outline `#5b86c9`) for the Men's check and soft pink (`#fbe9f0`, outline `#d58aa9`) for the Women's check, outlined and tinted rather than filled. Every button is an outline.
 
 ## Photography
 Hero: the client's clinician-and-patient photograph under a navy gradient. Journey chapter: the client's "clinician explaining results" photograph. Preparation split: a CC0 image of cutting an orange. Closing banner: a CC0 beach walk, graded into the palette. All are captioned or described as illustrative. Provenance: `brand/photo-sources/PROVENANCE.md`.

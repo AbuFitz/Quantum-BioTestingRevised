@@ -2,42 +2,35 @@
 // The two tests as equal, comparable product cards. Used on the homepage and /tests/.
 import Icon from './Icon.astro';
 import { PRICE, RRP, SAVING } from '../data/site';
-import { TESTS, MENS_CHIPS, WOMENS_CHIPS } from '../data/tests';
+import { TESTS } from '../data/tests';
 interface Props { headingLevel?: 'h2' | 'h3'; clinic?: string }
 const { headingLevel: H = 'h3', clinic } = Astro.props;
 const enquire = (key: string) => `/contact/?test=${key}${clinic ? `&clinic=${encodeURIComponent(clinic)}` : ''}`;
 const copy = {
-  mens: { tag: 'For men', pre: '', num: '300+', unit: 'biomarkers in 11 groups', desc: 'A broad look at your heart, blood, metabolism, hormones, vitamins and more, grouped so it’s easy to follow.', chips: MENS_CHIPS, extra: [{ icon: 'clipboard-check', text: 'Reviewed by a clinical specialist' }, { icon: 'file-text', text: 'Plain-English digital report' }] },
-  womens: { tag: 'For women', pre: 'Up to', num: '350', unit: 'biomarkers in 27 areas', desc: 'A wide-ranging check from hormone balance and heart health to stress and nutrition, with extra support built in.', chips: WOMENS_CHIPS, extra: [{ icon: 'stethoscope', text: 'Private remote GP consultation included' }, { icon: 'repeat', text: '6-month repeat test included' }] },
+  mens: { tag: 'For men', desc: 'A broad look at your heart, blood, metabolism, hormones, vitamins and more, grouped into 11 areas so it’s easy to follow.' },
+  womens: { tag: 'For women', desc: 'A wide-ranging check across 27 health areas, from hormone balance and heart health to stress and nutrition, with a private GP consultation and a repeat test included.' },
 };
 ---
-<div class="packs">
-  {TESTS.map((t, i) => {
-    const c = copy[t.key];
-    return (
-      <article class:list={['pack', `pack--${t.key}`]} aria-labelledby={`t-${t.key}`} data-reveal style={`--d:${i * 0.1}s`}>
-        <div class="pack__top">
-          <p class="pack__tag">{c.tag}</p>
-          <p class="pack__num" aria-hidden="true">{c.pre && <span class="pack__pre">{c.pre}</span>}{c.num}</p>
-          <p class="pack__unit">{c.unit}</p>
+<div class="cards">
+  {TESTS.map((t, i) => (
+    <article class:list={['card', { 'card--women': t.key === 'womens' }]} aria-labelledby={`t-${t.key}`} data-reveal style={`--d:${i * 0.1}s`}>
+      <p class="card__tag">{copy[t.key].tag}</p>
+      <div class="card__body">
+        <H id={`t-${t.key}`}>{t.name}</H>
+        <p class="card__desc">{copy[t.key].desc}</p>
+        <ul class="card__meta">
+          <li><Icon name="flask-conical" />{t.biomarkers}</li>
+          <li><Icon name="clock" />Results in {t.results}</li>
+        </ul>
+        <ul class="ticks">
+          {t.inclusions.slice(1).map((inc) => <li><Icon name="check" /><span>{inc.text}</span></li>)}
+        </ul>
+        <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
+        <div class="card__actions">
+          <a class:list={['btn', t.key === 'mens' ? 'btn--men' : 'btn--women']} href={enquire(t.key)}>Enquire<span class="vh"> about the {t.name}</span> <Icon name="arrow-right" /></a>
+          <a class="btn btn--quiet" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a>
         </div>
-        <div class="pack__body">
-          <H id={`t-${t.key}`}>{t.name}</H>
-          <p class="pack__desc">{c.desc}</p>
-          <ul class="chips" aria-label="Some of what it covers">
-            {c.chips.map((x) => <li>{x}</li>)}<li class="chips__more">and more</li>
-          </ul>
-          <ul class="pack__facts">
-            {c.extra.map((e) => <li><Icon name={e.icon} />{e.text}</li>)}
-            <li><Icon name="clock" />Results in {t.results}</li>
-          </ul>
-          <div class="pack__buy">
-            <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
-            <a class:list={['btn', 'btn--block', t.key === 'mens' ? 'btn--men' : 'btn--women']} href={enquire(t.key)}>Enquire<span class="vh"> about the {t.name}</span> <Icon name="arrow-right" /></a>
-            <a class="pack__more" href={`/tests/${t.slug}/`}>See everything that’s tested<span class="vh"> in the {t.name}</span> <Icon name="arrow-right" /></a>
-          </div>
-        </div>
-      </article>
-    );
-  })}
+      </div>
+    </article>
+  ))}
 </div>

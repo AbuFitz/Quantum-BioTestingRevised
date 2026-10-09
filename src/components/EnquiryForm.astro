@@ -55,7 +55,7 @@ const { steps = false } = Astro.props;
     <div class="form-row form-row--2">
       <div class="field" data-field="clinic">
         <label class="field__label" for="f-clinic">Clinic or area <span class="field__opt">(optional)</span></label>
-        <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" list="clinic-list" autocomplete="off" aria-describedby="err-clinic" />
+        <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" list="clinic-list" autocomplete="off" placeholder="For example, Fulham" aria-describedby="err-clinic" />
         <datalist id="clinic-list">{CLINICS.map((c) => <option value={c.name} />)}</datalist>
         <p class="field__error" id="err-clinic" hidden></p>
       </div>

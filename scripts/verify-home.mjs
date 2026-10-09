@@ -14,7 +14,7 @@ const check = (n, ok, d = '') => { results.push(ok); if (!ok) fail.push(`${n} ${
 // WCAG contrast for the colour pairs the design actually uses
 const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
-const PAPER = '#ffffff', BLUSH = '#f3f6fb', SKY = '#e8eff9', WHITE = '#ffffff';
+const PAPER = '#fbf3ef', BLUSH = '#f6e5e0', SKY = '#e3edf9', WHITE = '#ffffff';
 for (const [name, fg, bg, min] of [
   ['ink on paper', '#0f1d36', PAPER, 7], ['muted on paper', '#4b5870', PAPER, 4.5], ['muted on white', '#4b5870', WHITE, 4.5], ['muted on blush', '#4b5870', BLUSH, 4.5],
   ['blue on paper', '#013275', PAPER, 7], ['blue on white', '#013275', WHITE, 7], ['blue on sky', '#013275', SKY, 7],
@@ -38,9 +38,9 @@ try {
     check(`no top banner and the floating pill is present ${tag}`, (await page.locator('.announce').count()) === 0 && (await page.locator('.hdr__pill').isVisible()));
     const filled = await page.evaluate(() => [...document.querySelectorAll('.btn')].filter((b) => b.offsetParent && b.getBoundingClientRect().width).filter((b) => { const m = getComputedStyle(b).backgroundColor.match(/[\d.]+/g) || []; return m.length < 4 ? (m[0] !== undefined && !(+m[0] > 250 && +m[1] > 250 && +m[2] > 250)) : +m[3] > 0.1; }).map((b) => b.textContent.trim().slice(0, 30)));
     check(`every button is an outline (no filled buttons) ${tag}`, filled.length === 0, filled.join(' | '));
-    const bc = await page.evaluate(() => [...document.querySelectorAll('.pack')].map((c) => getComputedStyle(c).borderTopColor));
+    const bc = await page.evaluate(() => [...document.querySelectorAll('.card')].map((c) => getComputedStyle(c).borderTopColor));
     check(`men's card outline is blue and women's is pink ${tag}`, bc.length === 2 && bc[0] === 'rgb(91, 134, 201)' && bc[1] === 'rgb(213, 138, 169)', bc.join(' / '));
-    check(`page background is white ${tag}`, (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === 'rgb(255, 255, 255)');
+    check(`page background is the warm paper colour ${tag}`, (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === 'rgb(251, 243, 239)');
     // Both tests reachable in the first viewport, with equal prominence
     const men = page.locator('.hero__actions a[href$="test=mens"]'), wom = page.locator('.hero__actions a[href$="test=womens"]');
     const inView = async (l) => { const b = await l.boundingBox(); return !!b && b.y + b.height <= h && b.y >= 0; };
@@ -48,7 +48,7 @@ try {
     const [mb, wb] = [await men.boundingBox(), await wom.boundingBox()];
     check(`hero buttons have equal size ${tag}`, Math.abs(mb.height - wb.height) < 1 && Math.abs(mb.width - wb.width) < 40, `${mb.width}x${mb.height} vs ${wb.width}x${wb.height}`);
     // Product cards are equal
-    const cards = await page.locator('.pack').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
+    const cards = await page.locator('.card').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
     check(`two product cards ${tag}`, cards.length === 2);
     if (w >= 768) check(`product cards equal size ${tag}`, Math.abs(cards[0][0] - cards[1][0]) < 1 && Math.abs(cards[0][1] - cards[1][1]) < 2, JSON.stringify(cards));
     const text = await page.locator('main').innerText();

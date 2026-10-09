@@ -6,16 +6,31 @@ import Icon from './Icon.astro';
 ---
 <dialog class="enq" id="enquiry-dialog" aria-labelledby="enq-title" data-enq>
   <div class="enq__sheet">
-    <header class="enq__head">
-      <div>
-        <p class="enq__step" data-enq-step aria-live="polite">Step 1 of 3</p>
-        <h2 id="enq-title">Request an appointment</h2>
+    <aside class="enq__aside">
+      <p class="enq__kicker">Quantum BioTesting</p>
+      <p class="enq__lead">A few details, and we’ll take it from here.</p>
+      <ul class="enq__points">
+        <li><Icon name="circle-check" />No GP referral needed</li>
+        <li><Icon name="mail" />We reply by email to confirm your clinic and time</li>
+        <li><Icon name="shield-check" />It isn’t a booking until you hear from us</li>
+      </ul>
+    </aside>
+    <div class="enq__main">
+      <header class="enq__head">
+        <div>
+          <p class="enq__step" data-enq-step aria-live="polite">Step 1 of 3</p>
+          <h2 id="enq-title">Request an appointment</h2>
+        </div>
+        <button class="enq__close" type="button" aria-label="Close" data-enq-close><Icon name="x" /></button>
+      </header>
+      <ol class="enq__dots" aria-hidden="true">
+        <li class="is-active" data-enq-dot>Your check</li>
+        <li data-enq-dot>Your details</li>
+        <li data-enq-dot>Preferences</li>
+      </ol>
+      <div class="enq__body" data-enq-body>
+        <EnquiryForm steps />
       </div>
-      <button class="enq__close" type="button" aria-label="Close" data-enq-close><Icon name="x" /></button>
-    </header>
-    <div class="enq__bar" aria-hidden="true"><span data-enq-bar></span></div>
-    <div class="enq__body" data-enq-body>
-      <EnquiryForm steps />
     </div>
   </div>
 </dialog>
@@ -24,7 +39,7 @@ import Icon from './Icon.astro';
   const dlg = document.getElementById('enquiry-dialog') as HTMLDialogElement | null;
   if (dlg && typeof dlg.showModal === 'function') {
     const stepEl = dlg.querySelector('[data-enq-step]')!;
-    const bar = dlg.querySelector<HTMLElement>('[data-enq-bar]')!;
+    const dots = Array.from(dlg.querySelectorAll<HTMLElement>('[data-enq-dot]'));
     const title = dlg.querySelector('#enq-title')!;
     let opener: HTMLElement | null = null;
     let pushed = false;
@@ -54,11 +69,11 @@ import Icon from './Icon.astro';
     document.addEventListener('enquiry:step', ((e: CustomEvent) => {
       const { step, total } = e.detail;
       stepEl.textContent = `Step ${step} of ${total}`;
-      bar.style.width = `${(step / total) * 100}%`;
+      dots.forEach((d, i) => { d.classList.toggle('is-active', i === step - 1); d.classList.toggle('is-done', i < step - 1); });
     }) as EventListener);
     document.addEventListener('enquiry:sent', () => {
       stepEl.textContent = 'Done';
-      bar.style.width = '100%';
+      dots.forEach((d) => { d.classList.remove('is-active'); d.classList.add('is-done'); });
       title.textContent = 'Enquiry sent';
       dlg.querySelector<HTMLElement>('[data-enq-body]')!.scrollTop = 0;
     });

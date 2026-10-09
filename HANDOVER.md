@@ -66,16 +66,16 @@ Old public routes redirect (301) via `vercel.json`: `/testing.html` to `/tests/`
 
 ## Design decisions at the client's direction
 
-- White page background with a very light cool tint on alternating sections (the earlier blush-tinted paper was removed as it read as a red tint).
+- The warm blush paper background (`#fbf3ef`) is kept, as the client confirmed it was what they asked for (a white version was tried and reverted).
 - All buttons are outlines: red primary, blue secondary, white on photographs, soft blue and soft pink for the two checks.
-- The Men's check is soft blue and the Women's check soft pink, outlined on tinted panels rather than filled.
+- The "Two health checks" section keeps its original layout (a tag strip on each card, then the three highlight boxes) but is coloured soft blue for the Men's check and soft pink for the Women's check, outlined rather than filled.
 - No top banner.
 - The reception-wall image supplied by the client sits in the preparation section; the example-evening timeline moved to How it works.
 - The client briefly asked to return to the version with the clock (`301fcc0`, via `002bc4b`), then asked for the card, map and timeline improvements back; this branch now contains both sets of changes (the card and map work from `0a25fa2` plus the outline, white and pink/blue changes).
 
 ## Enquiry popup
 
-Every Enquire button and any link to `/contact/` opens a native `<dialog>` with a three-step form (check, contact details, preferences and consent) when JavaScript is available; without it the link goes to `/contact/`. It is a bottom sheet on phones and a centred card on larger screens, validates per step, keeps what was typed when going back, closes with Escape, the close button, the backdrop or the browser Back button, and returns focus to the button that opened it. Choosing a check (from a button or a card) starts on step 2. The same form component and the same `/api/enquiry` function serve the popup and `/contact/`.
+On desktop it is a split card: a blue panel on the left reassures (no GP referral, reply by email, not a booking until confirmed) and the stepped form sits on the right with a three-segment progress indicator; the card keeps one height across steps so nothing jumps. On phones it is a bottom sheet without the side panel. Every Enquire button and any link to `/contact/` opens a native `<dialog>` with a three-step form (check, contact details, preferences and consent) when JavaScript is available; without it the link goes to `/contact/`. It is a bottom sheet on phones and a centred card on larger screens, validates per step, keeps what was typed when going back, closes with Escape, the close button, the backdrop or the browser Back button, and returns focus to the button that opened it. Choosing a check (from a button or a card) starts on step 2. The same form component and the same `/api/enquiry` function serve the popup and `/contact/`.
 
 ## Emails
 
