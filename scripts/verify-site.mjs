@@ -248,9 +248,10 @@ try {
       check(`${slug}: no show-map button`, (await page.getByRole('button', { name: /show the map/i }).count()) === 0);
     }
     await page.goto(BASE + '/clinics/', { waitUntil: 'load' }); await ready(page);
+    for (const m of await page.locator('[data-rmap]').all()) await m.scrollIntoViewIfNeeded();
     await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
     check('finder: a real map for each city with every clinic pinned', (await page.locator('.leaflet-container').count()) === 2 && (await page.locator('.leaflet-marker-icon').count()) === 5);
-    await page.goto(BASE + '/', { waitUntil: 'load' }); await page.locator('.maps').scrollIntoViewIfNeeded(); await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
+    await page.goto(BASE + '/', { waitUntil: 'load' }); for (const m of await page.locator('[data-rmap]').all()) await m.scrollIntoViewIfNeeded(); await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
     check('home: a real map for London and for Birmingham, pins link to the clinic pages', (await page.locator('.leaflet-marker-icon').count()) === 5 && (await page.locator('.rmap__links a').count()) === 5);
     await page.locator('.rmap').first().locator('.leaflet-marker-icon').first().click(); await page.waitForSelector('.leaflet-popup a[href^="/clinics/"]');
     check('clicking a pin shows the clinic name and a link to its page', (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
