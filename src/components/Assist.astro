@@ -1,0 +1,117 @@
+---
+import Icon from './Icon.astro';
+import { PRICE, RRP, SAVING } from '../data/site';
+import { COUNT } from '../data/clinics';
+const total = COUNT;
+---
+<div class="assist" data-assist hidden>
+  <section class="assist__panel" id="assist-panel" role="region" aria-label="Quick answers" hidden>
+    <header class="assist__head">
+      <span class="assist__badge" aria-hidden="true"><Icon name="message-circle" /></span>
+      <div><p class="assist__title">Quick answers</p><p class="assist__sub">Instant help with the common questions. For anything personal, send us an enquiry.</p></div>
+      <button class="assist__x" type="button" aria-label="Close quick answers" data-assist-close><Icon name="x" /></button>
+    </header>
+    <div class="assist__log" data-assist-log role="log" aria-live="polite" tabindex="0"></div>
+    <div class="assist__chips" data-assist-chips></div>
+    <form class="assist__ask" data-assist-form autocomplete="off">
+      <label class="vh" for="assist-q">Type a question</label>
+      <input id="assist-q" class="assist__input" type="text" inputmode="text" enterkeyhint="send" placeholder="Type a question, e.g. fasting" maxlength="120" data-assist-input />
+      <button class="assist__send" type="submit" aria-label="Send"><Icon name="send" /></button>
+    </form>
+  </section>
+  <button class="assist__fab" type="button" aria-expanded="false" aria-controls="assist-panel" data-assist-toggle>
+    <Icon name="message-circle" /><span>Quick answers</span>
+  </button>
+  <script type="application/json" id="assist-data" set:html={JSON.stringify({ price: PRICE, rrp: RRP, saving: SAVING, total })} />
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-assist]');
+  if (root) {
+    const facts = JSON.parse(document.getElementById('assist-data')!.textContent || '{}');
+    const panel = root.querySelector<HTMLElement>('.assist__panel')!;
+    const fab = root.querySelector<HTMLButtonElement>('[data-assist-toggle]')!;
+    const log = root.querySelector<HTMLElement>('[data-assist-log]')!;
+    const chipsEl = root.querySelector<HTMLElement>('[data-assist-chips]')!;
+    const form = root.querySelector<HTMLFormElement>('[data-assist-form]')!;
+    const input = root.querySelector<HTMLInputElement>('[data-assist-input]')!;
+    root.hidden = false;
+
+    type Topic = { id: string; chip: string; keys: string[]; html: string; next: string[] };
+    // Every answer repeats what the site already says. Nothing here is a clinical judgement.
+    const T: Topic[] = [
+      { id: 'price', chip: 'Price and what’s included', keys: ['price', 'cost', 'how much', '995', 'rrp', 'discount', 'save', 'pay', 'include', 'cheap', 'expensive', '£'],
+        html: `<p>Both health checks are <strong>${facts.price} each</strong>, against a usual price of ${facts.rrp}. That is a saving of ${facts.saving}.</p><p>It covers the blood draw, laboratory analysis, a clinical specialist’s review and your digital report. The Women’s Health Check also includes a private GP consultation and a 6-month repeat test.</p>`, next: ['tests', 'book', 'where'] },
+      { id: 'tests', chip: 'Men’s or Women’s check?', keys: ['mens', 'men', 'womens', 'women', 'male', 'female', 'which', 'difference', 'biomarker', 'markers', '300', '350', 'compare', 'test'],
+        html: `<p>The <strong>Men’s Health Check</strong> looks at 300+ biomarkers in 11 groups, including heart and cholesterol, hormones, thyroid, liver and kidney, vitamins and inflammation.</p><p>The <strong>Women’s Health Check</strong> looks at up to 350 biomarkers in 27 areas, with a private GP consultation and a 6-month repeat test included.</p><p><a href="/tests/mens-health-check/">Men’s details</a> · <a href="/tests/womens-health-check/">Women’s details</a></p>`, next: ['price', 'prepare', 'results'] },
+      { id: 'book', chip: 'How do I book?', keys: ['book', 'booking', 'appointment', 'enquire', 'enquiry', 'reserve', 'confirm', 'sign up', 'start', 'order', 'buy'],
+        html: `<p>Send a short enquiry with your preferred check and location. It takes about a minute.</p><p>An enquiry is a request rather than a booking. Your appointment is confirmed once we reply by email with your clinic and time.</p><p><a href="/contact/" data-assist-enquire>Start an enquiry</a></p>`, next: ['gp', 'where', 'prepare'] },
+      { id: 'where', chip: 'Find a location', keys: ['where', 'location', 'locations', 'clinic', 'near', 'nearest', 'map', 'london', 'scotland', 'wales', 'ireland', 'belfast', 'dublin', 'city', 'town', 'postcode', 'mobile'],
+        html: `<p>We have <strong>${facts.total} locations</strong> across England, Scotland, Wales, Northern Ireland and the Republic of Ireland.</p><p>Use the <a href="/clinics/">location finder</a> to search by town or postcode, or tap “Near me” to see the closest first. Opening hours vary by location, so tell us where suits you and we will confirm the time.</p>`, next: ['book', 'prepare', 'price'] },
+      { id: 'prepare', chip: 'How to prepare', keys: ['prepare', 'preparation', 'fast', 'fasting', 'eat', 'drink', 'water', 'coffee', 'medication', 'medicine', 'exercise', 'before'],
+        html: `<p>Most people fast for 8 to 12 hours beforehand (water is fine), drink plenty of water, carry on with prescribed medication and avoid hard exercise for 24 hours.</p><p>If you have a health condition or you’re unsure about anything, ask us before your appointment. See the <a href="/how-it-works/">full guide</a>.</p>`, next: ['visit', 'results', 'book'] },
+      { id: 'visit', chip: 'What happens at the visit?', keys: ['visit', 'happen', 'appointment length', 'minutes', 'how long', 'needle', 'draw', 'phlebotomist', 'blood sample', 'sample', 'pain'],
+        html: `<p>A trained phlebotomist takes your blood sample in an appointment of about 15 minutes. There is no GP referral needed. Your sample then goes to the laboratory.</p>`, next: ['prepare', 'results', 'gp'] },
+      { id: 'results', chip: 'When do I get results?', keys: ['result', 'results', 'report', 'when', 'turnaround', 'days', 'express', 'fast results', 'quick'],
+        html: `<p>Usually 2 to 5 working days from the moment your sample reaches the laboratory, and 4 working days for the Women’s Health Check. An express service may return results in as little as 2 hours; ask us about availability.</p><p>Your digital report arrives by email in plain English, and a clinical specialist reviews every result first.</p>`, next: ['share', 'visit', 'book'] },
+      { id: 'gp', chip: 'Do I need a GP referral?', keys: ['gp', 'referral', 'doctor', 'refer', 'nhs'],
+        html: `<p>No. You can get in touch with us directly.</p>`, next: ['book', 'share', 'results'] },
+      { id: 'share', chip: 'Share results with my GP', keys: ['share', 'sharing', 'my gp', 'send results', 'forward'],
+        html: `<p>Of course. Your digital report can be shared with your GP or any other healthcare provider.</p>`, next: ['results', 'book'] },
+      { id: 'privacy', chip: 'Privacy and cookies', keys: ['privacy', 'data', 'cookie', 'cookies', 'gdpr', 'safe', 'secure', 'track', 'store'],
+        html: `<p>This website sets no cookies and uses no analytics. This helper stores nothing and sends nothing: your questions stay in your browser. Read the <a href="/privacy/">privacy notice</a> and <a href="/cookies/">cookies page</a>.</p>`, next: ['book', 'price'] },
+      { id: 'urgent', chip: 'I feel unwell', keys: ['unwell', 'emergency', 'chest pain', 'urgent', 'ill', 'symptom', 'symptoms', 'diagnose', 'diagnosis', 'worried', 'cancer', 'pregnant'],
+        html: `<p>These tests are not an emergency or diagnostic service. If you feel seriously unwell, call <strong>999</strong>. For urgent advice that is not an emergency, contact <strong>NHS 111</strong> or your GP.</p><p>For questions about whether a check suits you, <a href="/contact/" data-assist-enquire>send us an enquiry</a>.</p>`, next: ['book', 'tests'] },
+    ];
+    const byId = (id: string) => T.find((t) => t.id === id)!;
+    const START = ['price', 'tests', 'book', 'where', 'prepare', 'results'];
+
+    const add = (cls: 'bot' | 'me', html: string, text = false) => {
+      const el = document.createElement('div'); el.className = `assist__msg assist__msg--${cls}`;
+      if (text) el.textContent = html; else el.innerHTML = html;
+      log.append(el); log.scrollTop = log.scrollHeight; return el;
+    };
+    const setChips = (ids: string[]) => {
+      chipsEl.replaceChildren(...ids.map((id) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'assist__chip'; b.textContent = byId(id).chip; b.addEventListener('click', () => ask(id, byId(id).chip)); return b; }));
+    };
+    const reply = (t: Topic) => { add('bot', t.html); setChips(t.next); };
+    const ask = (id: string, label: string) => { add('me', label, true); setTimeout(() => reply(byId(id)), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280); };
+    const norm = (s: string) => s.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9£ ]+/g, ' ');
+    const match = (q: string) => {
+      const n = ` ${norm(q)} `; let best: Topic | null = null, score = 0;
+      for (const t of T) { let s = 0; for (const k of t.keys) if (n.includes(` ${norm(k).trim()} `) || (k.length > 4 && n.includes(norm(k).trim()))) s += k.length > 4 ? 2 : 1; if (s > score) { score = s; best = t; } }
+      return score ? best : null;
+    };
+
+    const greet = () => {
+      log.replaceChildren();
+      add('bot', '<p>Hello. I can answer common questions about the health checks, prices, locations and what to expect. Pick a topic or type your own.</p>');
+      setChips(START);
+    };
+
+    let greeted = false;
+    const setOpen = (open: boolean, focus = true) => {
+      panel.hidden = !open; fab.setAttribute('aria-expanded', String(open)); root.classList.toggle('is-open', open);
+      document.documentElement.classList.toggle('assist-open', open && matchMedia('(max-width: 40em)').matches);
+      if (open && !greeted) { greeted = true; greet(); }
+      if (open && focus) (matchMedia('(pointer: fine)').matches ? input : panel.querySelector<HTMLElement>('.assist__x')!).focus();
+      if (!open && focus) fab.focus();
+    };
+    fab.addEventListener('click', () => setOpen(panel.hidden));
+    root.querySelector('[data-assist-close]')!.addEventListener('click', () => setOpen(false));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); const q = input.value.trim(); if (!q) return; input.value = '';
+      add('me', q, true);
+      const t = match(q);
+      setTimeout(() => {
+        if (t) reply(t);
+        else { add('bot', '<p>I don’t have a good answer to that one. A person can: <a href="/contact/" data-assist-enquire>send us an enquiry</a> and we will reply by email. Or try one of these.</p>'); setChips(START); }
+      }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280);
+    });
+    // Opening the enquiry popup or leaving to another page tidies the helper away.
+    log.addEventListener('click', (e) => { const a = (e.target as HTMLElement).closest('a[data-assist-enquire]'); if (a) setOpen(false, false); });
+    new MutationObserver(() => { const d = document.getElementById('enquiry-dialog') as HTMLDialogElement | null; root.hidden = !!d?.open; }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('rmap:select', () => { if (!panel.hidden) setOpen(false, false); });
+  }
+</script>

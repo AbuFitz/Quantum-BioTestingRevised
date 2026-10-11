@@ -159,3 +159,10 @@ Built at the client's request from two reference sites, replacing every earlier 
 | Content truth | provisional facts listed in the ledger above (marker counts and lists, turnaround, GP consultation and repeat test, clinic addresses, photo rights) | **blocked** (client confirmation) |
 
 Run them with `npm run verify` (all pages, about 10 minutes because of the axe scans), `npm run verify:home` (homepage detail, 88 checks; the full run is now 682 checks) and `npm test`. Lighthouse was run separately against `scripts/preview-server.mjs`.
+
+## Quick answers helper, scroll motion and map zoom (latest)
+
+- **Quick answers** (`src/components/Assist.astro`): bottom-right launcher, bottom sheet on phones. It is a rules-based FAQ helper, not live chat and not AI: every answer repeats facts already on the site (price, RRP, inclusions, preparation, results timing, locations, enquiry vs booking, privacy). Unknown questions fall back to "send us an enquiry"; urgent or symptom wording points to 999 / NHS 111. It stores nothing, sends nothing and sets no cookies, so the privacy and cookie pages stay accurate. It is not shown on /contact/. If the client wants a real human or AI chat, that needs a provider, a privacy-page update and sign-off.
+- **Scroll motion**: staggered reveals for cards, tiles, location rows and FAQ items; a thin scroll-progress line; header shadow after scrolling. All disabled for reduced motion and without JS.
+- **Maps**: clicking a pin or "Show on map" flies in to the location and opens its popup; clusters zoom in; "Show all locations" resets; list and map highlight each other.
+- Checks: `scripts/verify-assist.mjs` (82), `scripts/verify-map-zoom.mjs` (10), `verify-site` 839/839, `verify-home` 127/127, 12 unit tests.
