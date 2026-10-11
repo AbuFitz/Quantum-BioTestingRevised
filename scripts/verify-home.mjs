@@ -41,12 +41,15 @@ try {
     const bc = await page.evaluate(() => [...document.querySelectorAll('.card')].map((c) => getComputedStyle(c).borderTopColor));
     check(`men's card outline is blue and women's is pink ${tag}`, bc.length === 2 && bc[0] === 'rgb(91, 134, 201)' && bc[1] === 'rgb(213, 138, 169)', bc.join(' / '));
     check(`page background is the warm paper colour ${tag}`, (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === 'rgb(251, 243, 239)');
-    // Both tests reachable in the first viewport, with equal prominence
-    const men = page.locator('.hero__actions a[href$="test=mens"]'), wom = page.locator('.hero__actions a[href$="test=womens"]');
+    // One clear Enquire button up top; the two checks are the two cards, with no repeated test-name buttons
+    const enq = page.locator('.hero__actions a', { hasText: 'Enquire now' });
     const inView = async (l) => { const b = await l.boundingBox(); return !!b && b.y + b.height <= h && b.y >= 0; };
-    check(`both test buttons visible in first viewport ${tag}`, (await inView(men)) && (await inView(wom)));
-    const [mb, wb] = [await men.boundingBox(), await wom.boundingBox()];
-    check(`hero buttons have equal size ${tag}`, Math.abs(mb.height - wb.height) < 1 && Math.abs(mb.width - wb.width) < 40, `${mb.width}x${mb.height} vs ${wb.width}x${wb.height}`);
+    check(`hero has a single clear Enquire button in the first viewport ${tag}`, (await page.locator('.hero__actions a').count()) === 2 && (await inView(enq)));
+    check(`no repeated Men's and Women's buttons: none in the hero, the banner or a highlights band ${tag}`, (await page.locator('.hero__actions a[href*="test="], .banner__actions a[href*="test="], .trio, .feature').count()) === 0);
+    check(`the card button says View full test details ${tag}`, (await page.getByRole('link', { name: /View full test details/ }).count()) === 2);
+    const headingNote = await page.locator('#choose').innerText();
+    check(`health checks heading is simple and the "which feels right" line is gone ${tag}`, (await page.locator('#choose-title').innerText()) === 'Our health checks' && !/feels right|have a look/i.test(headingNote));
+    if (w >= 1440) { const top = await page.locator('.card').first().evaluate((e) => e.getBoundingClientRect().top); check(`product cards start inside the first screen at desktop width ${tag}`, top < h, String(top)); const cw = await page.locator('.wrap').first().evaluate((e) => e.getBoundingClientRect().width); check(`content uses the width at desktop ${tag}`, cw >= 1250, String(cw)); }
     // Product cards are equal
     const cards = await page.locator('.card').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }));
     check(`two product cards ${tag}`, cards.length === 2);

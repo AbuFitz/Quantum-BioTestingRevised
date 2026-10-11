@@ -106,7 +106,7 @@ export const INCLUDED = [
   { icon: 'clipboard-check', title: 'Clinical specialist review', text: 'A clinical specialist reviews every result before your report reaches you.' },
   { icon: 'file-text', title: 'A report in plain English', text: 'Your digital report arrives by email, with commentary that’s easy to follow.' },
   { icon: 'share-2', title: 'Easy to share with your GP', text: 'Take your report to your GP or any other healthcare provider if you’d like to.' },
-  { icon: 'map-pin', title: 'Clinics to choose from', text: 'Four in London and one in Birmingham. Tell us which suits you best.' },
+  { icon: 'map-pin', title: 'Locations to choose from', text: 'Across England, Scotland, Wales, Northern Ireland and Ireland. Tell us which suits you best.' },
 ];
 
 // The areas shown as chips on each product card

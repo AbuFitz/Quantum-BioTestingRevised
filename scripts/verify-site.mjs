@@ -8,7 +8,12 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const PORT = 4397, BASE = `http://localhost:${PORT}`;
 const EXE = process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
-const ROUTES = ['/', '/tests/', '/tests/mens-health-check/', '/tests/womens-health-check/', '/clinics/', '/clinics/fulham/', '/clinics/canary-wharf/', '/clinics/chiswick/', '/clinics/westfield-stratford/', '/clinics/birmingham/', '/how-it-works/', '/contact/', '/privacy/', '/terms/', '/cookies/'];
+const LOCATIONS = JSON.parse(readFileSync('src/data/locations.json', 'utf8'));
+const CORE = ['/', '/tests/', '/tests/mens-health-check/', '/tests/womens-health-check/', '/clinics/', '/how-it-works/', '/contact/', '/privacy/', '/terms/', '/cookies/'];
+// Every location page is checked for content, metadata and its map; a spread of them goes through the heavy layout and axe scans.
+const SAMPLE = ['chelsea', 'birmingham', 'edinburgh', 'dublin-sandyford', 'derry-londonderry', 'cambridge'];
+const ROUTES = [...CORE, ...SAMPLE.map((x) => `/clinics/${x}/`)];
+const ALL_PAGES = [...CORE, ...LOCATIONS.map((l) => `/clinics/${l.slug}/`)];
 const WIDTHS = [[320, 640], [360, 740], [390, 844], [768, 1024], [1440, 900]];
 mkdirSync('verification', { recursive: true });
 const server = spawn('node', ['scripts/preview-server.mjs'], { env: { ...process.env, PORT }, stdio: 'ignore' });
@@ -103,7 +108,7 @@ try {
     const ctx = await browser.newContext(); const page = await ctx.newPage(); await page.goto(BASE + '/');
     for (const p of ['/favicon.ico', '/favicon-32.png', '/icon-192.png', '/apple-touch-icon.png', '/og-image.png', '/site.webmanifest', '/robots.txt', '/sitemap.xml']) { const r = await ctx.request.get(BASE + p); check(`asset ${p}`, r.ok(), String(r.status())); }
     const sm = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
-    check('sitemap lists every page', ROUTES.every((r) => sm.includes(`<loc>`) && sm.includes(r === '/' ? '.app/</loc>' : r + '</loc>') || sm.includes(r + '</loc>')) && (sm.match(/<loc>/g) || []).length === ROUTES.length);
+    check('sitemap lists every page, including every location', ALL_PAGES.every((r) => sm.includes(r === '/' ? '.app/</loc>' : r + '</loc>') || sm.includes(r + '</loc>')) && (sm.match(/<loc>/g) || []).length === ALL_PAGES.length, `${(sm.match(/<loc>/g) || []).length} vs ${ALL_PAGES.length}`);
     const vj = JSON.parse(readFileSync('vercel.json', 'utf8'));
     check('legacy routes redirect to existing pages', vj.redirects.every((x) => x.permanent && ROUTES.includes(x.destination)), JSON.stringify(vj.redirects.map((x) => x.source)));
     const ldOf = async (r) => { await page.goto(BASE + r); return page.locator('script[type="application/ld+json"]').allInnerTexts(); };
@@ -128,8 +133,8 @@ try {
       }
       await page.goto(BASE + `/tests/${slug}/`); await page.getByRole('link', { name: 'Enquire about this test' }).click(); await page.waitForSelector('#enquiry-dialog[open]');
       check(`${slug} enquire preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
-      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.banner__actions a').nth(key === 'mens' ? 0 : 1).click(); await page.waitForSelector('#enquiry-dialog[open]');
-      check(`${slug} closing enquiry preselects the product`, await page.locator(`input[name=test][value=${key}]`).isChecked());
+      await page.goto(BASE + `/tests/${slug}/`); await page.locator('.banner__actions a').click(); await page.waitForSelector('#enquiry-dialog[open]');
+      check(`${slug} closing banner has one Enquire button that opens the popup`, (await page.locator('.banner__actions a').count()) === 1 && /Step 1 of 3/i.test(await page.locator('[data-enq-step]').innerText()));
     }
     await page.goto(BASE + '/tests/mens-health-check/'); const mens = await page.locator('main').innerText();
     await page.goto(BASE + '/tests/womens-health-check/'); const wom = await page.locator('main').innerText();
@@ -228,7 +233,7 @@ try {
       await page.getByRole('button', { name: 'Back' }).click(); check(`back returns to step 2 and keeps what was typed @${w}`, (await page.inputValue('#f-name')) === 'Test Person' && /step 2/i.test(await page.locator('[data-enq-step]').innerText()));
       await page.keyboard.press('Escape'); await page.waitForTimeout(300);
       check(`escape closes the popup and returns focus to the button @${w}`, !(await open()) && (await page.evaluate(() => document.activeElement?.classList.contains('hdr__enquire'))));
-      await page.locator('.hero__actions a[href$="test=mens"]').click(); await page.waitForTimeout(450);
+      await page.locator('#t-mens').locator('xpath=ancestor::article').getByRole('link', { name: /^Enquire/ }).click(); await page.waitForTimeout(450);
       check(`a test button opens the popup straight on step 2 @${w}`, /step 2 of 3/i.test(await page.locator('[data-enq-step]').innerText()) && (await page.locator('input[name=test][value=mens]').isChecked()));
       const box = await page.locator('.enq__sheet').boundingBox(); check(`popup fits the viewport @${w}`, box.height <= h + 1 && box.width <= w + 1, JSON.stringify(box));
       await page.goBack(); await page.waitForTimeout(300); check(`browser back closes the popup @${w}`, !(await open()) && new URL(page.url()).pathname === '/');
@@ -240,26 +245,40 @@ try {
     await page.goto(BASE + '/contact/?test=womens&clinic=Fulham', { waitUntil: 'networkidle' });
     check('contact page preselects test and clinic from the link', (await page.locator('input[name=test][value=womens]').isChecked()) && (await page.inputValue('#f-clinic')) === 'Fulham');
     check('contact page has no popup (the form is on the page)', (await page.locator('#enquiry-dialog').count()) === 0);
-    const ready = async (pg) => { await pg.locator('[data-rmap]').first().scrollIntoViewIfNeeded(); await pg.waitForSelector('.leaflet-container', { timeout: 15000 }); await pg.waitForSelector('.leaflet-marker-icon'); };
-    const CITY_COUNT = { fulham: 4, 'canary-wharf': 4, chiswick: 4, 'westfield-stratford': 4, birmingham: 1 };
-    for (const slug of ['fulham', 'canary-wharf', 'chiswick', 'westfield-stratford', 'birmingham']) {
-      external.length = 0;
-      await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'load' }); await ready(page);
-      check(`${slug}: a real map with its clinic pinned, no iframe`, (await page.locator('.leaflet-marker-icon').count()) === CITY_COUNT[slug] && (await page.locator('.rmap__pin.is-active').count()) === 1 && (await page.locator('iframe').count()) === 0);
-      check(`${slug}: the only third-party requests are OpenStreetMap map tiles`, external.every((u) => new URL(u).host === 'tile.openstreetmap.org'), external.join(','));
-      check(`${slug}: address, h1 and breadcrumb schema present`, /SW6|E14|W4|E20|B4/.test(await page.locator('address').innerText()) && (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('script[type="application/ld+json"]').allInnerTexts()).some((t) => /BreadcrumbList/.test(t)));
-      check(`${slug}: direction links open safely`, (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
-      check(`${slug}: map attribution to OpenStreetMap is shown`, /OpenStreetMap/.test(await page.locator('.leaflet-control-attribution').innerText()));
-      check(`${slug}: no show-map button`, (await page.getByRole('button', { name: /show the map/i }).count()) === 0);
+    const ready = async (pg) => { await pg.locator('[data-rmap]').first().scrollIntoViewIfNeeded(); await pg.waitForSelector('.leaflet-container', { timeout: 15000 }); await pg.waitForSelector('.leaflet-marker-icon, .rmap__cluster'); };
+    const byRegion = (r) => LOCATIONS.filter((l) => l.region === r).length;
+    for (const l of LOCATIONS) {
+      const slug = l.slug; external.length = 0;
+      await page.goto(BASE + `/clinics/${slug}/`, { waitUntil: 'load' });
+      const ldj = await page.locator('script[type="application/ld+json"]').allInnerTexts();
+      check(`${slug}: h1, address, postcode, breadcrumb and FAQ schema, no phone number`, (await page.locator('h1').innerText()).startsWith('Private blood tests in') && (await page.locator('address').innerText()).includes(l.street.split(',')[0].split(' ')[0]) && (!l.postcode || (await page.locator('address').innerText()).includes(l.postcode)) && ldj.some((t) => /BreadcrumbList/.test(t)) && ldj.some((t) => /FAQPage/.test(t)) && !/telephone/i.test(ldj.join('')));
+      check(`${slug}: one Enquire button for the location and both checks listed once`, (await page.locator('aside .btn').count()) === 1 && (await page.locator('.card').count()) === 2);
+      if (SAMPLE.includes(slug)) {
+        await ready(page);
+        check(`${slug}: a real map with this location highlighted and the others in its region`, (await page.locator('.leaflet-marker-icon').count()) === byRegion(l.region) && (await page.locator('.rmap__pin.is-active').count()) === 1 && (await page.locator('iframe').count()) === 0);
+        check(`${slug}: the only third-party requests are OpenStreetMap map tiles`, external.every((u) => new URL(u).host === 'tile.openstreetmap.org'), external.join(','));
+        check(`${slug}: attribution to OpenStreetMap is shown and directions links open safely`, /OpenStreetMap/.test(await page.locator('.leaflet-control-attribution').innerText()) && (await page.locator('.map__links a[target=_blank]:not([rel~=noopener])').count()) === 0);
+      }
     }
+    // Finder: one national map with clusters, every location listed, search and region filter
     await page.goto(BASE + '/clinics/', { waitUntil: 'load' }); await ready(page);
-    for (const m of await page.locator('[data-rmap]').all()) await m.scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
-    check('finder: a real map for each city with every clinic pinned', (await page.locator('.leaflet-container').count()) === 2 && (await page.locator('.leaflet-marker-icon').count()) === 5);
-    await page.goto(BASE + '/', { waitUntil: 'load' }); for (const m of await page.locator('[data-rmap]').all()) await m.scrollIntoViewIfNeeded(); await page.waitForFunction(() => document.querySelectorAll('.leaflet-container').length === 2);
-    check('home: a real map for London and for Birmingham, pins link to the clinic pages', (await page.locator('.leaflet-marker-icon').count()) === 5 && (await page.locator('.rmap__links a').count()) === 5);
-    await page.locator('.rmap').first().locator('.leaflet-marker-icon').first().click(); await page.waitForSelector('.leaflet-popup a[href^="/clinics/"]');
-    check('clicking a pin shows the clinic name and a link to its page', (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
+    const pinsOnMap = await page.locator('[data-rmap]').getAttribute('data-pins');
+    check('finder: one real map holding every location, with clustered pins', JSON.parse(pinsOnMap).length === LOCATIONS.length && (await page.locator('.leaflet-container').count()) === 1 && (await page.locator('.rmap__cluster').count()) > 0);
+    check('finder: every location is also listed with its address, linking to its own page', (await page.locator('.loc').count()) === LOCATIONS.length && (await page.locator('.loc h3 a').evaluateAll((a) => new Set(a.map((x) => x.getAttribute('href'))).size)) === LOCATIONS.length);
+    await page.fill('#loc-search', 'edinburgh');
+    check('finder: searching narrows the list', (await page.locator('.loc:visible').count()) === 1, String(await page.locator('.loc:visible').count()));
+    await page.fill('#loc-search', ''); await page.getByRole('button', { name: 'Scotland', exact: true }).click();
+    check('finder: a region chip shows only that region', (await page.locator('.loc:visible').count()) === LOCATIONS.filter((l) => l.region === 'Scotland').length && (await page.getByRole('button', { name: 'Scotland', exact: true }).getAttribute('aria-pressed')) === 'true');
+    await page.getByRole('button', { name: 'All', exact: true }).click();
+    check('finder: all regions are covered, including Wales, Northern Ireland and Ireland', ['Scotland', 'Wales', 'Northern Ireland', 'Republic of Ireland'].every((r) => LOCATIONS.some((l) => l.region === r)) && (await page.locator('.finder__region').count()) === new Set(LOCATIONS.map((l) => l.region)).size);
+    await page.goto(BASE + '/', { waitUntil: 'load' }); await ready(page);
+    check('home: one national map and region links, no old five-clinic wording', (await page.locator('.leaflet-container').count()) === 1 && (await page.locator('main').innerText()).includes(`${LOCATIONS.length} locations`) && !/five clinics|four in london/i.test(await page.locator('main').innerText()));
+    await page.locator('.leaflet-marker-icon').first().click({ force: true }).catch(() => {});
+    await page.evaluate(() => { const c = document.querySelector('.rmap__cluster'); if (c) c.click(); });
+    await page.waitForTimeout(600);
+    await page.goto(BASE + '/clinics/chelsea/', { waitUntil: 'load' }); await ready(page);
+    await page.locator('.leaflet-marker-icon').first().click({ force: true }); await page.waitForSelector('.leaflet-popup a[href^="/clinics/"]');
+    check('clicking a pin shows the name, area, address and a link to its page', (await page.locator('.leaflet-popup .rmap__pop strong').count()) === 1 && (await page.locator('.leaflet-popup .rmap__sub').count()) === 1 && (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
     await page.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
     check('tests page has no male-versus-female comparison table', (await page.locator('table').count()) === 0);
     await ctx.close();

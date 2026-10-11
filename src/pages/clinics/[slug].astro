@@ -2,66 +2,72 @@
 import Base from '../../layouts/Base.astro';
 import Intro from '../../components/Intro.astro';
 import Icon from '../../components/Icon.astro';
-import TestCards from '../../components/TestCards.astro';
 import ClinicMap from '../../components/ClinicMap.astro';
+import TestCards from '../../components/TestCards.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import CloseEnquiry from '../../components/CloseEnquiry.astro';
-import { CLINICS, fullAddress, type Clinic } from '../../data/clinics';
-import { TESTS, STEPS } from '../../data/tests';
-import { PRICE, RRP, SAVING, SITE } from '../../data/site';
+import { CLINICS, COUNT, fullAddress, inRegion, kindLabel, mapsQuery, placeName, regionSlug, type Clinic } from '../../data/clinics';
+import { STEPS } from '../../data/tests';
+import { PRICE, RRP, SITE } from '../../data/site';
 import { breadcrumbLd, faqLd } from '../../data/seo';
 
 export function getStaticPaths() {
   return CLINICS.map((c) => ({ params: { slug: c.slug }, props: { clinic: c } }));
 }
 const { clinic } = Astro.props as { clinic: Clinic };
-const others = CLINICS.filter((c) => c.slug !== clinic.slug);
+const place = placeName(clinic);
+const nearby = inRegion(clinic.region).filter((c) => c.slug !== clinic.slug).slice(0, 10);
+const at = clinic.venue ? `${clinic.venue}, ${clinic.street}` : clinic.street;
+const mobile = clinic.kind === 'mobile';
 const faqs = [
-  { q: `Where is the ${clinic.name} clinic?`, a: `It is ${clinic.where}: ${fullAddress(clinic)}. We confirm the exact details by email when your appointment is arranged.` },
-  { q: `Can I get a private blood test in ${clinic.name} without a GP referral?`, a: `Yes. You don’t need a GP referral. Send us an enquiry for the Men’s or Women’s Health Check and we’ll email you to confirm your time at ${clinic.name}.` },
+  { q: `Where can I have a private blood test in ${clinic.city}?`, a: `At ${at}, ${clinic.locality}${clinic.postcode ? ' ' + clinic.postcode : ''}. We confirm the exact details by email when your appointment is arranged.` },
+  { q: `Do I need a GP referral for a blood test in ${clinic.city}?`, a: `No. You don’t need a GP referral. Send us an enquiry for the Men’s or Women’s Health Check and we’ll email you to confirm your time.` },
   { q: 'How long does the appointment take?', a: 'About 15 minutes. A trained phlebotomist takes your sample, and your report follows by email in 2–5 working days (4 for the Women’s Health Check).' },
-  { q: 'How much does it cost?', a: `Each Health Check is ${PRICE} (RRP ${RRP}), whichever clinic you choose.` },
+  { q: 'How much does it cost?', a: `Each Health Check is ${PRICE} (RRP ${RRP}), whichever location you choose.` },
 ];
 const ld = [
-  breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Clinics', path: '/clinics/' }, { name: clinic.name }]),
+  breadcrumbLd(Astro.site!, [{ name: 'Home', path: '/' }, { name: 'Locations', path: '/clinics/' }, { name: place }]),
   faqLd(faqs),
   {
     '@context': 'https://schema.org',
     '@type': 'MedicalBusiness',
-    name: `${SITE.name}, ${clinic.name}`,
+    name: `${SITE.name}, ${place}`,
     url: Astro.url.href,
     parentOrganization: { '@type': 'Organization', name: SITE.name, url: Astro.site!.href },
-    address: { '@type': 'PostalAddress', streetAddress: clinic.street, addressLocality: clinic.city, postalCode: clinic.postcode, addressCountry: 'GB' },
+    address: { '@type': 'PostalAddress', streetAddress: clinic.street, addressLocality: clinic.city, ...(clinic.postcode ? { postalCode: clinic.postcode } : {}), addressCountry: clinic.nation === 'Ireland' ? 'IE' : 'GB' },
     medicalSpecialty: 'Diagnostic',
   },
 ];
 ---
 <Base
-  title={`Private Blood Tests in ${clinic.name}, ${clinic.city} | Quantum BioTesting`}
-  description={`Private Men’s and Women’s Health Checks at our ${clinic.name} clinic, no GP referral needed. Send an enquiry and we’ll confirm your time by email.`}
+  title={`Private Blood Tests in ${place} | Quantum BioTesting`}
+  description={`Private Men’s and Women’s Health Checks in ${place}${clinic.venue ? ` at ${clinic.venue}` : ''}, no GP referral needed. Send an enquiry and we’ll confirm your time by email.`}
   jsonLd={ld}
 >
-  <Intro title={`Private blood tests in ${clinic.name}`} lead={`Our ${clinic.name} clinic is ${clinic.where}. Choose the Men’s or Women’s Health Check and we’ll arrange your visit.`} crumbs={[{ href: '/', label: 'Home' }, { href: '/clinics/', label: 'Clinics' }, { label: clinic.name }]} />
+  <Intro title={`Private blood tests in ${place}`} lead={`${mobile ? 'Our mobile clinic' : 'Our location'} at ${at}. Choose the Men’s or Women’s Health Check and we’ll arrange your visit.`} crumbs={[{ href: '/', label: 'Home' }, { href: '/clinics/', label: 'Locations' }, { label: place }]} />
 
   <section class="section" aria-labelledby="find-title">
     <div class="wrap facts-split">
       <div>
         <h2 class="display" id="find-title" style="margin-bottom:1.25rem">Finding us</h2>
-        <address class="addr"><Icon name="map-pin" /><span>{clinic.street}<br />{clinic.locality}<br />{clinic.postcode}</span></address>
-        <ClinicMap city={clinic.city} active={clinic.slug} />
-        <p class="map__links"><a class="link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Open in Google Maps<span class="vh"> (opens in a new tab)</span></a> <a class="link" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(clinic.mapQuery)}`} target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></p>
+        <address class="addr"><Icon name="map-pin" /><span>{clinic.venue && <><strong>{clinic.venue}</strong><br /></>}{clinic.street}<br />{clinic.area && clinic.area !== clinic.locality ? <>{clinic.area}<br /></> : null}{clinic.locality}{clinic.postcode ? <><br />{clinic.postcode}</> : null}</span></address>
+        {clinic.hours && <p class="loc-meta"><Icon name="clock" /><span>Open {clinic.hours}</span></p>}
+        {clinic.notes && <p class="loc-meta"><Icon name="info" /><span>{clinic.notes}</span></p>}
+        {mobile && <p class="loc-meta"><Icon name="info" /><span>This is a mobile clinic, so tell us your preferred date and we’ll confirm availability.</span></p>}
+        <ClinicMap active={clinic.slug} label={`Map showing ${place}`} />
+        <p class="map__links"><a class="link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsQuery(clinic))}`} target="_blank" rel="noopener">Open in Google Maps<span class="vh"> (opens in a new tab)</span></a> <a class="link" href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapsQuery(clinic))}`} target="_blank" rel="noopener">Get directions<span class="vh"> (opens in a new tab)</span></a></p>
       </div>
-      <aside class="panel panel--stick" aria-label="Book at this clinic">
-        <h2>Visit {clinic.name}</h2>
-        <p>Choose your check and we’ll reply by email to confirm your time. It isn’t a booking until you hear from us.</p>
-        {TESTS.map((t) => <p><a class:list={['btn', 'btn--block', t.key === 'mens' ? 'btn--men' : 'btn--women']} href={`/contact/?test=${t.key}&clinic=${encodeURIComponent(clinic.name)}`}>{t.name} <Icon name="arrow-right" /></a></p>)}
-              </aside>
+      <aside class="panel panel--stick" aria-label="Enquire about this location">
+        <h2>Visit {place}</h2>
+        <p>Send us an enquiry and we’ll reply by email to confirm your time. It isn’t a booking until you hear from us.</p>
+        <p><a class="btn btn--block" href={`/contact/?clinic=${encodeURIComponent(clinic.name)}`}>Enquire about this location <Icon name="arrow-right" /></a></p>
+      </aside>
     </div>
   </section>
 
   <section class="section section--tight" aria-labelledby="tests-title">
     <div class="wrap">
-      <div class="section__head"><h2 class="display" id="tests-title">Tests available in {clinic.name}</h2></div>
+      <div class="section__head"><h2 class="display" id="tests-title">Health checks at this location</h2></div>
       <TestCards headingLevel="h3" clinic={clinic.name} />
     </div>
   </section>
@@ -76,15 +82,18 @@ const ld = [
     </div>
   </section>
 
-  <FaqSection id="faq-title" heading={`${clinic.name} questions`} items={faqs} />
+  <FaqSection id="faq-title" heading={`${place} questions`} items={faqs} />
 
-  <section class="section section--tight" aria-labelledby="other-title">
-    <div class="wrap">
-      <div class="section__head"><h2 class="display" id="other-title">Other clinics</h2></div>
-      <ul class="jump jump--big">
-        {others.map((c) => <li><a href={`/clinics/${c.slug}/`}>{c.name}</a></li>)}
-      </ul>
-    </div>
-  </section>
+  {nearby.length > 0 && (
+    <section class="section section--tight" aria-labelledby="other-title">
+      <div class="wrap">
+        <div class="section__head"><h2 class="display" id="other-title">More in {clinic.region}</h2></div>
+        <ul class="jump jump--big">
+          {nearby.map((c) => <li><a href={`/clinics/${c.slug}/`}>{placeName(c)}</a></li>)}
+          <li><a href={`/clinics/#${regionSlug(clinic.region)}`}>All {COUNT} locations</a></li>
+        </ul>
+      </div>
+    </section>
+  )}
   <CloseEnquiry />
 </Base>

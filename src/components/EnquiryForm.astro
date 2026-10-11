@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { TESTS } from '../data/tests';
-import { CLINICS } from '../data/clinics';
+import { CLINICS, placeName } from '../data/clinics';
 interface Props { steps?: boolean }
 const { steps = false } = Astro.props;
 ---
@@ -56,7 +56,7 @@ const { steps = false } = Astro.props;
       <div class="field" data-field="clinic">
         <label class="field__label" for="f-clinic">Clinic or area <span class="field__opt">(optional)</span></label>
         <input class="input" id="f-clinic" name="clinic" type="text" maxlength="120" list="clinic-list" autocomplete="off" placeholder="For example, Fulham" aria-describedby="err-clinic" />
-        <datalist id="clinic-list">{CLINICS.map((c) => <option value={c.name} />)}</datalist>
+        <datalist id="clinic-list">{CLINICS.map((c) => <option value={c.name} label={placeName(c)} />)}</datalist>
         <p class="field__error" id="err-clinic" hidden></p>
       </div>
       <div class="field" data-field="date">

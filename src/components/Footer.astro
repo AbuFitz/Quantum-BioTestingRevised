@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import wordmark from '../assets/brand/logo-wordmark.png';
 import { SITE } from '../data/site';
 import { TESTS } from '../data/tests';
-import { CLINICS } from '../data/clinics';
+import { COUNT } from '../data/clinics';
 ---
 <footer class="ftr">
   <div class="wrap">
@@ -21,10 +21,14 @@ import { CLINICS } from '../data/clinics';
           </ul>
         </nav>
         <nav aria-labelledby="f-i">
-          <h2 id="f-i">Clinics</h2>
+          <h2 id="f-i">Locations</h2>
           <ul>
-            <li><a href="/clinics/">All clinics</a></li>
-            {CLINICS.map((c) => <li><a href={`/clinics/${c.slug}/`}>{c.name}</a></li>)}
+            <li><a href="/clinics/">All {COUNT} locations</a></li>
+            <li><a href="/clinics/#london">London</a></li>
+            <li><a href="/clinics/#scotland">Scotland</a></li>
+            <li><a href="/clinics/#wales">Wales</a></li>
+            <li><a href="/clinics/#northern-ireland">Northern Ireland</a></li>
+            <li><a href="/clinics/#republic-of-ireland">Ireland</a></li>
           </ul>
         </nav>
         <nav aria-labelledby="f-h">
@@ -45,7 +49,7 @@ import { CLINICS } from '../data/clinics';
       </div>
     </div>
     <div class="ftr__legal">
-      <p>Quantum BioTesting health checks are private health information services. They are not a substitute for NHS services and do not constitute a diagnosis. In a medical emergency, call 999.</p>
+      <p>Our health checks are not a substitute for NHS services, and results are not a diagnosis. In a medical emergency, call 999.</p>
       <p>© {new Date().getFullYear()} {SITE.legalName}. Registered in England &amp; Wales.</p>
     </div>
   </div>

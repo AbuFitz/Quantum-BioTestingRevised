@@ -10,7 +10,7 @@ import Icon from '../components/Icon.astro';
 import PrepTimeline from '../components/PrepTimeline.astro';
 import visit from '../assets/photos/visit.jpg';
 import { PREPARATION, FAQS } from '../data/tests';
-import { CLINICS, fullAddress } from '../data/clinics';
+import { COUNT, REGIONS, inRegion, regionSlug } from '../data/clinics';
 import { breadcrumbLd, faqLd } from '../data/seo';
 ---
 <Base
@@ -41,11 +41,12 @@ import { breadcrumbLd, faqLd } from '../data/seo';
           <h2 class="display" id="clinic-title">At the clinic</h2>
           <p class="muted">Your appointment takes about 15 minutes. A trained phlebotomist takes your sample, so a short-sleeved or loose-fitting top helps.</p>
         </div>
-        <h3 class="display" style="font-size:1.4rem">Our clinics</h3>
-        <ul class="clinics">
-          {CLINICS.map((c) => <li class="clinic"><Icon name="map-pin" /><div><strong><a href={`/clinics/${c.slug}/`}>{c.name}</a></strong><span>{fullAddress(c)}</span></div></li>)}
+        <h3 class="display" style="font-size:1.4rem">Our locations</h3>
+        <p class="muted" style="margin-top:0.5rem;max-width:36rem">{COUNT} locations across England, Scotland, Wales, Northern Ireland and Ireland.</p>
+        <ul class="jump jump--big">
+          {REGIONS.filter((r) => inRegion(r).length).map((r) => <li><a href={`/clinics/#${regionSlug(r)}`}>{r}</a></li>)}
         </ul>
-        <p class="muted" style="margin-top:1rem;max-width:36rem">Tell us your preferred clinic or area when you enquire, and we’ll confirm the location by email.</p>
+        <p class="muted" style="margin-top:1rem;max-width:36rem">Tell us your preferred location when you enquire, and we’ll confirm it by email.</p>
       </div>
       <figure class="photo">
         <Image src={visit} alt="A clinician applying a plaster to a patient’s arm after a blood sample" widths={[480, 720, 960]} sizes="(min-width: 62em) 30rem, 92vw" loading="lazy" />

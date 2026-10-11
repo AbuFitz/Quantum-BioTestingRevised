@@ -3,7 +3,6 @@
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import walk from '../assets/photos/walk.jpg';
-import { TESTS } from '../data/tests';
 ---
 <section class="close-wrap" aria-labelledby="close-title">
   <div class="banner">
@@ -11,7 +10,7 @@ import { TESTS } from '../data/tests';
     <h2 id="close-title" data-reveal>Ready when you are</h2>
     <p data-reveal style="--d:.06s">Tell us which check you’d like and we’ll email you to confirm your clinic and time.</p>
     <div class="banner__actions" data-reveal style="--d:.12s">
-      {TESTS.map((t, i) => <a class={['btn', i ? 'btn--ghost-light' : 'btn--light'].join(' ')} href={`/contact/?test=${t.key}`}>{t.name} <Icon name="arrow-right" /></a>)}
+      <a class="btn btn--light" href="/contact/">Enquire now <Icon name="arrow-right" /></a>
     </div>
     <p class="banner__note">Sending an enquiry isn’t a booking. Your appointment is confirmed when we reply.</p>
   </div>

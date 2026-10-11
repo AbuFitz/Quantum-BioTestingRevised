@@ -22,7 +22,7 @@ Repositories: **NEW** (this one, implementation) · **OLD** `AbuFitz/Quantum-Bio
 - Turnaround 2–5 working days (men), 4 (women); express "from 2 hours, ask the team". Earlier versions said 48–72 h / 48 h.
 - Clinician review of results; Women's private remote GP consultation and 6-month repeat test; Men's optional follow-up telephone consultation (conflicts with Terms §9, which scope consultations to Women's only, so it is worded as "ask the team").
 - "About 15 minutes" appointment, "no GP referral required", preparation guidance.
-- Five clinic addresses (Fulham, Canary Wharf, Chiswick, Westfield Stratford, Birmingham): from the owner's April commit "real clinic addresses"; not independently verified. The old booking form's 15-city list is not used.
+- **59 locations** across England, Scotland, Wales, Northern Ireland and the Republic of Ireland: the list supplied by the client on 2026-10-11 (replaces the five addresses carried over from the old site). Verified as supplied by the client; see "Locations" below for the entries to confirm.
 - Legal text (Privacy, Terms): carried from the old pages with edits listed below. Needs legal review.
 
 **Withheld from public copy (unsupported or conflicting)**
@@ -32,7 +32,7 @@ UKAS / ISO 15189 / RIQAS / GCP / CQC / ICO-registration claims; "40+ clinics", "
 Astro static site + one Vercel function; Fraunces + Plus Jakarta Sans; dedicated enquiry page instead of a modal; Resend as the email provider (see below); "Enquire" as the single CTA label; canonical defaults to the Vercel URL.
 
 **Provisional (new in this pass)**
-Clinic addresses (carried over from the old site, unconfirmed); the saving figure £1,117 is derived from the client-supplied price and RRP (the client has confirmed the RRP is genuine); the map pin positions are approximate; the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (gloved hand with a blood tube, beach walk) now appear without that label; the reception-wall image was supplied by the client and looks like a rendered mock-up, so confirm its origin and that it may represent the business; the blood-tube photograph is only 1024 px wide (rawpixel, CC0) and should be replaced with commissioned photography.
+the saving figure £1,117 is derived from the client-supplied price and RRP (the client has confirmed the RRP is genuine); the map pin positions are approximate; the legal pages' retention periods, controller details and clinical statements are carried over from the old site and need legal review; acknowledgement email wording; the "Illustrative photograph" captions were removed at the client's request, so the stock photographs (gloved hand with a blood tube, beach walk) now appear without that label; the reception-wall image was supplied by the client and looks like a rendered mock-up, so confirm its origin and that it may represent the business; the blood-tube photograph is only 1024 px wide (rawpixel, CC0) and should be replaced with commissioned photography.
 
 **Blocking for launch**
 1. **Enquiry destination and provider.** Set `RESEND_API_KEY`, `ENQUIRY_TO`, `ENQUIRY_FROM` (verified sender domain) in Vercel. Until then `/api/enquiry` returns 503 and the form says the enquiry has not been sent. Swap `api/enquiry.js` if the client prefers another provider.
@@ -55,8 +55,8 @@ Clinic addresses (carried over from the old site, unconfirmed); the saving figur
 |---|---|
 | `/` | Home |
 | `/tests/`, `/tests/mens-health-check/`, `/tests/womens-health-check/` | Overview and per-product detail |
-| `/clinics/`, `/clinics/{fulham,canary-wharf,chiswick,westfield-stratford,birmingham}/` | Clinic finder and one local page per clinic, each with address, a real interactive map, both tests, FAQ and schema |
-| `/how-it-works/` | Process, preparation, clinics, results, FAQs |
+| `/clinics/`, `/clinics/{slug}/` (59 pages) | Location finder (one national map with clustered pins, search by town or postcode, filter by region, every location listed) and one page per location with address, hours and notes where supplied, its own map, both checks, FAQ and schema. Old URLs `/clinics/fulham/`, `/canary-wharf/`, `/chiswick/`, `/westfield-stratford/` and `/birmingham/` still exist |
+| `/how-it-works/` | Process, preparation, locations, results, FAQs |
 | `/contact/` | Full-page enquiry form: the no-JavaScript fallback and deep link (`?test=mens\|womens&clinic=Name` preselects). Not in the navigation by request; linked from the footer |
 | `/privacy/`, `/terms/`, `/cookies/` | Legal, linked from the footer |
 | `/api/enquiry` | Delivery function |
@@ -70,8 +70,30 @@ Old public routes redirect (301) via `vercel.json`: `/testing.html` to `/tests/`
 - All buttons are outlines: red primary, blue secondary, white on photographs, soft blue and soft pink for the two checks.
 - The "Two health checks" section keeps its original layout (a tag strip on each card, then the three highlight boxes) but is coloured soft blue for the Men's check and soft pink for the Women's check, outlined rather than filled.
 - No top banner.
-- The reception-wall image supplied by the client sits in the preparation section; the example-evening timeline moved to How it works.
+- The reception-wall image supplied by the client was replaced (it looked AI-generated) by a real CC0 photograph of a doctor talking with a patient; the example-evening timeline is on How it works.
 - The client briefly asked to return to the version with the clock (`301fcc0`, via `002bc4b`), then asked for the card, map and timeline improvements back; this branch now contains both sets of changes (the card and map work from `0a25fa2` plus the outline, white and pink/blue changes).
+- Revision of 2026-10-11: the page is wider (content up to 84rem, 88rem on very wide screens), the hero is shorter and section spacing tighter so the two checks start inside the first desktop screen; the line above the checks is gone and the heading is simply "Our health checks"; the repeated Men's and Women's buttons (hero, closing banner, location panel) and the highlights band under the cards are removed, leaving one "Enquire now" button per area and, on each card, "Enquire" and "View full test details".
+
+## Locations
+
+The client's list (2026-10-11) holds 59 sites: 42 in England, 4 in Scotland, 1 in Wales, 6 in Northern Ireland and 6 in the Republic of Ireland. Many are partner sites (Holland & Barrett, John Lewis, Randox, UNTIL, hotels) and six are described by the client as mobile clinics. The site shows names, addresses, and opening hours or notes only where the client supplied them (8 sites have hours or notes). No phone numbers or coordinates were supplied. The site now says "across the UK and Ireland" (it said "in the UK" before): confirm that is right.
+
+**To confirm with the client**
+- Entries that look like typos and are shown exactly as supplied: "23-1 Paternoster Row" (St Pauls), "25-25 Tithebarn Street" (Liverpool), postcode "HP12 4N2" (High Wycombe, not a valid format), and the Westfield Stratford unit and postcode (now Unit 2052A, E20 1EJ; the old site had 122 The Street, E20 1EN).
+- Seven entries have no postcode: Bournemouth, Cheadle, Chester (Broughton), Hull, Leeds, Leicester, Newcastle.
+- Mobile clinics (Brighton x2, Cambridge, Coleraine, Dundee, Exeter): their pages say "tell us your preferred date and we'll confirm availability"; confirm how they really operate.
+- Eleven map positions are approximate (matched to a street, town or business park rather than the exact door): Dublin Sandyford, Dublin Airport, Exeter, High Wycombe, Holywood and others flagged `approx` in `src/data/locations.json`.
+- Opening hours were supplied for Oxford, Hampstead, Cheadle and Winchester only (alternating Monday to Friday and Tuesday to Saturday). Whether every site offers both checks is not stated.
+- Local pages (59) are deliberately plain so they stay true; if the client wants richer local copy it needs real facts per site.
+
+## Medical disclaimer: position and recommendation
+
+The footer now reads: "Our health checks are not a substitute for NHS services, and results are not a diagnosis. In a medical emergency, call 999." It was longer ("private health information services ... do not constitute a diagnosis"). The client asked whether "do not constitute a diagnosis" must stay and suggested a version without it. **I am not a lawyer and have not confirmed the legal position, so the "not a diagnosis" clause is kept in short form until the client's solicitor or clinical governance lead signs off its removal.** What the research found:
+- No single statute found requires that exact sentence. But health claims in UK advertising fall under the ASA's CAP Code section 12 (medicines, medical devices, health), which expects claims to be substantiated and not to imply diagnosis or cure without evidence; blood tests and biomarker panels (the cancer markers in particular, already noted as indicative only on the Men's page) are information for a clinician to interpret, so the limitation protects against over-claiming and against misrepresentation complaints. The Terms (section "Results and limitations") already hold the longer wording.
+- Independently providing diagnostic and screening procedures in England is a CQC regulated activity ("Diagnostic and screening procedures"), and it is an offence to carry on a regulated activity without registration; the other nations have their own regulators (HIS in Scotland, HIW in Wales, RQIA in Northern Ireland, HIQA in Ireland: not verified in this work). The client should confirm who holds registration for each site. The site makes no registration claim and must not until that is confirmed.
+- The tests themselves are in vitro diagnostic devices under the UK Medical Devices Regulations (MHRA registration and labelling apply to the laboratory and device suppliers, not the website).
+- Recommendation: keep a short "not a diagnosis" clause in the footer and the report template, keep the full wording in the Terms, and take written advice before removing either. If advice says it can go, change one line in `src/components/Footer.astro`.
+Sources used: CQC "Quick guide to regulated activities" and scope-of-registration pages; ASA CAP Code section 12; UK MDR 2002 (MHRA) guidance. These were read through web searches, not the original statutes, so treat them as pointers for the client's adviser.
 
 ## Enquiry popup
 
@@ -87,9 +109,9 @@ One `<h1>` per page, unique titles and descriptions, absolute canonicals, sitema
 
 ## Privacy and cookie behaviour as implemented
 
-No cookies, no `localStorage`, no analytics. Fonts and images are self-hosted. The one thing loaded from another host is the **map**: the home page, the clinic finder and each clinic page show a real interactive street map (Leaflet, bundled with the site, with OpenStreetMap tiles from `tile.openstreetmap.org`). The map sets up as it nears the viewport; one-finger drag is disabled on touch screens so the page still scrolls, and wheel zoom needs a click into the map first. When a map appears the visitor's browser requests tiles from OpenStreetMap, which therefore sees their IP address and browser details. A direct request to a tile showed no `Set-Cookie` header on the day of writing. `/privacy/` and `/cookies/` say exactly this and link to the OpenStreetMap Foundation's policy. The list of clinic links under every map and the address on each clinic page work without JavaScript. Each clinic page also has "Open in Google Maps" and "Get directions" links (new tab, `rel=noopener`).
+No cookies, no `localStorage`, no analytics. Fonts and images are self-hosted. The one thing loaded from another host is the **map**: the home page, the location finder and each location page show a real interactive street map (Leaflet and its marker-cluster plugin, bundled with the site, with OpenStreetMap tiles from `tile.openstreetmap.org`). The map sets up as it nears the viewport; one-finger drag is disabled on touch screens so the page still scrolls, and wheel zoom needs a click into the map first. When a map appears the visitor's browser requests tiles from OpenStreetMap, which therefore sees their IP address and browser details. A direct request to a tile showed no `Set-Cookie` header on the day of writing. `/privacy/` and `/cookies/` say exactly this and link to the OpenStreetMap Foundation's policy. The list of clinic links under every map and the address on each clinic page work without JavaScript. Each clinic page also has "Open in Google Maps" and "Get directions" links (new tab, `rel=noopener`).
 
-Pin positions are geocoded from the addresses with OpenStreetMap Nominatim (`src/data/clinics.ts`); confirm them against the real entrances. Coordinates are not published in structured data. The tile server is OpenStreetMap's public one, which asks for light use with attribution (shown on every map). If traffic grows, switch the tile URL in `src/components/ClinicMap.astro` to a paid tile provider.
+Pin positions are geocoded from the addresses with OpenStreetMap Nominatim by `scripts/geocode-locations.mjs` into `src/data/locations.json`, with hand-checked corrections in `scripts/location-overrides.json` (`node scripts/geocode-locations.mjs --apply` re-applies them); confirm them against the real entrances. Coordinates are not published in structured data. The tile server is OpenStreetMap's public one, which asks for light use with attribution (shown on every map). If traffic grows, switch the tile URL in `src/components/ClinicMap.astro` to a paid tile provider.
 
 Because only map tiles come from elsewhere and no cookies are set, there is no cookie banner. If analytics are ever added, add a consent banner and update both legal pages.
 

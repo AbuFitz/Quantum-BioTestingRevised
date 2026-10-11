@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+import { fullAddress, kindLabel, placeName, subtitle, type Clinic } from '../data/clinics';
+interface Props { c: Clinic }
+const { c } = Astro.props;
+---
+<li class="loc" data-loc data-search={`${placeName(c)} ${c.venue ?? ''} ${c.city} ${c.region} ${c.postcode ?? ''} ${c.street}`.toLowerCase()}>
+  <span class="loc__pin" aria-hidden="true"><Icon name="map-pin" /></span>
+  <div class="loc__body">
+    <h3><a href={`/clinics/${c.slug}/`}>{placeName(c)}</a></h3>
+    <p class="loc__sub">{[kindLabel(c), subtitle(c)].filter(Boolean).join(' · ')}</p>
+    <p class="loc__addr">{fullAddress(c)}</p>
+  </div>
+  <a class="loc__go" href={`/clinics/${c.slug}/`} aria-label={`View ${placeName(c)}`}><Icon name="arrow-right" /></a>
+</li>

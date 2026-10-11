@@ -10,9 +10,9 @@ import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
 import { SITE, PRICE, RRP } from '../data/site';
 import { FAQS, INCLUDED } from '../data/tests';
-import { CLINICS } from '../data/clinics';
+import { COUNT, REGIONS, inRegion, regionSlug } from '../data/clinics';
 import ClinicMap from '../components/ClinicMap.astro';
-import reception from '../assets/photos/reception.jpg';
+import consult from '../assets/photos/consult.jpg';
 import { faqLd } from '../data/seo';
 
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.name, legalName: SITE.legalName, url: Astro.site!.href, logo: new URL('/icon-512.png', Astro.site).href };
@@ -33,18 +33,18 @@ const tips = [
     </div>
     <div class="wrap hero__inner">
       <div class="hero__copy">
-        <p class="hero__kicker">Private blood tests in the UK</p>
+        <p class="hero__kicker">Private blood tests across the UK and Ireland</p>
         <h1 id="hero-title">A clearer picture of your health.</h1>
-        <p class="hero__lead">Private blood tests for men and women, reviewed by a clinical specialist and explained in plain English. Pick the check that suits you and we’ll take care of the rest.</p>
+        <p class="hero__lead">Private blood tests for men and women, reviewed by a clinical specialist and explained in plain English.</p>
         <div class="hero__actions">
-          <a class="btn btn--ghost-light" href="/contact/?test=mens">Men’s Health Check <Icon name="arrow-right" /></a>
-          <a class="btn btn--ghost-light" href="/contact/?test=womens">Women’s Health Check <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost-light" href="/contact/">Enquire now <Icon name="arrow-right" /></a>
+          <a class="btn btn--ghost-light" href="#choose">View health checks</a>
         </div>
       </div>
       <ul class="hero__facts" aria-label="At a glance">
         <li><Icon name="map-pin" />
-          <strong>London and Birmingham</strong>
-          <span>Five clinics to choose from</span></li>
+          <strong>{COUNT} locations</strong>
+          <span>Across the UK and Ireland</span></li>
         <li><Icon name="circle-check" />
           <strong>No GP referral needed</strong>
           <span>Just get in touch</span></li>
@@ -61,20 +61,9 @@ const tips = [
   <section class="section" id="choose" aria-labelledby="choose-title">
     <div class="wrap">
       <div class="section__head center">
-        <h2 class="display" id="choose-title">Two health checks, made for you</h2>
-        <p class="lead">Have a look at what each one covers, then tell us which feels right.</p>
+        <h2 class="display" id="choose-title">Our health checks</h2>
       </div>
       <TestCards />
-    </div>
-  </section>
-
-  <section class="section section--tight" aria-label="Highlights">
-    <div class="wrap">
-      <ul class="trio">
-        <li class="feature" data-reveal><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">300+</p><p class="feature__label">Men’s Health Check</p><p>Biomarkers across 11 groups, from heart and cholesterol to hormones and vitamins.</p></li>
-        <li class="feature" data-reveal style="--d:.08s"><span class="feature__icon" aria-hidden="true"><Icon name="clock" /></span><p class="feature__big">15 min</p><p class="feature__label">The appointment</p><p>A quick visit to the clinic, then results by email in 2–5 working days.</p></li>
-        <li class="feature" data-reveal style="--d:.16s"><span class="feature__icon" aria-hidden="true"><Icon name="flask-conical" /></span><p class="feature__big">Up to 350</p><p class="feature__label">Women’s Health Check</p><p>Biomarkers across 27 health areas, with a GP consultation and a repeat test included.</p></li>
-      </ul>
     </div>
   </section>
 
@@ -102,7 +91,7 @@ const tips = [
         </div>
       </div>
       <figure class="split__photo" data-reveal>
-        <Image src={reception} alt="The Quantum reception wall with the logo, a marble desk and a plant" widths={[480, 720, 960, 1200]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
+        <Image src={consult} alt="A doctor talking with a patient at a desk" widths={[480, 720, 960, 1200]} sizes="(min-width: 62em) 34rem, 92vw" loading="lazy" />
       </figure>
     </div>
   </section>
@@ -110,13 +99,14 @@ const tips = [
   <section class="section" aria-labelledby="where-title">
     <div class="wrap">
       <div class="section__head center">
-        <h2 class="display" id="where-title">Find a clinic near you</h2>
-        <p class="lead">Four clinics in London and one in Birmingham. Select a pin to see the clinic.</p>
+        <h2 class="display" id="where-title">Find a location near you</h2>
+        <p class="lead">{COUNT} locations across the UK and Ireland. Select a pin for details.</p>
       </div>
-      <div class="maps">
-        <div><h3 class="maps__city">London</h3><ClinicMap city="London" /></div>
-        <div><h3 class="maps__city">Birmingham</h3><ClinicMap city="Birmingham" /></div>
-      </div>
+      <ClinicMap tall label="Map of all our locations. Select a pin for details." />
+      <ul class="jump jump--big jump--center" aria-label="Browse by region">
+        {REGIONS.filter((r) => inRegion(r).length).map((r) => <li><a href={`/clinics/#${regionSlug(r)}`}>{r}</a></li>)}
+      </ul>
+      <p class="center" style="margin-top:1.25rem"><a class="btn btn--blue" href="/clinics/">See all {COUNT} locations <Icon name="arrow-right" /></a></p>
     </div>
   </section>
 

@@ -28,7 +28,7 @@ const copy = {
         <p class="price"><strong>{PRICE}</strong> <span class="price__rrp">RRP <s>{RRP}</s></span> <span class="price__save">Save {SAVING}</span></p>
         <div class="card__actions">
           <a class:list={['btn', t.key === 'mens' ? 'btn--men' : 'btn--women']} href={enquire(t.key)}>Enquire<span class="vh"> about the {t.name}</span> <Icon name="arrow-right" /></a>
-          <a class="btn btn--quiet" href={`/tests/${t.slug}/`}>What’s tested<span class="vh"> in the {t.name}</span></a>
+          <a class="btn btn--quiet" href={`/tests/${t.slug}/`}>View full test details<span class="vh"> in the {t.name}</span></a>
         </div>
       </div>
     </article>

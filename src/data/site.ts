@@ -2,7 +2,7 @@
 export const SITE = {
   name: 'Quantum BioTesting',
   legalName: 'Quantum BioTesting Ltd',
-  tagline: 'Private blood tests for men and women in the UK',
+  tagline: 'Private blood tests for men and women across the UK and Ireland',
   // Client-supplied pricing. Keep these as the only place the figures are written.
   price: 995,
   rrp: 2112,

@@ -1,0 +1,14 @@
+{
+  "Royal Tunbridge Wells": { "lat": 51.12999, "lng": 0.26336, "approx": false, "why": "Mount Pleasant Road; the full address matched Paddock Wood" },
+  "Cork": { "lat": 51.89999, "lng": -8.47053, "approx": false, "why": "St Patrick's Street; the Eircode matched an industrial estate" },
+  "Dublin Sandyford": { "lat": 53.27743, "lng": -6.21322, "approx": true, "why": "Corrig Road, Sandyford Business Park; Time Place not found" },
+  "Dublin Airport": { "lat": 53.4321, "lng": -6.23013, "approx": true, "why": "Stockhole Lane, Swords" },
+  "Cheadle": { "lat": 53.37874, "lng": -2.22151, "approx": false, "why": "Cheadle Royal Business Park" },
+  "Crumlin": { "lat": 54.62362, "lng": -6.21218, "approx": false, "why": "Mill Road, Crumlin, County Antrim; the town name had matched Crumlin in Wales" },
+  "Holywood": { "lat": 54.64045, "lng": -5.83617, "approx": true, "why": "Holywood town centre; Redburn Square not found" },
+  "Derry/Londonderry": { "lat": 55.00209, "lng": -7.32246, "approx": false, "why": "Strand Road" },
+  "High Wycombe": { "lat": 51.61285, "lng": -0.7856, "approx": true, "why": "Holmers Farm Way" },
+  "Bournemouth": { "lat": 50.75209, "lng": -1.84192, "approx": false, "why": "Castlepoint Shopping Centre" },
+  "Galway": { "lat": 53.2735, "lng": -9.05159, "approx": false, "why": "William Street" },
+  "Exeter": { "lat": 50.72974, "lng": -3.45632, "approx": true, "why": "Postcode EX5 2AN (Redhayes), about 5 km from the city centre" }
+}
