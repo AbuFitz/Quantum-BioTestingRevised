@@ -34,7 +34,7 @@ export const getClinic = (slug: string) => CLINICS.find((c) => c.slug === slug)!
 export const fullAddress = (c: Clinic) => [c.street, c.area && c.area !== c.locality ? c.area : '', c.locality, c.postcode].filter(Boolean).join(', ');
 /** "Chelsea, London" for London sites; the town name elsewhere */
 export const placeName = (c: Clinic) => (c.region === 'London' && !/london/i.test(c.name) ? `${c.name}, London` : c.name);
-export const kindLabel = (c: Clinic) => ({ clinic: 'Clinic', partner: 'Partner site', mobile: 'Mobile clinic', hotel: 'Hotel health club' })[c.kind];
+export const kindLabel = (c: Clinic) => ({ clinic: 'Location', partner: 'Location', mobile: 'Mobile clinic', hotel: 'Hotel health club' })[c.kind];
 /** One short line for lists and popups: venue (if any) and area */
-export const subtitle = (c: Clinic) => [c.venue, c.region === 'London' ? 'London' : c.city].filter(Boolean).join(' · ');
+export const subtitle = (c: Clinic) => [c.venue, c.region === 'London' || c.name.toLowerCase().includes(c.city.toLowerCase()) ? '' : c.city].filter(Boolean).join(' · ');
 export const mapsQuery = (c: Clinic) => `${c.street}, ${c.locality}${c.postcode ? ' ' + c.postcode : ''}`;

@@ -1,15 +1,17 @@
 ---
 import Icon from './Icon.astro';
 import { fullAddress, kindLabel, placeName, subtitle, type Clinic } from '../data/clinics';
-interface Props { c: Clinic }
-const { c } = Astro.props;
+interface Props { c: Clinic; finder?: boolean }
+const { c, finder = false } = Astro.props;
 ---
-<li class="loc" data-loc data-search={`${placeName(c)} ${c.venue ?? ''} ${c.city} ${c.region} ${c.postcode ?? ''} ${c.street}`.toLowerCase()}>
+<li class="loc" data-loc data-slug={c.slug} data-lat={c.lat} data-lng={c.lng} data-search={`${placeName(c)} ${c.venue ?? ''} ${c.city} ${c.region} ${c.postcode ?? ''} ${c.street}`.toLowerCase()}>
   <span class="loc__pin" aria-hidden="true"><Icon name="map-pin" /></span>
   <div class="loc__body">
     <h3><a href={`/clinics/${c.slug}/`}>{placeName(c)}</a></h3>
     <p class="loc__sub">{[kindLabel(c), subtitle(c)].filter(Boolean).join(' · ')}</p>
     <p class="loc__addr">{fullAddress(c)}</p>
+    {c.hours && <p class="loc__hours"><Icon name="clock" />Open {c.hours}</p>}
+    {finder && <button class="loc__show" type="button" data-show={c.slug}><Icon name="map" />Show on map</button>}
   </div>
   <a class="loc__go" href={`/clinics/${c.slug}/`} aria-label={`View ${placeName(c)}`}><Icon name="arrow-right" /></a>
 </li>

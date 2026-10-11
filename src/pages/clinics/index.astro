@@ -14,7 +14,7 @@ const ld = [
 ];
 ---
 <Base
-  title={`Private Blood Test Locations Across the UK and Ireland | Quantum BioTesting`}
+  title={`Private Blood Test Locations in the UK and Ireland | Quantum BioTesting`}
   description={`${COUNT} locations across England, Scotland, Wales, Northern Ireland and Ireland for the Men’s and Women’s Health Checks. Find yours and send an enquiry.`}
   jsonLd={ld}
 >
@@ -23,37 +23,55 @@ const ld = [
   <section class="section section--tight" aria-labelledby="finder-title">
     <div class="wrap">
       <h2 class="vh" id="finder-title">Locations</h2>
-      <div class="finder__bar">
-        <div class="finder__search">
-          <label class="vh" for="loc-search">Search by town, area or postcode</label>
-          <Icon name="search" />
-          <input id="loc-search" class="input" type="search" placeholder="Search by town, area or postcode" autocomplete="off" data-loc-search />
+      <div class="finder">
+        <div class="finder__tools">
+          <div class="finder__row">
+            <div class="finder__search">
+              <label class="vh" for="loc-search">Search by town, area or postcode</label>
+              <Icon name="search" />
+              <input id="loc-search" class="input" type="search" placeholder="Town, area or postcode" autocomplete="off" data-loc-search />
+            </div>
+            <button class="btn btn--sm finder__near" type="button" data-near hidden><Icon name="locate-fixed" />Near me</button>
+          </div>
+          <p class="finder__note" data-near-note aria-live="polite" hidden></p>
+          <div class="finder__select">
+            <label class="vh" for="loc-region">Region</label>
+            <select id="loc-region" class="input" data-loc-region-select>
+              <option value="">All regions ({COUNT})</option>
+              {regions.map((r) => <option value={r}>{r} ({inRegion(r).length})</option>)}
+            </select>
+          </div>
         </div>
-        <div class="finder__chips" role="group" aria-label="Filter by region">
-          <button type="button" class="chip is-on" data-region="" aria-pressed="true">All</button>
-          {regions.map((r) => <button type="button" class="chip" data-region={r} aria-pressed="false">{r}</button>)}
+
+        <div class="finder__map"><ClinicMap size="fill" label="Map of all our locations. Select a pin for details." /></div>
+
+        <div class="finder__list">
+          <p class="finder__count" data-loc-count aria-live="polite">{COUNT} locations</p>
+          <p class="finder__none" data-loc-none hidden>No locations match that search. Try a town, a postcode area or a region.</p>
+          <div class="finder__nearest" data-nearest hidden>
+            <h2 class="finder__h">Nearest to you <button type="button" class="link link--btn" data-near-clear>Clear</button></h2>
+            <ul class="locs locs--one" data-nearest-list></ul>
+          </div>
+          {regions.map((r) => (
+            <section class="finder__region" id={regionSlug(r)} data-loc-region={r} aria-labelledby={`h-${regionSlug(r)}`}>
+              <h2 class="finder__h" id={`h-${regionSlug(r)}`}>{r} <span class="finder__n">{inRegion(r).length}</span></h2>
+              <ul class="locs locs--one">{inRegion(r).map((c) => <LocationCard c={c} finder />)}</ul>
+            </section>
+          ))}
         </div>
       </div>
-      <ClinicMap tall label="Map of all our locations. Select a pin for details." />
-      <p class="finder__count" data-loc-count aria-live="polite">{COUNT} locations</p>
-      <p class="finder__none" data-loc-none hidden>No locations match that search. Try a town, a postcode area or a region.</p>
-      {regions.map((r) => (
-        <section class="finder__region" id={regionSlug(r)} data-loc-region={r} aria-labelledby={`h-${regionSlug(r)}`}>
-          <h2 class="display" id={`h-${regionSlug(r)}`}>{r} <span class="finder__n">{inRegion(r).length}</span></h2>
-          <ul class="locs">{inRegion(r).map((c) => <LocationCard c={c} />)}</ul>
-        </section>
-      ))}
     </div>
   </section>
   <CloseEnquiry />
 </Base>
 <script>
-  const search = document.querySelector<HTMLInputElement>('[data-loc-search]')!;
-  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.chip[data-region]'));
-  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-loc]'));
+  const q$ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
+  const search = q$<HTMLInputElement>('[data-loc-search]');
+  const sel = q$<HTMLSelectElement>('[data-loc-region-select]');
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.finder__region [data-loc]'));
   const regions = Array.from(document.querySelectorAll<HTMLElement>('[data-loc-region]'));
-  const count = document.querySelector<HTMLElement>('[data-loc-count]')!;
-  const none = document.querySelector<HTMLElement>('[data-loc-none]')!;
+  const count = q$('[data-loc-count]'), none = q$('[data-loc-none]');
+  const nearest = q$('[data-nearest]'), nearestList = q$('[data-nearest-list]');
   let region = '';
   const apply = () => {
     const q = search.value.trim().toLowerCase();
@@ -67,14 +85,35 @@ const ld = [
     count.textContent = `${shown} location${shown === 1 ? '' : 's'}${region ? ` in ${region}` : ''}${q ? ` matching “${search.value.trim()}”` : ''}`;
     none.hidden = shown > 0;
   };
-  chips.forEach((b) => b.addEventListener('click', () => {
-    region = b.dataset.region || '';
-    chips.forEach((x) => { const on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', String(on)); });
-    document.dispatchEvent(new CustomEvent('rmap:region', { detail: { region } }));
-    apply();
-  }));
+  sel.addEventListener('change', () => { region = sel.value; document.dispatchEvent(new CustomEvent('rmap:region', { detail: { region } })); apply(); });
   search.addEventListener('input', apply);
-  // Deep links such as /clinics/#scotland select that region
-  const fromHash = () => { const h = decodeURIComponent(location.hash.slice(1)); const hit = chips.find((b) => (b.dataset.region || '').toLowerCase().replace(/[^a-z0-9]+/g, '-') === h); if (hit) hit.click(); };
-  fromHash(); addEventListener('hashchange', fromHash);
+  // List and map are linked: "Show on map" flies to the pin and opens its popup
+  document.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-show]'); if (!b) return;
+    document.dispatchEvent(new CustomEvent('rmap:focus', { detail: { slug: b.dataset.show } }));
+    if (matchMedia('(max-width: 61.99em)').matches) q$('.finder__map').scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
+  // Deep links: /clinics/#scotland selects a region, /clinics/?q=leeds searches
+  const fromUrl = () => {
+    const h = decodeURIComponent(location.hash.slice(1)); const hit = Array.from(sel.options).find((o) => o.value && o.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') === h); if (hit) { sel.value = hit.value; sel.dispatchEvent(new Event('change')); }
+    const qs = new URLSearchParams(location.search).get('q'); if (qs) { search.value = qs; apply(); }
+  };
+  fromUrl(); addEventListener('hashchange', fromUrl);
+  // Nearest to me: the position is used in the browser only and is never sent anywhere
+  const nearBtn = q$<HTMLButtonElement>('[data-near]'), nearNote = q$('[data-near-note]');
+  const km = (a: number, b: number, c: number, d: number) => { const R = 6371, r = Math.PI / 180, x = (d - b) * r * Math.cos(((a + c) / 2) * r), y = (c - a) * r; return R * Math.hypot(x, y); };
+  if ('geolocation' in navigator) {
+    nearBtn.hidden = false;
+    nearBtn.addEventListener('click', () => {
+      nearNote.hidden = false; nearNote.textContent = 'Finding your position…';
+      navigator.geolocation.getCurrentPosition((p) => {
+        const { latitude: la, longitude: lo } = p.coords;
+        const sorted = cards.map((c) => ({ c, d: km(la, lo, +c.dataset.lat!, +c.dataset.lng!) })).sort((a, b) => a.d - b.d).slice(0, 6);
+        nearestList.replaceChildren(...sorted.map(({ c, d }) => { const n = c.cloneNode(true) as HTMLElement; n.hidden = false; const t = document.createElement('p'); t.className = 'loc__dist'; t.textContent = d < 1.6 ? 'Less than a mile away' : `${Math.round(d / 1.609)} miles away`; n.querySelector('.loc__body')!.prepend(t); return n; }));
+        nearest.hidden = false; nearNote.textContent = 'Showing the locations nearest to you. Your position stays in your browser.';
+        document.dispatchEvent(new CustomEvent('rmap:near', { detail: { lat: la, lng: lo } }));
+      }, () => { nearNote.textContent = 'We couldn’t get your position. You can search by town or postcode instead.'; }, { timeout: 10000, maximumAge: 600000 });
+    });
+    q$('[data-near-clear]').addEventListener('click', () => { nearest.hidden = true; nearNote.hidden = true; document.dispatchEvent(new CustomEvent('rmap:region', { detail: { region } })); });
+  }
 </script>

@@ -1,13 +1,18 @@
 ---
-// A real, interactive street map (Leaflet with OpenStreetMap tiles) with every location as a pin. Pins are
-// clustered where they are close together. Leaflet is bundled with the site (no CDN). The map is set up when it
-// nears the viewport. Without JavaScript the lists of locations on the page still work.
+// A real, interactive street map (Leaflet with OpenStreetMap tiles) with every location as a pin. Pins cluster
+// where they are close together. Leaflet is bundled with the site (no CDN). The map is set up when it nears the
+// viewport. Without JavaScript the lists of locations on the page still work.
+//
+// Page scripts steer it with document events:
+//   rmap:region  { region }  fit the map to a region ('' = everywhere)
+//   rmap:focus   { slug }    fly to a location and open its popup
+//   rmap:near    { lat, lng } show the visitor's position and fit to the nearest locations
 import { CLINICS, fullAddress, subtitle, kindLabel, placeName } from '../data/clinics';
-interface Props { active?: string; region?: string; tall?: boolean; label?: string }
-const { active, region, tall = false, label = 'Map of our locations' } = Astro.props;
+interface Props { active?: string; region?: string; size?: 'normal' | 'hub' | 'fill'; label?: string }
+const { active, region, size = 'normal', label = 'Map of our locations' } = Astro.props;
 const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtitle(c), kind: kindLabel(c), address: fullAddress(c), hours: c.hours ?? '', notes: c.notes ?? '', region: c.region, lat: c.lat, lng: c.lng }));
 ---
-<div class:list={['rmap', { 'rmap--tall': tall }]} data-rmap data-pins={JSON.stringify(pins)} data-active={active} data-region={region}>
+<div class={`rmap rmap--${size}`} data-rmap data-pins={JSON.stringify(pins)} data-active={active} data-region={region}>
   <div class="rmap__canvas" data-rmap-canvas role="group" aria-label={label}>
     <p class="rmap__wait">Loading map…</p>
   </div>
@@ -16,7 +21,8 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
   import 'leaflet/dist/leaflet.css';
   import 'leaflet.markercluster/dist/MarkerCluster.css';
   type Pin = { slug: string; name: string; sub: string; kind: string; address: string; hours: string; notes: string; region: string; lat: number; lng: number };
-  const pinSvg = (cls: string) => `<svg class="${cls}" viewBox="0 0 28 38" width="28" height="38" aria-hidden="true"><path d="M14 37C14 37 2 23.5 2 14.5a12 12 0 0 1 24 0C26 23.5 14 37 14 37Z" /><circle cx="14" cy="14.5" r="4.6" fill="#fff" /></svg>`;
+  const pinSvg = (cls: string) => `<svg class="${cls}" viewBox="0 0 32 42" width="32" height="42" aria-hidden="true"><path d="M16 41C16 41 3 26.5 3 16a13 13 0 0 1 26 0C29 26.5 16 41 16 41Z" /><circle cx="16" cy="16" r="5.2" fill="#fff" /></svg>`;
+  const km = (a: [number, number], b: [number, number]) => { const R = 6371, d = Math.PI / 180, x = (b[1] - a[1]) * d * Math.cos(((a[0] + b[0]) / 2) * d), y = (b[0] - a[0]) * d; return R * Math.hypot(x, y); };
 
   const start = async (root: HTMLElement) => {
     const canvas = root.querySelector<HTMLElement>('[data-rmap-canvas]')!;
@@ -27,7 +33,9 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
     await import('leaflet.markercluster');
     canvas.replaceChildren();
     const touch = L.Browser.mobile;
-    const map = L.map(canvas, { scrollWheelZoom: false, dragging: !touch, zoomControl: true, attributionControl: true, keyboard: true, minZoom: 4 });
+    // Keep the national map on the UK and Ireland rather than the whole of Europe
+    const home = L.latLngBounds([49.7, -10.9], [60.0, 2.1]);
+    const map = L.map(canvas, { scrollWheelZoom: false, dragging: !touch, zoomControl: true, attributionControl: true, keyboard: true, minZoom: 4, ...(active ? {} : { maxBounds: home.pad(0.12), maxBoundsViscosity: 0.85 }) });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
     // Wheel zoom only after the visitor clicks into the map, so scrolling the page is never hijacked
     let zoomOn = false;
@@ -38,21 +46,24 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
     const popup = (p: Pin) => {
       const box = document.createElement('div');
       box.className = 'rmap__pop';
+      const k = document.createElement('span'); k.className = 'rmap__kind'; k.textContent = p.kind;
       const h = document.createElement('strong'); h.textContent = p.name;
-      const s = document.createElement('span'); s.className = 'rmap__sub'; s.textContent = [p.kind, p.sub].filter(Boolean).join(' · ');
-      const a = document.createElement('p'); a.textContent = p.address;
-      box.append(h, s, a);
+      box.append(k, h);
+      if (p.sub) { const s = document.createElement('span'); s.className = 'rmap__sub'; s.textContent = p.sub; box.append(s); }
+      const a = document.createElement('p'); a.textContent = p.address; box.append(a);
       if (p.hours) { const t = document.createElement('p'); t.className = 'rmap__meta'; t.textContent = `Open ${p.hours}`; box.append(t); }
       if (p.notes) { const t = document.createElement('p'); t.className = 'rmap__meta'; t.textContent = p.notes; box.append(t); }
-      const l = document.createElement('a'); l.href = `/clinics/${p.slug}/`; l.textContent = p.slug === active ? 'This location' : 'View location & enquire';
+      const l = document.createElement('a'); l.className = 'rmap__cta'; l.href = `/clinics/${p.slug}/`; l.textContent = p.slug === active ? 'This location' : 'View location & enquire';
       box.append(l);
       return box;
     };
+    const markers = new Map<string, L.Marker>();
     const mk = (p: Pin, cls = '') => {
-      const icon = L.divIcon({ className: `rmap__pin ${cls}`, html: pinSvg('rmap__drop'), iconSize: [28, 38], iconAnchor: [14, 37], popupAnchor: [0, -34], tooltipAnchor: [14, -22] });
+      const icon = L.divIcon({ className: `rmap__pin ${cls}`, html: pinSvg('rmap__drop'), iconSize: [32, 42], iconAnchor: [16, 41], popupAnchor: [0, -38], tooltipAnchor: [16, -24] });
       const m = L.marker([p.lat, p.lng], { icon, title: p.name, alt: `${p.name} location`, keyboard: true, riseOnHover: true });
       m.bindTooltip(p.name, { direction: 'auto', className: 'rmap__label', permanent: cls.includes('is-active') });
-      m.bindPopup(popup(p), { closeButton: true, autoPanPadding: [24, 24], maxWidth: 280 });
+      m.bindPopup(popup(p), { closeButton: true, autoPanPadding: [24, 24], maxWidth: 300, minWidth: 240, className: 'rmap__popup' });
+      markers.set(p.slug, m);
       return m;
     };
 
@@ -60,23 +71,41 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
     const fit = (list: Pin[]) => {
       if (!list.length) return;
       if (list.length === 1) { map.setView([list[0].lat, list[0].lng], 14); return; }
-      map.fitBounds(L.latLngBounds(list.map((p) => [p.lat, p.lng] as [number, number])), { padding: [40, 40], maxZoom: 13 });
+      map.fitBounds(L.latLngBounds(list.map((p) => [p.lat, p.lng] as [number, number])), { padding: [36, 36], maxZoom: 13 });
     };
+    let cluster: any = null;
 
     if (active) {
       const a = pins.find((p) => p.slug === active)!;
       pins.filter((p) => p.region === a.region).forEach((p) => mk(p, p.slug === active ? 'is-active' : 'is-dim').addTo(map));
       map.setView([a.lat, a.lng], 15);
     } else {
-      const cluster = (L as any).markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 48, spiderfyOnMaxZoom: true,
-        iconCreateFunction: (c: any) => L.divIcon({ html: `<span>${c.getChildCount()}</span>`, className: 'rmap__cluster', iconSize: [40, 40] }) });
+      cluster = (L as any).markerClusterGroup({ showCoverageOnHover: false, maxClusterRadius: 52, spiderfyOnMaxZoom: true,
+        iconCreateFunction: (c: any) => { const n = c.getChildCount(); const s = n < 5 ? 's' : n < 15 ? 'm' : 'l'; const px = s === 's' ? 38 : s === 'm' ? 46 : 56; return L.divIcon({ html: `<span>${n}</span>`, className: `rmap__cluster rmap__cluster--${s}`, iconSize: [px, px] }); } });
       pins.forEach((p) => cluster.addLayer(mk(p)));
       map.addLayer(cluster);
       fit(byRegion(root.dataset.region || ''));
-      // The location finder can steer the map to a region
+      // Fit the whole UK and Ireland snugly, and do not let people zoom out into empty sea
+      requestAnimationFrame(() => { map.invalidateSize(); map.setMinZoom(Math.max(4, map.getBoundsZoom(home, false) - 0.0)); });
       document.addEventListener('rmap:region', ((e: CustomEvent) => fit(byRegion(e.detail?.region || ''))) as EventListener);
     }
+
+    document.addEventListener('rmap:focus', ((e: CustomEvent) => {
+      const m = markers.get(e.detail?.slug); if (!m) return;
+      const open = () => { map.flyTo(m.getLatLng(), Math.max(map.getZoom(), 14), { duration: 0.8 }); setTimeout(() => m.openPopup(), 850); };
+      if (cluster) cluster.zoomToShowLayer(m, () => m.openPopup()); else open();
+    }) as EventListener);
+
+    let you: L.Marker | null = null;
+    document.addEventListener('rmap:near', ((e: CustomEvent) => {
+      const { lat, lng } = e.detail; you?.remove();
+      you = L.marker([lat, lng], { icon: L.divIcon({ className: 'rmap__you', html: '<span></span>', iconSize: [18, 18] }), interactive: false, keyboard: false }).addTo(map);
+      const near = [...pins].sort((a, b) => km([lat, lng], [a.lat, a.lng]) - km([lat, lng], [b.lat, b.lng])).slice(0, 3);
+      map.fitBounds(L.latLngBounds([[lat, lng], ...near.map((p) => [p.lat, p.lng] as [number, number])]), { padding: [48, 48], maxZoom: 13 });
+    }) as EventListener);
+
     requestAnimationFrame(() => map.invalidateSize());
+    new ResizeObserver(() => map.invalidateSize()).observe(canvas);
   };
 
   const roots = document.querySelectorAll<HTMLElement>('[data-rmap]');

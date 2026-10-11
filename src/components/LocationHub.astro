@@ -1,0 +1,44 @@
+---
+// Home page "Find a location near you": a panel (search, nearest, regions) beside the national map.
+import ClinicMap from './ClinicMap.astro';
+import Icon from './Icon.astro';
+import { COUNT, REGIONS, inRegion, regionSlug } from '../data/clinics';
+const regions = REGIONS.filter((r) => inRegion(r).length);
+---
+<section class="section hub" aria-labelledby="where-title">
+  <div class="wrap hub__grid">
+    <div class="hub__panel">
+      <p class="hub__kicker">{COUNT} locations</p>
+      <h2 class="display" id="where-title">Find a location near you</h2>
+      <p class="lead">Across England, Scotland, Wales, Northern Ireland and Ireland.</p>
+      <form class="hub__search" action="/clinics/" method="get" role="search">
+        <label class="vh" for="hub-q">Town, area or postcode</label>
+        <Icon name="search" />
+        <input id="hub-q" class="input" type="search" name="q" placeholder="Town, area or postcode" autocomplete="off" />
+        <button class="btn btn--sm" type="submit">Search</button>
+      </form>
+      <button class="hub__near" type="button" data-near hidden><Icon name="locate-fixed" />Use my location</button>
+      <p class="hub__near-note" data-near-note aria-live="polite" hidden></p>
+      <ul class="hub__regions" aria-label="Browse by region">
+        {regions.map((r) => <li><a href={`/clinics/#${regionSlug(r)}`}><span>{r}</span><b>{inRegion(r).length}</b></a></li>)}
+      </ul>
+      <p class="hub__all"><a class="btn btn--blue" href="/clinics/">See all {COUNT} locations <Icon name="arrow-right" /></a></p>
+    </div>
+    <ClinicMap size="hub" label="Map of all our locations. Select a pin for details." />
+  </div>
+</section>
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-near]');
+  const note = document.querySelector<HTMLElement>('[data-near-note]');
+  if (btn && note && 'geolocation' in navigator) {
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      note.hidden = false; note.textContent = 'Finding your position…';
+      navigator.geolocation.getCurrentPosition(
+        (p) => { document.dispatchEvent(new CustomEvent('rmap:near', { detail: { lat: p.coords.latitude, lng: p.coords.longitude } })); note.textContent = 'Showing the locations nearest to you. Your position stays in your browser.'; },
+        () => { note.textContent = 'We couldn’t get your position. You can search by town or postcode instead.'; },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+      );
+    });
+  }
+</script>

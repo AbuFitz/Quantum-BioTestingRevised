@@ -10,8 +10,8 @@ import CloseEnquiry from '../components/CloseEnquiry.astro';
 import visit from '../assets/photos/visit.jpg';
 import { SITE, PRICE, RRP } from '../data/site';
 import { FAQS, INCLUDED } from '../data/tests';
-import { COUNT, REGIONS, inRegion, regionSlug } from '../data/clinics';
-import ClinicMap from '../components/ClinicMap.astro';
+import { COUNT } from '../data/clinics';
+import LocationHub from '../components/LocationHub.astro';
 import consult from '../assets/photos/consult.jpg';
 import { faqLd } from '../data/seo';
 
@@ -96,19 +96,7 @@ const tips = [
     </div>
   </section>
 
-  <section class="section" aria-labelledby="where-title">
-    <div class="wrap">
-      <div class="section__head center">
-        <h2 class="display" id="where-title">Find a location near you</h2>
-        <p class="lead">{COUNT} locations across the UK and Ireland. Select a pin for details.</p>
-      </div>
-      <ClinicMap tall label="Map of all our locations. Select a pin for details." />
-      <ul class="jump jump--big jump--center" aria-label="Browse by region">
-        {REGIONS.filter((r) => inRegion(r).length).map((r) => <li><a href={`/clinics/#${regionSlug(r)}`}>{r}</a></li>)}
-      </ul>
-      <p class="center" style="margin-top:1.25rem"><a class="btn btn--blue" href="/clinics/">See all {COUNT} locations <Icon name="arrow-right" /></a></p>
-    </div>
-  </section>
+  <LocationHub />
 
   <FaqSection items={FAQS.slice(0, 5)} more />
 
