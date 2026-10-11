@@ -41,11 +41,10 @@ try {
     const bc = await page.evaluate(() => [...document.querySelectorAll('.card')].map((c) => getComputedStyle(c).borderTopColor));
     check(`men's card outline is blue and women's is pink ${tag}`, bc.length === 2 && bc[0] === 'rgb(91, 134, 201)' && bc[1] === 'rgb(213, 138, 169)', bc.join(' / '));
     check(`page background is the warm paper colour ${tag}`, (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === 'rgb(251, 243, 239)');
-    // One clear Enquire button up top; the two checks are the two cards, with no repeated test-name buttons
-    const enq = page.locator('.hero__actions a', { hasText: 'Enquire now' });
-    const inView = async (l) => { const b = await l.boundingBox(); return !!b && b.y + b.height <= h && b.y >= 0; };
-    check(`hero has a single clear Enquire button in the first viewport ${tag}`, (await page.locator('.hero__actions a').count()) === 2 && (await inView(enq)));
-    check(`no repeated Men's and Women's buttons: none in the hero, the banner or a highlights band ${tag}`, (await page.locator('.hero__actions a[href*="test="], .banner__actions a[href*="test="], .trio, .feature').count()) === 0);
+    // The hero carries no buttons: the header Enquire is the one action at the top
+    check(`hero has no buttons (no Enquire now, no View health checks) ${tag}`, (await page.locator('.hero a.btn, .hero button').count()) === 0 && !/Enquire now|View health checks/.test(await page.locator('.hero').innerText()));
+    check(`header still has the Enquire button ${tag}`, await page.locator('.hdr__enquire').isVisible());
+    check(`no repeated Men's and Women's buttons: none in the hero, the banner or a highlights band ${tag}`, (await page.locator('.hero__actions, .banner__actions a[href*="test="], .trio, .feature').count()) === 0);
     check(`the card button says View full test details ${tag}`, (await page.getByRole('link', { name: /View full test details/ }).count()) === 2);
     const headingNote = await page.locator('#choose').innerText();
     check(`health checks heading is simple and the "which feels right" line is gone ${tag}`, (await page.locator('#choose-title').innerText()) === 'Our health checks' && !/feels right|have a look/i.test(headingNote));
