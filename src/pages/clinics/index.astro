@@ -93,6 +93,15 @@ const ld = [
     document.dispatchEvent(new CustomEvent('rmap:focus', { detail: { slug: b.dataset.show } }));
     if (matchMedia('(max-width: 61.99em)').matches) q$('.finder__map').scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   });
+  // The list follows the map: choosing a pin highlights and reveals its entry; hovering an entry lifts its pin
+  const listPane = q$('.finder__list');
+  document.addEventListener('rmap:select', ((e: CustomEvent) => {
+    cards.forEach((c) => c.classList.toggle('is-selected', c.dataset.slug === e.detail.slug));
+    const hit = cards.find((c) => c.dataset.slug === e.detail.slug);
+    if (hit && !hit.hidden && matchMedia('(min-width: 62em)').matches) hit.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }) as EventListener);
+  listPane.addEventListener('mouseover', (e) => { const c = (e.target as HTMLElement).closest<HTMLElement>('[data-loc]'); document.dispatchEvent(new CustomEvent('rmap:hover', { detail: { slug: c?.dataset.slug || '' } })); });
+  listPane.addEventListener('mouseleave', () => document.dispatchEvent(new CustomEvent('rmap:hover', { detail: { slug: '' } })));
   // Deep links: /clinics/#scotland selects a region, /clinics/?q=leeds searches
   const fromUrl = () => {
     const h = decodeURIComponent(location.hash.slice(1)); const hit = Array.from(sel.options).find((o) => o.value && o.value.toLowerCase().replace(/[^a-z0-9]+/g, '-') === h); if (hit) { sel.value = hit.value; sel.dispatchEvent(new Event('change')); }

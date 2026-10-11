@@ -6,6 +6,8 @@
 // Page scripts steer it with document events:
 //   rmap:region  { region }  fit the map to a region ('' = everywhere)
 //   rmap:focus   { slug }    fly to a location and open its popup
+//   rmap:hover   { slug }    lift a pin while the pointer is over its list item ('' clears)
+// and it announces rmap:select { slug } when a pin is chosen, so a list can follow along.
 //   rmap:near    { lat, lng } show the visitor's position and fit to the nearest locations
 import { CLINICS, fullAddress, subtitle, kindLabel, placeName } from '../data/clinics';
 interface Props { active?: string; region?: string; size?: 'normal' | 'hub' | 'fill'; label?: string }
@@ -35,7 +37,8 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
     const touch = L.Browser.mobile;
     // Keep the national map on the UK and Ireland rather than the whole of Europe
     const home = L.latLngBounds([49.7, -10.9], [60.0, 2.1]);
-    const map = L.map(canvas, { scrollWheelZoom: false, dragging: !touch, zoomControl: true, attributionControl: true, keyboard: true, minZoom: 4, ...(active ? {} : { maxBounds: home.pad(0.12), maxBoundsViscosity: 0.85 }) });
+    const map = L.map(canvas, { scrollWheelZoom: false, dragging: !touch, zoomControl: true, attributionControl: true, keyboard: true, minZoom: 4, zoomSnap: 0.5, wheelDebounceTime: 30, wheelPxPerZoomLevel: 90, ...(active ? {} : { maxBounds: home.pad(0.12), maxBoundsViscosity: 0.85 }) });
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
     // Wheel zoom only after the visitor clicks into the map, so scrolling the page is never hijacked
     let zoomOn = false;
@@ -63,17 +66,36 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
       const m = L.marker([p.lat, p.lng], { icon, title: p.name, alt: `${p.name} location`, keyboard: true, riseOnHover: true });
       m.bindTooltip(p.name, { direction: 'auto', className: 'rmap__label', permanent: cls.includes('is-active') });
       m.bindPopup(popup(p), { closeButton: true, autoPanPadding: [24, 24], maxWidth: 300, minWidth: 240, className: 'rmap__popup' });
+      m.off('click', (m as any)._openPopup, m);   // a click flies to the pin first, then opens the popup (select below)
+      m.on('click', () => select(p.slug));
       markers.set(p.slug, m);
       return m;
     };
 
     const byRegion = (r: string) => pins.filter((p) => !r || p.region === r);
+    let current: Pin[] = [];
     const fit = (list: Pin[]) => {
       if (!list.length) return;
-      if (list.length === 1) { map.setView([list[0].lat, list[0].lng], 14); return; }
-      map.fitBounds(L.latLngBounds(list.map((p) => [p.lat, p.lng] as [number, number])), { padding: [36, 36], maxZoom: 13 });
+      current = list;
+      if (list.length === 1) { map.setView([list[0].lat, list[0].lng], 14, { animate: !calm }); return; }
+      map.fitBounds(L.latLngBounds(list.map((p) => [p.lat, p.lng] as [number, number])), { padding: [36, 36], maxZoom: 13, animate: !calm });
     };
     let cluster: any = null;
+    let selected = '';
+    const mark = (slug: string, cls: string, on: boolean) => { const el = markers.get(slug) && (markers.get(slug) as any)._icon as HTMLElement | undefined; el?.classList.toggle(cls, on); };
+    // Fly to a location, then show its popup; the list (if any) is told which one was chosen
+    const select = (slug: string) => {
+      const m = markers.get(slug); if (!m) return;
+      if (selected) mark(selected, 'is-selected', false);
+      selected = slug;
+      const ll = m.getLatLng();
+      const show = () => { mark(slug, 'is-selected', true); m.openPopup(); };
+      map.closePopup();
+      if (cluster && !map.hasLayer(m)) { cluster.zoomToShowLayer(m, show); }
+      else if (calm) { map.setView(ll, Math.max(map.getZoom(), 15), { animate: false }); show(); }
+      else { map.once('moveend', show); map.flyTo(ll, Math.max(map.getZoom(), 15), { duration: 0.75, easeLinearity: 0.3 }); }
+      document.dispatchEvent(new CustomEvent('rmap:select', { detail: { slug } }));
+    };
 
     if (active) {
       const a = pins.find((p) => p.slug === active)!;
@@ -90,11 +112,18 @@ const pins = CLINICS.map((c) => ({ slug: c.slug, name: placeName(c), sub: subtit
       document.addEventListener('rmap:region', ((e: CustomEvent) => fit(byRegion(e.detail?.region || ''))) as EventListener);
     }
 
-    document.addEventListener('rmap:focus', ((e: CustomEvent) => {
-      const m = markers.get(e.detail?.slug); if (!m) return;
-      const open = () => { map.flyTo(m.getLatLng(), Math.max(map.getZoom(), 14), { duration: 0.8 }); setTimeout(() => m.openPopup(), 850); };
-      if (cluster) cluster.zoomToShowLayer(m, () => m.openPopup()); else open();
-    }) as EventListener);
+    document.addEventListener('rmap:focus', ((e: CustomEvent) => select(e.detail?.slug)) as EventListener);
+    document.addEventListener('rmap:hover', ((e: CustomEvent) => { markers.forEach((_, k) => mark(k, 'is-hover', false)); if (e.detail?.slug) mark(e.detail.slug, 'is-hover', true); }) as EventListener);
+    map.on('popupclose', () => { if (selected) { mark(selected, 'is-selected', false); selected = ''; } });
+
+    // "Show all locations" returns to the starting view once the visitor has zoomed in
+    if (!active) {
+      let btn: HTMLButtonElement;
+      const Reset = (L.Control as any).extend({ onAdd() { btn = L.DomUtil.create('button', 'rmap__reset') as HTMLButtonElement; btn.type = 'button'; btn.textContent = 'Show all locations'; btn.hidden = true; L.DomEvent.disableClickPropagation(btn); btn.addEventListener('click', () => { map.closePopup(); fit(current); }); return btn; } });
+      new Reset({ position: 'bottomleft' }).addTo(map);
+      const base = () => map.getBoundsZoom(L.latLngBounds(current.map((p) => [p.lat, p.lng] as [number, number])).pad(0.1), false);
+      map.on('zoomend moveend', () => { btn.hidden = map.getZoom() < base() + 1.5; });
+    }
 
     let you: L.Marker | null = null;
     document.addEventListener('rmap:near', ((e: CustomEvent) => {
