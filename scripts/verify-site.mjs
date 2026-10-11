@@ -288,7 +288,7 @@ try {
     check('finder: deep links with ?q= and #region pre-filter the list', (await page.inputValue('#loc-search')) === 'cork' && (await page.inputValue('#loc-region')) === 'Republic of Ireland' && (await page.locator('.loc:visible').count()) === 1);
     await page.goto(BASE + '/clinics/chelsea/', { waitUntil: 'load' }); await ready(page);
     await page.locator('.leaflet-marker-icon').first().click({ force: true }); await page.waitForSelector('.leaflet-popup a[href^="/clinics/"]');
-    check('clicking a pin shows the name, area, address and a link to its page', (await page.locator('.leaflet-popup .rmap__pop strong').count()) === 1 && (await page.locator('.leaflet-popup .rmap__sub').count()) === 1 && (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
+    check('clicking a pin shows the kind, name, address and a link to its page', (await page.locator('.leaflet-popup .rmap__kind').count()) === 1 && (await page.locator('.leaflet-popup .rmap__pop strong').count()) === 1 && (await page.locator('.leaflet-popup a[href^="/clinics/"]').count()) === 1);
     await page.goto(BASE + '/tests/', { waitUntil: 'networkidle' });
     check('tests page has no male-versus-female comparison table', (await page.locator('table').count()) === 0);
     await ctx.close();
